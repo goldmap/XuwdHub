@@ -1,0 +1,2 @@
+-- Configuring incomplete, errors occurred!
+See also "G:/Xuwd/JniTest/app/.externalNativeBuild/cmake/debug/armeabi-v7a/CMakeFiles/CMakeOutput.log".

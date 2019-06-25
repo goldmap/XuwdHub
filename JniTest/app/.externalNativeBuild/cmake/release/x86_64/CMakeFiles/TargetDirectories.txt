@@ -1,0 +1,3 @@
+G:/Xuwd/JniTest/app/.externalNativeBuild/cmake/release/x86_64/CMakeFiles/rebuild_cache.dir
+G:/Xuwd/JniTest/app/.externalNativeBuild/cmake/release/x86_64/CMakeFiles/xuwd_lib.dir
+G:/Xuwd/JniTest/app/.externalNativeBuild/cmake/release/x86_64/CMakeFiles/edit_cache.dir
