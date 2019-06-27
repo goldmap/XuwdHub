@@ -1,0 +1,14 @@
+prefix=../../libs/x86
+exec_prefix=${prefix}
+libdir=../../libs/x86
+includedir=../../libs/x86/include
+
+Name: libavdevice
+Description: FFmpeg device handling library
+Version: 58.5.100
+Requires: 
+Requires.private: libavfilter >= 7.40.101, libavformat >= 58.20.100, libavcodec >= 58.35.100, libavutil >= 56.22.100
+Conflicts:
+Libs: -L${libdir}  -lavdevice 
+Libs.private: -lm
+Cflags: -I${includedir}

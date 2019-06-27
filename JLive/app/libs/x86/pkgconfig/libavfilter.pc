@@ -1,0 +1,14 @@
+prefix=../../libs/x86
+exec_prefix=${prefix}
+libdir=../../libs/x86
+includedir=../../libs/x86/include
+
+Name: libavfilter
+Description: FFmpeg audio/video filtering library
+Version: 7.40.101
+Requires: 
+Requires.private: libavutil >= 56.22.100
+Conflicts:
+Libs: -L${libdir}  -lavfilter 
+Libs.private: -pthread -lm
+Cflags: -I${includedir}

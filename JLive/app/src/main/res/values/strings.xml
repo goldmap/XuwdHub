@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">JLive</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="live_start">开始推流</string>
+    <string name="live_stop">停止推流</string>
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+</resources>
