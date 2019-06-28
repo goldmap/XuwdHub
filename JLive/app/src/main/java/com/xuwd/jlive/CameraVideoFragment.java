@@ -222,7 +222,7 @@ public class CameraVideoFragment extends Fragment {
             byte[] yBytes = new byte[width * height];
             //目标数组的装填到的位置
             int dstIndex = 0;
-
+/*
             //临时存储uv数据的
             byte uBytes[] = new byte[width * height / 4];
             byte vBytes[] = new byte[width * height / 4];
@@ -278,7 +278,7 @@ public class CameraVideoFragment extends Fragment {
             }
             Toast.makeText(getContext(),"... ",Toast.LENGTH_SHORT).show();
             int i=jFFmpeg.pushCameraData(yBytes, yBytes.length, uBytes, uBytes.length, vBytes, vBytes.length);
-
+*/
             image.close();
 //            Toast.makeText(getContext(),"--- "+i,Toast.LENGTH_SHORT).show();
         }
@@ -396,6 +396,7 @@ public class CameraVideoFragment extends Fragment {
     private void startLive(){
         btnLive.setText(R.string.live_stop);
         int i= jFFmpeg.init("rtmp://203.195.210.150/live/123");
+        int i= jFFmpeg.init("rtmp:///live/123");
         Toast.makeText(getContext(),"init:"+i,Toast.LENGTH_SHORT).show();
         mIsLiving=true;
     }
