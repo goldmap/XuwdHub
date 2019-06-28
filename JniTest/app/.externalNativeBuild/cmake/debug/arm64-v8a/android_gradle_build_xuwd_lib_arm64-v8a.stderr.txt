@@ -1,1 +1,0 @@
-ninja: error: 'G:/Xuwd/JniTest/app/libs/arm64-v8a/libavutil.so', needed by 'G:/Xuwd/JniTest/app/build/intermediates/cmake/debug/obj/arm64-v8a/libxuwd_lib.so', missing and no known rule to make it

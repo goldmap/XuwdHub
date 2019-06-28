@@ -1,6 +1,0 @@
-[1/2] Building C object CMakeFiles/xuwd_lib.dir/NativeSrc.c.o
-G:\Xuwd\JniTest\app\jni\NativeSrc.c:24:57: warning: format specifies type 'char *' but the argument has type 'AVCodec *' (aka 'struct AVCodec *') [-Wformat]
-    sprintf(str, "%s  AV_CODEC_ID_H264 code: %s\n",str, pCodec);
-                                             ~~         ^~~~~~
-1 warning generated.
-[2/2] Linking C shared library G:\Xuwd\JniTest\app\build\intermediates\cmake\debug\obj\x86_64\libxuwd_lib.so

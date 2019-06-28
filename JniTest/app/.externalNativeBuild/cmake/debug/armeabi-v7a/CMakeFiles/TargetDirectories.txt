@@ -1,3 +1,0 @@
-G:/Xuwd/JniTest/app/.externalNativeBuild/cmake/debug/armeabi-v7a/CMakeFiles/rebuild_cache.dir
-G:/Xuwd/JniTest/app/.externalNativeBuild/cmake/debug/armeabi-v7a/CMakeFiles/xuwd_lib.dir
-G:/Xuwd/JniTest/app/.externalNativeBuild/cmake/debug/armeabi-v7a/CMakeFiles/edit_cache.dir
