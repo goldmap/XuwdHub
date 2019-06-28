@@ -395,7 +395,6 @@ public class CameraVideoFragment extends Fragment {
     }
     private void startLive(){
         btnLive.setText(R.string.live_stop);
-        int i= jFFmpeg.init("rtmp://203.195.210.150/live/123");
         int i= jFFmpeg.init("rtmp:///live/123");
         Toast.makeText(getContext(),"init:"+i,Toast.LENGTH_SHORT).show();
         mIsLiving=true;
