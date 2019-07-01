@@ -24,6 +24,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import android.os.HandlerThread;
+import android.util.Size;
 import android.view.LayoutInflater;
 import android.view.Surface;
 import android.view.TextureView;
@@ -35,6 +37,7 @@ import android.widget.Toast;
 
 import java.nio.ByteBuffer;
 import java.util.Arrays;
+import java.util.Collections;
 
 
 /**
@@ -60,7 +63,7 @@ public class CameraFragment extends Fragment {
             mImageReader.setOnImageAvailableListener(mOnImageAvailableListener, null);
 
             //!!!!!!!!!!!!!!!!!!!!!!!!!! Joint of framework !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!//
-            igniteCamera(width, height);
+            linkCamera(width, height);
         }
 
         @Override
@@ -169,7 +172,7 @@ public class CameraFragment extends Fragment {
     private Boolean mPreviewing=false;
     private CameraDevice mCameraDevice;
     private CameraCaptureSession mPreviewSession;
-    private CaptureRequest.Builder mRequestBuilder;
+    private CaptureRequest.Builder mPreviewBuilder;
     private CameraCharacteristics mCharacteristics;
     private CameraDevice.StateCallback mStateCallback = new CameraDevice.StateCallback() {
         @Override
@@ -199,8 +202,7 @@ public class CameraFragment extends Fragment {
     };
 
     @SuppressLint("MissingPermission")
-    //触发某个相机，为其设置回调函数，该相机开始生命周期
-    private void igniteCamera(int width, int height) {
+    private void linkCamera(int width, int height) {
         Activity activity = getActivity();
         if (null == activity || activity.isFinishing()) {
             return;
@@ -211,15 +213,19 @@ public class CameraFragment extends Fragment {
             String cameraId =  manager.getCameraIdList()[0];
             mCharacteristics = manager.getCameraCharacteristics(cameraId);
             StreamConfigurationMap map = mCharacteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
-//            int mSensorOrientation = mCharacteristics.get(CameraCharacteristics.SENSOR_ORIENTATION);
+            int mSensorOrientation = mCharacteristics.get(CameraCharacteristics.SENSOR_ORIENTATION);
+//            characteristics
 //            Size mPreviewSize = getPreferredPreviewSize(map.getOutputSizes(SurfaceTexture.class), width, height);
             manager.openCamera(cameraId, mStateCallback, null);
+/*            if (map == null) {
+                throw new RuntimeException("Cannot get available preview/video sizes");
+            }
+*/
         } catch (CameraAccessException e) {
             e.printStackTrace();
         }
     }
 
-    //建立物理相机和显示设备之间的通道,并启动会话
     private void setPreviewSession() {
         if (null == mCameraDevice || !mTextureView.isAvailable()) {
             return;
@@ -232,16 +238,16 @@ public class CameraFragment extends Fragment {
             Surface previewSurface = new Surface(texture);
             Surface imageSurface = mImageReader.getSurface();
 
-            mRequestBuilder = mCameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
-            mRequestBuilder.addTarget(previewSurface);
-            mRequestBuilder.addTarget(imageSurface);
+            mPreviewBuilder = mCameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
+            mPreviewBuilder.addTarget(previewSurface);
+            mPreviewBuilder.addTarget(imageSurface);
 
             mCameraDevice.createCaptureSession(Arrays.asList(previewSurface,imageSurface),
                     new CameraCaptureSession.StateCallback() {
                         @Override
                         public void onConfigured(@NonNull CameraCaptureSession session) {
                             mPreviewSession = session;
-                            updatePreview();//会话成功就开始预览
+                            updatePreview();
                         }
 
                         @Override
@@ -262,11 +268,11 @@ public class CameraFragment extends Fragment {
             return;
         }
         try {
-            mRequestBuilder.set(CaptureRequest.CONTROL_MODE, CameraMetadata.CONTROL_MODE_AUTO);
+            mPreviewBuilder.set(CaptureRequest.CONTROL_MODE, CameraMetadata.CONTROL_MODE_AUTO);
 //            HandlerThread thread = new HandlerThread("CameraPreview");
 //            thread.start();
             mPreviewing=true;
-            mPreviewSession.setRepeatingRequest(mRequestBuilder.build(), null, null);
+            mPreviewSession.setRepeatingRequest(mPreviewBuilder.build(), null, null);
         } catch (CameraAccessException e) {
             e.printStackTrace();
         }
