@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">JPhoto</string>
+    <string name="exitCamera">退出</string>
+    <string name="previewStart">浏览</string>
+    <string name="previewClose">关闭浏览</string>
+    <string name="shoot">拍照</string>
+    <string name="recordStart">开始录像</string>
+    <string name="recordEnd">结束录像</string>
+    <string name="record">开始录像</string>
+    <string name="stop">Stop</string>
+    <string name="test">测试</string>
+    <string name="description_info">Info</string>
+    <string name="permission_request">This sample needs permission for camera and audio recording.</string>
+    <string name="camera_error">This device doesn\'t support Camera2 API.</string>
+</resources>

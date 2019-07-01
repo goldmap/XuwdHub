@@ -91,8 +91,8 @@ public class CameraVideoFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         mContext=view.getContext();
         jFFmpeg =  JFFmpeg.getInstance();
-//        TextView tv = view.findViewById(R.id.testView);
-//        tv.setText(jFFmpeg.getFFmpegInfo());
+        int i= jFFmpeg.init("rtmp://203.195.210.150/live/123");
+        Toast.makeText(getContext(),"init:"+i,Toast.LENGTH_SHORT).show();
 
         mImageView=view.findViewById(R.id.testView);
 
@@ -148,8 +148,6 @@ public class CameraVideoFragment extends Fragment {
         @Override
         public void onSurfaceTextureUpdated(SurfaceTexture surfaceTexture) {
 /*
-           String pre=String.valueOf(mIsLiving);
-
             String str;
             if(bNow){
                 bNow=false;
@@ -158,26 +156,9 @@ public class CameraVideoFragment extends Fragment {
                 bNow=true;
                 str="----";
             }
-
-            if(mIsLiving==false){
-                Toast.makeText(getActivity(),str+pre,Toast.LENGTH_SHORT).show();
-            }
-            return;
 */
             mBitmap=mTextureView.getBitmap();
 //            mImageView.setImageBitmap(bitmap);
-            /*
-            if(mIsLiving==true){
-                ByteArrayOutputStream byteOs = new ByteArrayOutputStream();
-                bitmap.compress(Bitmap.CompressFormat.PNG, 100,byteOs);
-                byte[] bytes=byteOs.toByteArray();
-                ((ByteBuffer) yuvImage.image[0].position(0)).put(bytes);
-                try {
-                    mFFmpegRecorder.record(yuvImage);
-                } catch (FrameRecorder.Exception e) {
-                    e.printStackTrace();
-                }
-            }*/
         }
     };
 
@@ -208,21 +189,16 @@ public class CameraVideoFragment extends Fragment {
 //            Bitmap bmp = Bitmap.createBitmap(bmpWidth*k,height*k, Bitmap.Config.ARGB_8888);
             Bitmap bmp = Bitmap.createBitmap(bmpWidth,height, Bitmap.Config.ALPHA_8);
             buffer.rewind();
-            buffer.position(0);
             bmp.copyPixelsFromBuffer(buffer);
 
             mImageView.setImageBitmap(bmp);
 //            mImageView.setImageBitmap(mBitmap);
 
 //          数据有效宽度，一般的图片 width <= rowStride，这也是导致byte[].length <= capacity的原因,所以我们只取width部分
-            Toast.makeText(getContext(),"Living:"+width+","+height,Toast.LENGTH_SHORT).show();
-            Toast.makeText(getContext(),"view:"+mTextureWidth+","+mTextureHeight,Toast.LENGTH_SHORT).show();
-
             //此处用来装填最终的YUV数据，需要1.5倍的图片大小，因为Y U V 比例为 4:1:1
             byte[] yBytes = new byte[width * height];
-            //目标数组的装填到的位置
             int dstIndex = 0;
-/*
+
             //临时存储uv数据的
             byte uBytes[] = new byte[width * height / 4];
             byte vBytes[] = new byte[width * height / 4];
@@ -234,7 +210,7 @@ public class CameraVideoFragment extends Fragment {
                 rowStride = planes[i].getRowStride();
 
                 buffer = planes[i].getBuffer();
-
+                buffer.rewind();
                 //如果pixelsStride==2，一般的Y的buffer长度=640*480，UV的长度=640*480/2-1
                 //源数据的索引，y的数据是byte中连续的，u的数据是v向左移以为生成的，两者都是偶数位为有效数据
                 byte[] bytes = new byte[buffer.capacity()];
@@ -278,7 +254,7 @@ public class CameraVideoFragment extends Fragment {
             }
             Toast.makeText(getContext(),"... ",Toast.LENGTH_SHORT).show();
             int i=jFFmpeg.pushCameraData(yBytes, yBytes.length, uBytes, uBytes.length, vBytes, vBytes.length);
-*/
+
             image.close();
 //            Toast.makeText(getContext(),"--- "+i,Toast.LENGTH_SHORT).show();
         }
@@ -395,13 +371,11 @@ public class CameraVideoFragment extends Fragment {
     }
     private void startLive(){
         btnLive.setText(R.string.live_stop);
-        int i= jFFmpeg.init("rtmp:///live/123");
-        Toast.makeText(getContext(),"init:"+i,Toast.LENGTH_SHORT).show();
         mIsLiving=true;
     }
     private void stopLive(){
         btnLive.setText(R.string.live_start);
-        jFFmpeg.close();
+//        jFFmpeg.close();
         mIsLiving=false;
     }
     @Override

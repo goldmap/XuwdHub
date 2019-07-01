@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">JVideo</string>
+    <string name="previewOpen">打开浏览</string>
+    <string name="previewClose">关闭浏览</string>
+    <string name="shoot">拍照</string>
+    <string name="recordStart">开始录像</string>
+    <string name="recordEnd">结束录像</string>
+
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="record">开始录像</string>
+    <string name="stop">Stop</string>
+    <string name="description_info">Info</string>
+    <string name="permission_request">This sample needs permission for camera and audio recording.</string>
+    <string name="camera_error">This device doesn\'t support Camera2 API.</string>
+</resources>
