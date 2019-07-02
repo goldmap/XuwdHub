@@ -4,8 +4,6 @@ package com.xuwd.jphoto;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.ImageFormat;
 import android.graphics.SurfaceTexture;
 import android.hardware.camera2.CameraAccessException;
@@ -26,6 +24,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Surface;
 import android.view.TextureView;
@@ -152,6 +151,14 @@ public class CameraFragment extends Fragment {
             }
         });
 
+        Button btnCapture=view.findViewById(R.id.btnCapture);
+        btnCapture.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                lockFocus();
+            }
+        });
+
         final Button btnPreview = view.findViewById(R.id.btnPreview);
         btnPreview.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -243,37 +250,38 @@ public class CameraFragment extends Fragment {
             //建立浏览会话，应该怎样对待ImageReader呢？ 应该先不投射--------------------？？？？
             Surface imageSurface = mImageReader.getSurface();
             //mRequestBuilder.addTarget(imageSurface);
-            //创建会话
-            mCameraDevice.createCaptureSession(Arrays.asList(previewSurface,imageSurface),
-                    new CameraCaptureSession.StateCallback() {
-                        @Override
-                        public void onConfigured(@NonNull CameraCaptureSession session) {
-                            mCaptureSession = session;
-                            try {
-                                // Auto focus & flash should be continuous for camera preview.
-                                mRequestBuilder.set(CaptureRequest.CONTROL_AF_MODE,CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_PICTURE);
-                                mRequestBuilder.set(CaptureRequest.CONTROL_AE_MODE,CaptureRequest.CONTROL_AE_MODE_ON_AUTO_FLASH);
-                                //            HandlerThread thread = new HandlerThread("CameraPreview");
-                                //            thread.start();
-                                //启动请求-------------------！！！！
-                                mCaptureSession.setRepeatingRequest(mRequestBuilder.build(),mCaptureCallback,null);
-                            } catch (CameraAccessException e) {
-                                e.printStackTrace();
-                            }
-                        }
-
-                        @Override
-                        public void onConfigureFailed(@NonNull CameraCaptureSession session) {
-                            Activity activity = getActivity();
-                            if (null != activity) {
-                                Toast.makeText(activity, "CaptureSession Failed", Toast.LENGTH_SHORT).show();
-                            }
-                        }
-                    }, null);
+            //创建会话，似乎跟mRequestBuilder无关
+            mCameraDevice.createCaptureSession(Arrays.asList(previewSurface,imageSurface),sessionCallback,null);
         } catch (CameraAccessException e) {
             e.printStackTrace();
         }
     }
+    //**************************** CameraCaptureSession ****************************//
+    CameraCaptureSession.StateCallback sessionCallback =  new CameraCaptureSession.StateCallback() {
+        @Override
+        public void onConfigured(@NonNull CameraCaptureSession session) {
+            mCaptureSession = session;//向外暴露会话的句柄
+            try {
+                // Auto focus & flash should be continuous for camera preview.
+                mRequestBuilder.set(CaptureRequest.CONTROL_AF_MODE,CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_PICTURE);
+                mRequestBuilder.set(CaptureRequest.CONTROL_AE_MODE,CaptureRequest.CONTROL_AE_MODE_ON_AUTO_FLASH);
+                //            HandlerThread thread = new HandlerThread("CameraPreview");
+                //            thread.start();
+                //启动请求-------------------！！！！
+                mCaptureSession.setRepeatingRequest(mRequestBuilder.build(), captureRequestCallback,null);
+            } catch (CameraAccessException e) {
+                e.printStackTrace();
+            }
+        }
+
+        @Override
+        public void onConfigureFailed(@NonNull CameraCaptureSession session) {
+            Activity activity = getActivity();
+            if (null != activity) {
+                Toast.makeText(activity, "CaptureSession Failed", Toast.LENGTH_SHORT).show();
+            }
+        }
+    };
 
     private void closePreviewSession() {
         if (mCaptureSession != null) {
@@ -281,14 +289,18 @@ public class CameraFragment extends Fragment {
             mCaptureSession = null;
         }
     }
-
-    private CameraCaptureSession.CaptureCallback mCaptureCallback
+    //**************************** CaptureRequest ****************************//
+    private CameraCaptureSession.CaptureCallback captureRequestCallback
             = new CameraCaptureSession.CaptureCallback() {
 
         private void process(CaptureResult result) {
             switch (mState) {
                 case STATE_PREVIEW: {
                     // We have nothing to do when the camera preview is working normally.
+                    break;
+                }
+                case STATE_WAITING_LOCK: {
+                    captureStillPicture();
                     break;
                 }
             }
@@ -308,4 +320,73 @@ public class CameraFragment extends Fragment {
         }
     };
 
+    private void lockFocus(){
+        try {
+            // This is how to tell the camera to lock focus.
+            mRequestBuilder.set(CaptureRequest.CONTROL_AF_TRIGGER,CameraMetadata.CONTROL_AF_TRIGGER_START);
+            // Tell #mCaptureCallback to wait for the lock.
+            mState = STATE_WAITING_LOCK;
+            mCaptureSession.capture(mRequestBuilder.build(), captureRequestCallback,null);
+        } catch (CameraAccessException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void unlockFocus() {
+        try {
+            // Reset the auto-focus trigger
+            mRequestBuilder.set(CaptureRequest.CONTROL_AF_TRIGGER,
+                    CameraMetadata.CONTROL_AF_TRIGGER_CANCEL);
+            mRequestBuilder.set(CaptureRequest.CONTROL_AE_MODE,
+                    CaptureRequest.CONTROL_AE_MODE_ON_AUTO_FLASH);
+            mCaptureSession.capture(mRequestBuilder.build(), captureRequestCallback,
+                    null);
+            // After this, the camera will go back to the normal state of preview.
+            mState = STATE_PREVIEW;
+            mCaptureSession.setRepeatingRequest(mRequestBuilder.build(), captureRequestCallback,
+                    null);
+        } catch (CameraAccessException e) {
+            e.printStackTrace();
+        }
+    }
+    private void captureStillPicture() {
+        try {
+            final Activity activity = getActivity();
+            if (null == activity || null == mCameraDevice) {
+                return;
+            }
+            // This is the CaptureRequest.Builder that we use to take a picture.
+            final CaptureRequest.Builder captureBuilder =
+                    mCameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_STILL_CAPTURE);
+            captureBuilder.addTarget(mImageReader.getSurface());
+
+            // Use the same AE and AF modes as the preview.
+            captureBuilder.set(CaptureRequest.CONTROL_AF_MODE,
+                    CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_PICTURE);
+            captureBuilder.set(CaptureRequest.CONTROL_AE_MODE,
+                    CaptureRequest.CONTROL_AE_MODE_ON_AUTO_FLASH);
+
+            // Orientation
+            //int rotation = activity.getWindowManager().getDefaultDisplay().getRotation();
+            //captureBuilder.set(CaptureRequest.JPEG_ORIENTATION, getOrientation(rotation));
+
+            CameraCaptureSession.CaptureCallback CaptureCallback
+                    = new CameraCaptureSession.CaptureCallback() {
+
+                @Override
+                public void onCaptureCompleted(@NonNull CameraCaptureSession session,
+                                               @NonNull CaptureRequest request,
+                                               @NonNull TotalCaptureResult result) {
+                    //showToast("Saved: " + mFile);
+                    unlockFocus();
+                }
+            };
+
+            mCaptureSession.stopRepeating();
+            mCaptureSession.abortCaptures();
+            mCaptureSession.capture(captureBuilder.build(), CaptureCallback, null);
+        } catch (CameraAccessException e) {
+            e.printStackTrace();
+        }
+    }
 }

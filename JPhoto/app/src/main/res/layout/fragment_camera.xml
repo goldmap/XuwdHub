@@ -34,6 +34,12 @@
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="left"
+            android:id="@+id/btnCapture"
+            android:text="@string/shoot" />
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_gravity="right"
             android:id="@+id/btnExit"
             android:text="@string/exitCamera" />
