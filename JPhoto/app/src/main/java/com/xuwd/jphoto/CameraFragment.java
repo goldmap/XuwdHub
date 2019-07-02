@@ -15,6 +15,8 @@ import android.hardware.camera2.CameraDevice;
 import android.hardware.camera2.CameraManager;
 import android.hardware.camera2.CameraMetadata;
 import android.hardware.camera2.CaptureRequest;
+import android.hardware.camera2.CaptureResult;
+import android.hardware.camera2.TotalCaptureResult;
 import android.hardware.camera2.params.StreamConfigurationMap;
 import android.media.Image;
 import android.media.ImageReader;
@@ -41,7 +43,11 @@ import java.util.Arrays;
  * A simple {@link Fragment} subclass.
  */
 public class CameraFragment extends Fragment {
+    private static final int STATE_PREVIEW = 0;
+    private static final int STATE_WAITING_LOCK = 1;
+    private static final int STATE_WAITING_PRECAPTURE = 2;
 
+    private int mState = STATE_PREVIEW;
     private ImageView mImageView;
     //**************************** TextureView ****************************//
     private TextureView mTextureView;
@@ -169,7 +175,7 @@ public class CameraFragment extends Fragment {
     //**************************** CameraDevice ****************************//
     private Boolean mPreviewing=false;
     private CameraDevice mCameraDevice;
-    private CameraCaptureSession mPreviewSession;
+    private CameraCaptureSession mCaptureSession;
     private CaptureRequest.Builder mRequestBuilder;
     private CameraCharacteristics mCharacteristics;
     private CameraDevice.StateCallback mStateCallback = new CameraDevice.StateCallback() {
@@ -220,7 +226,7 @@ public class CameraFragment extends Fragment {
         }
     }
 
-    //建立物理相机和显示设备之间的通道,并启动会话
+    //建立物理相机和显示设备之间的通道，创建会话（设置会话的回调函数），通过会话启动“会话请求”Request
     private void setPreviewSession() {
         if (null == mCameraDevice || !mTextureView.isAvailable()) {
             return;
@@ -231,18 +237,29 @@ public class CameraFragment extends Fragment {
             assert texture != null;
             texture.setDefaultBufferSize(mTextureWidth,mTextureHeight);
             Surface previewSurface = new Surface(texture);
-            Surface imageSurface = mImageReader.getSurface();
 
             mRequestBuilder = mCameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
             mRequestBuilder.addTarget(previewSurface);
-            mRequestBuilder.addTarget(imageSurface);
-
+            //建立浏览会话，应该怎样对待ImageReader呢？ 应该先不投射--------------------？？？？
+            Surface imageSurface = mImageReader.getSurface();
+            //mRequestBuilder.addTarget(imageSurface);
+            //创建会话
             mCameraDevice.createCaptureSession(Arrays.asList(previewSurface,imageSurface),
                     new CameraCaptureSession.StateCallback() {
                         @Override
                         public void onConfigured(@NonNull CameraCaptureSession session) {
-                            mPreviewSession = session;
-                            updatePreview();//会话成功就开始预览
+                            mCaptureSession = session;
+                            try {
+                                // Auto focus & flash should be continuous for camera preview.
+                                mRequestBuilder.set(CaptureRequest.CONTROL_AF_MODE,CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_PICTURE);
+                                mRequestBuilder.set(CaptureRequest.CONTROL_AE_MODE,CaptureRequest.CONTROL_AE_MODE_ON_AUTO_FLASH);
+                                //            HandlerThread thread = new HandlerThread("CameraPreview");
+                                //            thread.start();
+                                //启动请求-------------------！！！！
+                                mCaptureSession.setRepeatingRequest(mRequestBuilder.build(),mCaptureCallback,null);
+                            } catch (CameraAccessException e) {
+                                e.printStackTrace();
+                            }
                         }
 
                         @Override
@@ -258,26 +275,37 @@ public class CameraFragment extends Fragment {
         }
     }
 
-    private void updatePreview() {
-        if (null == mCameraDevice) {
-            return;
-        }
-        try {
-            mRequestBuilder.set(CaptureRequest.CONTROL_MODE, CameraMetadata.CONTROL_MODE_AUTO);
-//            HandlerThread thread = new HandlerThread("CameraPreview");
-//            thread.start();
-            mPreviewing=true;
-            mPreviewSession.setRepeatingRequest(mRequestBuilder.build(), null, null);
-        } catch (CameraAccessException e) {
-            e.printStackTrace();
+    private void closePreviewSession() {
+        if (mCaptureSession != null) {
+            mCaptureSession.close();
+            mCaptureSession = null;
         }
     }
 
-    private void closePreviewSession() {
-        if (mPreviewSession != null) {
-            mPreviewSession.close();
-            mPreviewSession = null;
+    private CameraCaptureSession.CaptureCallback mCaptureCallback
+            = new CameraCaptureSession.CaptureCallback() {
+
+        private void process(CaptureResult result) {
+            switch (mState) {
+                case STATE_PREVIEW: {
+                    // We have nothing to do when the camera preview is working normally.
+                    break;
+                }
+            }
         }
-    }
+
+        @Override
+        public void onCaptureProgressed(@NonNull CameraCaptureSession session,
+                                        @NonNull CaptureRequest request,
+                                        @NonNull CaptureResult partialResult) {
+            process(partialResult);
+        }
+        @Override
+        public void onCaptureCompleted(@NonNull CameraCaptureSession session,
+                                       @NonNull CaptureRequest request,
+                                       @NonNull TotalCaptureResult result) {
+            process(result);
+        }
+    };
 
 }
