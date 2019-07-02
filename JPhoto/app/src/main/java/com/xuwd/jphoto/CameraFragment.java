@@ -96,10 +96,11 @@ public class CameraFragment extends Fragment {
             int pixelStride,rowStride,rowPadding,width,height;
             Image.Plane[] planes = image.getPlanes();
             ByteBuffer buffer = planes[0].getBuffer();
+            buffer.rewind();
 
             byte[] bytes = new byte[buffer.remaining()];
-            Bitmap temp = BitmapFactory.decodeByteArray(bytes,0,bytes.length);
-            Bitmap bmp = Bitmap.createBitmap(640,480,temp.getConfig());
+//            Bitmap temp = BitmapFactory.decodeByteArray(bytes,0,bytes.length);
+//            Bitmap bmp = Bitmap.createBitmap(640,480,temp.getConfig());
 /*
             width = image.getWidth();
             height = image.getHeight();
@@ -112,7 +113,7 @@ public class CameraFragment extends Fragment {
 //            Bitmap bmp = Bitmap.createBitmap(bmpWidth,height, Bitmap.Config.ALPHA_8);
             bmp.copyPixelsFromBuffer(buffer);
 */
-            mImageView.setImageBitmap(bmp);
+//            mImageView.setImageBitmap(bmp);
 
             image.close();
 //            Toast.makeText(getContext(),"--- "+i,Toast.LENGTH_SHORT).show();
