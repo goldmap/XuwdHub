@@ -7,6 +7,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.ImageFormat;
+import android.graphics.PixelFormat;
 import android.graphics.SurfaceTexture;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraCaptureSession;
@@ -48,6 +49,7 @@ import java.util.concurrent.TimeUnit;
  * A simple {@link Fragment} subclass.
  */
 public class CameraFragment extends Fragment {
+    private Bitmap mBmp;
     private static final int STATE_PREVIEW = 0;
     private static final int STATE_WAITING_LOCK = 1;
     private static final int STATE_WAITING_PRECAPTURE = 2;
@@ -86,7 +88,8 @@ public class CameraFragment extends Fragment {
 
         @Override
         public void onSurfaceTextureUpdated(SurfaceTexture surfaceTexture) {
-
+            mBmp= mTextureView.getBitmap();
+            mImageView.setImageBitmap(mBmp);
             //int rotation = getActivity().getWindowManager().getDefaultDisplay().getRotation();
             //Toast.makeText(getContext(),"Rot:"+rotation,Toast.LENGTH_SHORT).show();
         }
@@ -102,29 +105,37 @@ public class CameraFragment extends Fragment {
             Image image = reader.acquireLatestImage();
 
             int pixelStride,rowStride,rowPadding,width,height;
+            width=640;
+            height=480;
             Image.Plane[] planes = image.getPlanes();
             ByteBuffer buffer = planes[0].getBuffer();
-            buffer.rewind();
             byte[] bytes = new byte[buffer.remaining()];
-            buffer.get(bytes);
+            buffer.get(bytes);//由缓冲区存入字节数组
 
-            Bitmap srcBmp = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
-            Bitmap bmp=Bitmap.createScaledBitmap(srcBmp,320,240,false);
-            mImageView.setImageBitmap(bmp);
+            Bitmap bmp = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+//            mImageView.setImageBitmap(bmp);
+//            mImageView.setImageBitmap(mBmp);
 
+/*
+            pixelStride = planes[0].getPixelStride();
+            rowStride = planes[0].getRowStride();
+            rowPadding = rowStride - pixelStride * width;
+            Bitmap bmp = Bitmap.createBitmap(width + rowPadding / pixelStride,
+                    height, Bitmap.Config.ARGB_8888);
+
+            bmp.copyPixelsFromBuffer(buffer);
+            Bitmap cmp = Bitmap.createBitmap(bmp, 0, 0, width, height);
+            mImageView.setImageBitmap(cmp);
+            //            buffer.rewind();
+*/        ;
 //            Bitmap temp = BitmapFactory.decodeByteArray(bytes,0,bytes.length);
 //            Bitmap bmp = Bitmap.createBitmap(640,480,temp.getConfig());
 /*
             width = image.getWidth();
             height = image.getHeight();
 
-            pixelStride = planes[0].getPixelStride();
-            rowStride = planes[0].getRowStride();
-            rowPadding = rowStride - pixelStride * width;
             int bmpWidth=width + rowPadding / pixelStride;
 
-//            Bitmap bmp = Bitmap.createBitmap(bmpWidth,height, Bitmap.Config.ALPHA_8);
-            bmp.copyPixelsFromBuffer(buffer);
 */
 //            mImageView.setImageBitmap(bmp);
 
@@ -271,8 +282,9 @@ public class CameraFragment extends Fragment {
             StreamConfigurationMap map = mCharacteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
 //            int mSensorOrientation = mCharacteristics.get(CameraCharacteristics.SENSOR_ORIENTATION);
             Size imageSize = map.getOutputSizes(ImageFormat.JPEG)[0];
+            mImageReader = ImageReader.newInstance(1080, 640, ImageFormat.JPEG, 2);
 //            mImageReader = ImageReader.newInstance(640, 480, ImageFormat.YUV_420_888, 1);
-            mImageReader = ImageReader.newInstance(imageSize.getWidth(), imageSize.getHeight(), ImageFormat.JPEG, 2);
+//            mImageReader = ImageReader.newInstance(imageSize.getWidth(), imageSize.getHeight(), ImageFormat.JPEG, 2);
             mImageReader.setOnImageAvailableListener(mOnImageAvailableListener, mBackgroundHandler);
 
             try {
