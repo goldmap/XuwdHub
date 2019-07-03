@@ -4,6 +4,8 @@ package com.xuwd.jphoto;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.ImageFormat;
 import android.graphics.SurfaceTexture;
 import android.hardware.camera2.CameraAccessException;
@@ -26,6 +28,7 @@ import androidx.fragment.app.Fragment;
 
 import android.os.Handler;
 import android.os.HandlerThread;
+import android.util.Size;
 import android.view.LayoutInflater;
 import android.view.Surface;
 import android.view.TextureView;
@@ -37,6 +40,8 @@ import android.widget.Toast;
 
 import java.nio.ByteBuffer;
 import java.util.Arrays;
+import java.util.concurrent.Semaphore;
+import java.util.concurrent.TimeUnit;
 
 
 /**
@@ -63,9 +68,6 @@ public class CameraFragment extends Fragment {
             mTextureWidth=width;
             mTextureHeight=height;
             Toast.makeText(getContext(), "TextutrView: On", Toast.LENGTH_SHORT).show();
-//            mImageReader = ImageReader.newInstance(640, 480, ImageFormat.YUV_420_888, 1);
-            mImageReader = ImageReader.newInstance(640, 480, ImageFormat.JPEG, 1);
-            mImageReader.setOnImageAvailableListener(mOnImageAvailableListener, mBackgroundHandler);
 
             //!!!!!!!!!!!!!!!!!!!!!!!!!! Joint of framework !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!//
             igniteCamera(width, height);
@@ -98,15 +100,18 @@ public class CameraFragment extends Fragment {
         public void onImageAvailable(ImageReader reader) {
 //            mBackgroundHandler.post(new ImageSaver(reader.acquireNextImage(), mFile));
             Image image = reader.acquireLatestImage();
-            if (image == null) {
-                return;
-            }
+
             int pixelStride,rowStride,rowPadding,width,height;
             Image.Plane[] planes = image.getPlanes();
             ByteBuffer buffer = planes[0].getBuffer();
             buffer.rewind();
-
             byte[] bytes = new byte[buffer.remaining()];
+            buffer.get(bytes);
+
+            Bitmap srcBmp = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+            Bitmap bmp=Bitmap.createScaledBitmap(srcBmp,320,240,false);
+            mImageView.setImageBitmap(bmp);
+
 //            Bitmap temp = BitmapFactory.decodeByteArray(bytes,0,bytes.length);
 //            Bitmap bmp = Bitmap.createBitmap(640,480,temp.getConfig());
 /*
@@ -218,6 +223,7 @@ public class CameraFragment extends Fragment {
         }
     }
     //**************************** CameraDevice ****************************//
+    private Semaphore mCameraOpenCloseLock = new Semaphore(1);
     private Boolean mPreviewing=false;
     private CameraDevice mCameraDevice;
     private CameraCaptureSession mCaptureSession;
@@ -227,20 +233,20 @@ public class CameraFragment extends Fragment {
         @Override
         public void onOpened(@NonNull CameraDevice cameraDevice) {
             mCameraDevice = cameraDevice;//!!!!!!!! Joint of framework !!!!!!
-//            mCameraOpenCloseLock.release();
+            mCameraOpenCloseLock.release();
 //            configureTransform(mTextureView.getWidth(), mTextureView.getHeight());
             setPreviewSession();
         }
 
         @Override
         public void onDisconnected(@NonNull CameraDevice cameraDevice) {
-//            mCameraOpenCloseLock.release();
+            mCameraOpenCloseLock.release();
             cameraDevice.close();
             mCameraDevice = null;
         }
         @Override
         public void onError(@NonNull CameraDevice cameraDevice, int error) {
-//            mCameraOpenCloseLock.release();
+            mCameraOpenCloseLock.release();
             cameraDevice.close();
             mCameraDevice = null;
             Activity activity = getActivity();
@@ -264,10 +270,43 @@ public class CameraFragment extends Fragment {
             mCharacteristics = manager.getCameraCharacteristics(cameraId);
             StreamConfigurationMap map = mCharacteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
 //            int mSensorOrientation = mCharacteristics.get(CameraCharacteristics.SENSOR_ORIENTATION);
-//            Size mPreviewSize = getPreferredPreviewSize(map.getOutputSizes(SurfaceTexture.class), width, height);
+            Size imageSize = map.getOutputSizes(ImageFormat.JPEG)[0];
+//            mImageReader = ImageReader.newInstance(640, 480, ImageFormat.YUV_420_888, 1);
+            mImageReader = ImageReader.newInstance(imageSize.getWidth(), imageSize.getHeight(), ImageFormat.JPEG, 2);
+            mImageReader.setOnImageAvailableListener(mOnImageAvailableListener, mBackgroundHandler);
+
+            try {
+                if (!mCameraOpenCloseLock.tryAcquire(2500, TimeUnit.MILLISECONDS)) {
+                    throw new RuntimeException("Time out waiting to lock camera opening.");
+                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
             manager.openCamera(cameraId, cameraStateCallback, mBackgroundHandler);
         } catch (CameraAccessException e) {
             e.printStackTrace();
+        }
+    }
+
+    private void closeCamera() {
+        try {
+            mCameraOpenCloseLock.acquire();
+            if (null != mCaptureSession) {
+                mCaptureSession.close();
+                mCaptureSession = null;
+            }
+            if (null != mCameraDevice) {
+                mCameraDevice.close();
+                mCameraDevice = null;
+            }
+            if (null != mImageReader) {
+                mImageReader.close();
+                mImageReader = null;
+            }
+        } catch (InterruptedException e) {
+            throw new RuntimeException("Interrupted while trying to lock camera closing.", e);
+        } finally {
+            mCameraOpenCloseLock.release();
         }
     }
 
@@ -329,11 +368,12 @@ public class CameraFragment extends Fragment {
         }
     }
     //*****************通过Session启动的Capture.Request 的共用回调***********************//
+    //用真机调试通过，afState=5
     private CameraCaptureSession.CaptureCallback captureRequestCallback
             = new CameraCaptureSession.CaptureCallback() {
 
         private void process(CaptureResult result) {
-            Toast.makeText(getContext(),"mState"+mState,Toast.LENGTH_SHORT).show();
+//            Toast.makeText(getContext(),"mState"+mState,Toast.LENGTH_SHORT).show();
             switch (mState) {
                 case STATE_PREVIEW: {
 //                    Toast.makeText(getContext(),"previewing",Toast.LENGTH_SHORT).show();
@@ -342,14 +382,17 @@ public class CameraFragment extends Fragment {
                 }
                 case STATE_WAITING_LOCK: {
                     Integer afState = result.get(CaptureResult.CONTROL_AF_STATE);
+                    Integer aeState = result.get(CaptureResult.CONTROL_AE_STATE);
+                    Toast.makeText(getContext(),"af/aeState:"+afState+"/"+aeState,Toast.LENGTH_SHORT).show();
+
                     if (afState == null) {
                         captureStillPicture();
                     } else if (CaptureResult.CONTROL_AF_STATE_FOCUSED_LOCKED == afState ||
-                            CaptureResult.CONTROL_AF_STATE_NOT_FOCUSED_LOCKED == afState) {
+                            CaptureResult.CONTROL_AF_STATE_NOT_FOCUSED_LOCKED == afState ||
+                            CaptureResult.CONTROL_AF_STATE_PASSIVE_SCAN == afState) {
                         // CONTROL_AE_STATE can be null on some devices
-                        Integer aeState = result.get(CaptureResult.CONTROL_AE_STATE);
-                        if (aeState == null ||
-                                aeState == CaptureResult.CONTROL_AE_STATE_CONVERGED) {
+//                        Integer aeState = result.get(CaptureResult.CONTROL_AE_STATE);
+                        if (aeState == null || aeState == CaptureResult.CONTROL_AE_STATE_CONVERGED) {
                             mState = STATE_PICTURE_TAKEN;
                             captureStillPicture();
                         } else {
