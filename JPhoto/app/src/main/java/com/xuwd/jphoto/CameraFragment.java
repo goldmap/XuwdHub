@@ -88,8 +88,9 @@ public class CameraFragment extends Fragment {
 
         @Override
         public void onSurfaceTextureUpdated(SurfaceTexture surfaceTexture) {
-            mBmp= mTextureView.getBitmap();
-            mImageView.setImageBitmap(mBmp);
+//            mBmp= mTextureView.getBitmap();
+            if(mBmp!=null)
+                mImageView.setImageBitmap(mBmp);
             //int rotation = getActivity().getWindowManager().getDefaultDisplay().getRotation();
             //Toast.makeText(getContext(),"Rot:"+rotation,Toast.LENGTH_SHORT).show();
         }
@@ -101,46 +102,39 @@ public class CameraFragment extends Fragment {
 
         @Override
         public void onImageAvailable(ImageReader reader) {
-//            mBackgroundHandler.post(new ImageSaver(reader.acquireNextImage(), mFile));
-            Image image = reader.acquireLatestImage();
+            //子线程抛出，是对的
+            //         mBackgroundHandler.post(new ImageSaver(reader.acquireNextImage(), mFile));
+            Image image = reader.acquireNextImage();
+//            Image image = reader.acquireLatestImage();
 
             int pixelStride,rowStride,rowPadding,width,height;
-            width=640;
-            height=480;
+            width = image.getWidth();
+            height = image.getHeight();
             Image.Plane[] planes = image.getPlanes();
             ByteBuffer buffer = planes[0].getBuffer();
+ /*
+            //方法1 ，OK
             byte[] bytes = new byte[buffer.remaining()];
             buffer.get(bytes);//由缓冲区存入字节数组
 
             Bitmap bmp = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
-//            mImageView.setImageBitmap(bmp);
-//            mImageView.setImageBitmap(mBmp);
-
-/*
+            mBmp=bmp;
+*/
+          //方法2
             pixelStride = planes[0].getPixelStride();
             rowStride = planes[0].getRowStride();
             rowPadding = rowStride - pixelStride * width;
-            Bitmap bmp = Bitmap.createBitmap(width + rowPadding / pixelStride,
-                    height, Bitmap.Config.ARGB_8888);
-
-            bmp.copyPixelsFromBuffer(buffer);
-            Bitmap cmp = Bitmap.createBitmap(bmp, 0, 0, width, height);
-            mImageView.setImageBitmap(cmp);
-            //            buffer.rewind();
-*/        ;
-//            Bitmap temp = BitmapFactory.decodeByteArray(bytes,0,bytes.length);
-//            Bitmap bmp = Bitmap.createBitmap(640,480,temp.getConfig());
-/*
-            width = image.getWidth();
-            height = image.getHeight();
-
             int bmpWidth=width + rowPadding / pixelStride;
 
-*/
-//            mImageView.setImageBitmap(bmp);
+            Bitmap cmp = Bitmap.createBitmap(bmpWidth, height, Bitmap.Config.ARGB_8888);
+            cmp.copyPixelsFromBuffer(buffer);
+            mBmp=cmp;
+//            Bitmap cmp = Bitmap.createBitmap(bmp, 0, 0, bmpwidth, height);
+            buffer.rewind();
+        ;
+//            mImageView.setImageBitmap(bmp);  //子线程不能操作UI
 
             image.close();
-//            Toast.makeText(getContext(),"--- "+i,Toast.LENGTH_SHORT).show();
         }
 
 
