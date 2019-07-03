@@ -24,7 +24,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Surface;
 import android.view.TextureView;
@@ -45,8 +44,10 @@ public class CameraFragment extends Fragment {
     private static final int STATE_PREVIEW = 0;
     private static final int STATE_WAITING_LOCK = 1;
     private static final int STATE_WAITING_PRECAPTURE = 2;
-
+    private static final int STATE_WAITING_NON_PRECAPTURE = 3;
+    private static final int STATE_PICTURE_TAKEN = 4;
     private int mState = STATE_PREVIEW;
+
     private ImageView mImageView;
     //**************************** TextureView ****************************//
     private TextureView mTextureView;
@@ -183,9 +184,9 @@ public class CameraFragment extends Fragment {
     private Boolean mPreviewing=false;
     private CameraDevice mCameraDevice;
     private CameraCaptureSession mCaptureSession;
-    private CaptureRequest.Builder mRequestBuilder;
+    private CaptureRequest.Builder mPreviewRequestBuilder;
     private CameraCharacteristics mCharacteristics;
-    private CameraDevice.StateCallback mStateCallback = new CameraDevice.StateCallback() {
+    private CameraDevice.StateCallback cameraStateCallback = new CameraDevice.StateCallback() {
         @Override
         public void onOpened(@NonNull CameraDevice cameraDevice) {
             mCameraDevice = cameraDevice;//!!!!!!!! Joint of framework !!!!!!
@@ -227,7 +228,7 @@ public class CameraFragment extends Fragment {
             StreamConfigurationMap map = mCharacteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
 //            int mSensorOrientation = mCharacteristics.get(CameraCharacteristics.SENSOR_ORIENTATION);
 //            Size mPreviewSize = getPreferredPreviewSize(map.getOutputSizes(SurfaceTexture.class), width, height);
-            manager.openCamera(cameraId, mStateCallback, null);
+            manager.openCamera(cameraId, cameraStateCallback, null);
         } catch (CameraAccessException e) {
             e.printStackTrace();
         }
@@ -245,30 +246,30 @@ public class CameraFragment extends Fragment {
             texture.setDefaultBufferSize(mTextureWidth,mTextureHeight);
             Surface previewSurface = new Surface(texture);
 
-            mRequestBuilder = mCameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
-            mRequestBuilder.addTarget(previewSurface);
-            //建立浏览会话，应该怎样对待ImageReader呢？ 应该先不投射--------------------？？？？
+            //建立投射通道
+            mPreviewRequestBuilder = mCameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
+            mPreviewRequestBuilder.addTarget(previewSurface);
+
+            //创建会话，为什么要把ImageReader的surface关联进去？
             Surface imageSurface = mImageReader.getSurface();
-            //mRequestBuilder.addTarget(imageSurface);
-            //创建会话，似乎跟mRequestBuilder无关
-            mCameraDevice.createCaptureSession(Arrays.asList(previewSurface,imageSurface),sessionCallback,null);
+            mCameraDevice.createCaptureSession(Arrays.asList(previewSurface,imageSurface), sessionStateCallback,null);
         } catch (CameraAccessException e) {
             e.printStackTrace();
         }
     }
     //**************************** CameraCaptureSession ****************************//
-    CameraCaptureSession.StateCallback sessionCallback =  new CameraCaptureSession.StateCallback() {
+    CameraCaptureSession.StateCallback sessionStateCallback =  new CameraCaptureSession.StateCallback() {
         @Override
         public void onConfigured(@NonNull CameraCaptureSession session) {
             mCaptureSession = session;//向外暴露会话的句柄
             try {
                 // Auto focus & flash should be continuous for camera preview.
-                mRequestBuilder.set(CaptureRequest.CONTROL_AF_MODE,CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_PICTURE);
-                mRequestBuilder.set(CaptureRequest.CONTROL_AE_MODE,CaptureRequest.CONTROL_AE_MODE_ON_AUTO_FLASH);
+                mPreviewRequestBuilder.set(CaptureRequest.CONTROL_AF_MODE,CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_PICTURE);
+                mPreviewRequestBuilder.set(CaptureRequest.CONTROL_AE_MODE,CaptureRequest.CONTROL_AE_MODE_ON_AUTO_FLASH);
                 //            HandlerThread thread = new HandlerThread("CameraPreview");
                 //            thread.start();
                 //启动请求-------------------！！！！
-                mCaptureSession.setRepeatingRequest(mRequestBuilder.build(), captureRequestCallback,null);
+                mCaptureSession.setRepeatingRequest(mPreviewRequestBuilder.build(), captureRequestCallback,null);
             } catch (CameraAccessException e) {
                 e.printStackTrace();
             }
@@ -300,7 +301,40 @@ public class CameraFragment extends Fragment {
                     break;
                 }
                 case STATE_WAITING_LOCK: {
-                    captureStillPicture();
+                    Integer afState = result.get(CaptureResult.CONTROL_AF_STATE);
+                    if (afState == null) {
+                        captureStillPicture();
+                    } else if (CaptureResult.CONTROL_AF_STATE_FOCUSED_LOCKED == afState ||
+                            CaptureResult.CONTROL_AF_STATE_NOT_FOCUSED_LOCKED == afState) {
+                        // CONTROL_AE_STATE can be null on some devices
+                        Integer aeState = result.get(CaptureResult.CONTROL_AE_STATE);
+                        if (aeState == null ||
+                                aeState == CaptureResult.CONTROL_AE_STATE_CONVERGED) {
+                            mState = STATE_PICTURE_TAKEN;
+                            captureStillPicture();
+                        } else {
+                            runPrecaptureSequence();
+                        }
+                    }
+                    break;
+                }
+                case STATE_WAITING_PRECAPTURE: {
+                    // CONTROL_AE_STATE can be null on some devices
+                    Integer aeState = result.get(CaptureResult.CONTROL_AE_STATE);
+                    if (aeState == null ||
+                            aeState == CaptureResult.CONTROL_AE_STATE_PRECAPTURE ||
+                            aeState == CaptureRequest.CONTROL_AE_STATE_FLASH_REQUIRED) {
+                        mState = STATE_WAITING_NON_PRECAPTURE;
+                    }
+                    break;
+                }
+                case STATE_WAITING_NON_PRECAPTURE: {
+                    // CONTROL_AE_STATE can be null on some devices
+                    Integer aeState = result.get(CaptureResult.CONTROL_AE_STATE);
+                    if (aeState == null || aeState != CaptureResult.CONTROL_AE_STATE_PRECAPTURE) {
+                        mState = STATE_PICTURE_TAKEN;
+                        captureStillPicture();
+                    }
                     break;
                 }
             }
@@ -323,10 +357,10 @@ public class CameraFragment extends Fragment {
     private void lockFocus(){
         try {
             // This is how to tell the camera to lock focus.
-            mRequestBuilder.set(CaptureRequest.CONTROL_AF_TRIGGER,CameraMetadata.CONTROL_AF_TRIGGER_START);
+            mPreviewRequestBuilder.set(CaptureRequest.CONTROL_AF_TRIGGER,CameraMetadata.CONTROL_AF_TRIGGER_START);
             // Tell #mCaptureCallback to wait for the lock.
             mState = STATE_WAITING_LOCK;
-            mCaptureSession.capture(mRequestBuilder.build(), captureRequestCallback,null);
+            mCaptureSession.capture(mPreviewRequestBuilder.build(), captureRequestCallback,null);
         } catch (CameraAccessException e) {
             e.printStackTrace();
         }
@@ -335,16 +369,27 @@ public class CameraFragment extends Fragment {
     private void unlockFocus() {
         try {
             // Reset the auto-focus trigger
-            mRequestBuilder.set(CaptureRequest.CONTROL_AF_TRIGGER,
-                    CameraMetadata.CONTROL_AF_TRIGGER_CANCEL);
-            mRequestBuilder.set(CaptureRequest.CONTROL_AE_MODE,
-                    CaptureRequest.CONTROL_AE_MODE_ON_AUTO_FLASH);
-            mCaptureSession.capture(mRequestBuilder.build(), captureRequestCallback,
-                    null);
+            mPreviewRequestBuilder.set(CaptureRequest.CONTROL_AF_TRIGGER, CameraMetadata.CONTROL_AF_TRIGGER_CANCEL);
+            mPreviewRequestBuilder.set(CaptureRequest.CONTROL_AE_MODE, CaptureRequest.CONTROL_AE_MODE_ON_AUTO_FLASH);
+            mCaptureSession.capture(mPreviewRequestBuilder.build(), captureRequestCallback,null);
             // After this, the camera will go back to the normal state of preview.
             mState = STATE_PREVIEW;
-            mCaptureSession.setRepeatingRequest(mRequestBuilder.build(), captureRequestCallback,
-                    null);
+            mCaptureSession.setRepeatingRequest(mPreviewRequestBuilder.build(), captureRequestCallback,null);
+        } catch (CameraAccessException e) {
+            e.printStackTrace();
+        }
+    }
+    /**
+     * Run the precapture sequence for capturing a still image. This method should be called when
+     * we get a response in {@link #captureRequestCallback} from {@link #lockFocus()}.
+     */
+    private void runPrecaptureSequence() {
+        try {
+            // This is how to tell the camera to trigger.
+            mPreviewRequestBuilder.set(CaptureRequest.CONTROL_AE_PRECAPTURE_TRIGGER,CaptureRequest.CONTROL_AE_PRECAPTURE_TRIGGER_START);
+            // Tell #mCaptureCallback to wait for the precapture sequence to be set.
+            mState = STATE_WAITING_PRECAPTURE;
+            mCaptureSession.capture(mPreviewRequestBuilder.build(), captureRequestCallback,null);
         } catch (CameraAccessException e) {
             e.printStackTrace();
         }
@@ -355,38 +400,36 @@ public class CameraFragment extends Fragment {
             if (null == activity || null == mCameraDevice) {
                 return;
             }
-            // This is the CaptureRequest.Builder that we use to take a picture.
-            final CaptureRequest.Builder captureBuilder =
+            // capturePictureBuilder is the CaptureRequest.Builder that we use to take a picture.
+            final CaptureRequest.Builder capturePictureBuilder =
                     mCameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_STILL_CAPTURE);
-            captureBuilder.addTarget(mImageReader.getSurface());
+            capturePictureBuilder.addTarget(mImageReader.getSurface());
 
             // Use the same AE and AF modes as the preview.
-            captureBuilder.set(CaptureRequest.CONTROL_AF_MODE,
-                    CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_PICTURE);
-            captureBuilder.set(CaptureRequest.CONTROL_AE_MODE,
-                    CaptureRequest.CONTROL_AE_MODE_ON_AUTO_FLASH);
+            capturePictureBuilder.set(CaptureRequest.CONTROL_AF_MODE, CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_PICTURE);
+            capturePictureBuilder.set(CaptureRequest.CONTROL_AE_MODE, CaptureRequest.CONTROL_AE_MODE_ON_AUTO_FLASH);
 
             // Orientation
             //int rotation = activity.getWindowManager().getDefaultDisplay().getRotation();
             //captureBuilder.set(CaptureRequest.JPEG_ORIENTATION, getOrientation(rotation));
 
-            CameraCaptureSession.CaptureCallback CaptureCallback
+            CameraCaptureSession.CaptureCallback capturePictureCallback
                     = new CameraCaptureSession.CaptureCallback() {
-
                 @Override
                 public void onCaptureCompleted(@NonNull CameraCaptureSession session,
                                                @NonNull CaptureRequest request,
                                                @NonNull TotalCaptureResult result) {
-                    //showToast("Saved: " + mFile);
+                    Toast.makeText(getContext(),"phote takened: " ,Toast.LENGTH_SHORT).show();
                     unlockFocus();
                 }
             };
 
             mCaptureSession.stopRepeating();
             mCaptureSession.abortCaptures();
-            mCaptureSession.capture(captureBuilder.build(), CaptureCallback, null);
+            mCaptureSession.capture(capturePictureBuilder.build(), capturePictureCallback, null);
         } catch (CameraAccessException e) {
             e.printStackTrace();
         }
     }
+
 }
