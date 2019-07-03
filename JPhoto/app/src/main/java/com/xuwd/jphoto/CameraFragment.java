@@ -306,8 +306,8 @@ public class CameraFragment extends Fragment {
                 mPreviewRequestBuilder.set(CaptureRequest.CONTROL_AE_MODE,CaptureRequest.CONTROL_AE_MODE_ON_AUTO_FLASH);
                 //            HandlerThread thread = new HandlerThread("CameraPreview");
                 //            thread.start();
-                //启动请求-------------------！！！！
-                mCaptureSession.setRepeatingRequest(mPreviewRequestBuilder.build(), captureRequestCallback,mBackgroundHandler);
+                //启动预览请求-------------------！！！！
+                mCaptureSession.setRepeatingRequest(mPreviewRequestBuilder.build(), null,mBackgroundHandler);
             } catch (CameraAccessException e) {
                 e.printStackTrace();
             }
@@ -333,7 +333,7 @@ public class CameraFragment extends Fragment {
             = new CameraCaptureSession.CaptureCallback() {
 
         private void process(CaptureResult result) {
-//            Toast.makeText(getContext(),"mState"+mState,Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(),"mState"+mState,Toast.LENGTH_SHORT).show();
             switch (mState) {
                 case STATE_PREVIEW: {
 //                    Toast.makeText(getContext(),"previewing",Toast.LENGTH_SHORT).show();
@@ -391,7 +391,8 @@ public class CameraFragment extends Fragment {
                                        @NonNull CaptureRequest request,
                                        @NonNull TotalCaptureResult result) {
 //            Toast.makeText(getContext(),"mState:"+mState,Toast.LENGTH_SHORT).show();
-            process(result);
+            if(mState!=0)
+                process(result);
         }
     };
 
@@ -416,7 +417,7 @@ public class CameraFragment extends Fragment {
             mCaptureSession.capture(mPreviewRequestBuilder.build(), captureRequestCallback,mBackgroundHandler);
             // After this, the camera will go back to the normal state of preview.
             mState = STATE_PREVIEW;
-            mCaptureSession.setRepeatingRequest(mPreviewRequestBuilder.build(), captureRequestCallback,mBackgroundHandler);
+            mCaptureSession.setRepeatingRequest(mPreviewRequestBuilder.build(), null,mBackgroundHandler);
         } catch (CameraAccessException e) {
             e.printStackTrace();
         }
