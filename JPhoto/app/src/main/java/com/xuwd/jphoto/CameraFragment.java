@@ -24,6 +24,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import android.os.Handler;
+import android.os.HandlerThread;
 import android.view.LayoutInflater;
 import android.view.Surface;
 import android.view.TextureView;
@@ -63,7 +65,7 @@ public class CameraFragment extends Fragment {
             Toast.makeText(getContext(), "TextutrView: On", Toast.LENGTH_SHORT).show();
 //            mImageReader = ImageReader.newInstance(640, 480, ImageFormat.YUV_420_888, 1);
             mImageReader = ImageReader.newInstance(640, 480, ImageFormat.JPEG, 1);
-            mImageReader.setOnImageAvailableListener(mOnImageAvailableListener, null);
+            mImageReader.setOnImageAvailableListener(mOnImageAvailableListener, mBackgroundHandler);
 
             //!!!!!!!!!!!!!!!!!!!!!!!!!! Joint of framework !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!//
             igniteCamera(width, height);
@@ -165,11 +167,11 @@ public class CameraFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 if(mPreviewing){
-                    closePreviewSession();
                     btnPreview.setText(R.string.previewStart);
+                    closePreviewSession();
                 }else{
-                    setPreviewSession();
                     btnPreview.setText(R.string.previewClose);
+                    setPreviewSession();
                 }
                 mPreviewing=!mPreviewing;
             }
@@ -180,6 +182,41 @@ public class CameraFragment extends Fragment {
         mTextureView.setSurfaceTextureListener(surfaceTextureListener);
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        startBackgroundThread();
+    }
+
+    @Override
+    public void onPause() {
+//        closeCamera();
+        stopBackgroundThread();
+        super.onPause();
+    }
+
+    private HandlerThread mBackgroundThread;
+    private Handler mBackgroundHandler;
+
+    private void startBackgroundThread() {
+        mBackgroundThread = new HandlerThread("CameraBackground");
+        mBackgroundThread.start();
+        mBackgroundHandler = new Handler(mBackgroundThread.getLooper());
+    }
+
+    /**
+     * Stops the background thread and its {@link Handler}.
+     */
+    private void stopBackgroundThread() {
+        mBackgroundThread.quitSafely();
+        try {
+            mBackgroundThread.join();
+            mBackgroundThread = null;
+            mBackgroundHandler = null;
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
     //**************************** CameraDevice ****************************//
     private Boolean mPreviewing=false;
     private CameraDevice mCameraDevice;
@@ -228,7 +265,7 @@ public class CameraFragment extends Fragment {
             StreamConfigurationMap map = mCharacteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
 //            int mSensorOrientation = mCharacteristics.get(CameraCharacteristics.SENSOR_ORIENTATION);
 //            Size mPreviewSize = getPreferredPreviewSize(map.getOutputSizes(SurfaceTexture.class), width, height);
-            manager.openCamera(cameraId, cameraStateCallback, null);
+            manager.openCamera(cameraId, cameraStateCallback, mBackgroundHandler);
         } catch (CameraAccessException e) {
             e.printStackTrace();
         }
@@ -252,15 +289,16 @@ public class CameraFragment extends Fragment {
 
             //创建会话，为什么要把ImageReader的surface关联进去？
             Surface imageSurface = mImageReader.getSurface();
-            mCameraDevice.createCaptureSession(Arrays.asList(previewSurface,imageSurface), sessionStateCallback,null);
+            mCameraDevice.createCaptureSession(Arrays.asList(previewSurface,imageSurface), sessionStateCallback,mBackgroundHandler);
         } catch (CameraAccessException e) {
             e.printStackTrace();
         }
     }
-    //**************************** CameraCaptureSession ****************************//
+    //**************************** CameraCapture.Session ****************************//
     CameraCaptureSession.StateCallback sessionStateCallback =  new CameraCaptureSession.StateCallback() {
         @Override
         public void onConfigured(@NonNull CameraCaptureSession session) {
+            Toast.makeText(getContext(),"Session configured..",Toast.LENGTH_SHORT).show();
             mCaptureSession = session;//向外暴露会话的句柄
             try {
                 // Auto focus & flash should be continuous for camera preview.
@@ -269,7 +307,7 @@ public class CameraFragment extends Fragment {
                 //            HandlerThread thread = new HandlerThread("CameraPreview");
                 //            thread.start();
                 //启动请求-------------------！！！！
-                mCaptureSession.setRepeatingRequest(mPreviewRequestBuilder.build(), captureRequestCallback,null);
+                mCaptureSession.setRepeatingRequest(mPreviewRequestBuilder.build(), captureRequestCallback,mBackgroundHandler);
             } catch (CameraAccessException e) {
                 e.printStackTrace();
             }
@@ -290,13 +328,15 @@ public class CameraFragment extends Fragment {
             mCaptureSession = null;
         }
     }
-    //**************************** CaptureRequest ****************************//
+    //*****************通过Session启动的Capture.Request 的共用回调***********************//
     private CameraCaptureSession.CaptureCallback captureRequestCallback
             = new CameraCaptureSession.CaptureCallback() {
 
         private void process(CaptureResult result) {
+//            Toast.makeText(getContext(),"mState"+mState,Toast.LENGTH_SHORT).show();
             switch (mState) {
                 case STATE_PREVIEW: {
+//                    Toast.makeText(getContext(),"previewing",Toast.LENGTH_SHORT).show();
                     // We have nothing to do when the camera preview is working normally.
                     break;
                 }
@@ -344,23 +384,25 @@ public class CameraFragment extends Fragment {
         public void onCaptureProgressed(@NonNull CameraCaptureSession session,
                                         @NonNull CaptureRequest request,
                                         @NonNull CaptureResult partialResult) {
-            process(partialResult);
+//            process(partialResult);
         }
         @Override
         public void onCaptureCompleted(@NonNull CameraCaptureSession session,
                                        @NonNull CaptureRequest request,
                                        @NonNull TotalCaptureResult result) {
+//            Toast.makeText(getContext(),"mState:"+mState,Toast.LENGTH_SHORT).show();
             process(result);
         }
     };
 
+    //*****************通过Session启动各种功能****************************//
     private void lockFocus(){
         try {
             // This is how to tell the camera to lock focus.
             mPreviewRequestBuilder.set(CaptureRequest.CONTROL_AF_TRIGGER,CameraMetadata.CONTROL_AF_TRIGGER_START);
             // Tell #mCaptureCallback to wait for the lock.
             mState = STATE_WAITING_LOCK;
-            mCaptureSession.capture(mPreviewRequestBuilder.build(), captureRequestCallback,null);
+            mCaptureSession.capture(mPreviewRequestBuilder.build(), captureRequestCallback,mBackgroundHandler);
         } catch (CameraAccessException e) {
             e.printStackTrace();
         }
@@ -371,10 +413,10 @@ public class CameraFragment extends Fragment {
             // Reset the auto-focus trigger
             mPreviewRequestBuilder.set(CaptureRequest.CONTROL_AF_TRIGGER, CameraMetadata.CONTROL_AF_TRIGGER_CANCEL);
             mPreviewRequestBuilder.set(CaptureRequest.CONTROL_AE_MODE, CaptureRequest.CONTROL_AE_MODE_ON_AUTO_FLASH);
-            mCaptureSession.capture(mPreviewRequestBuilder.build(), captureRequestCallback,null);
+            mCaptureSession.capture(mPreviewRequestBuilder.build(), captureRequestCallback,mBackgroundHandler);
             // After this, the camera will go back to the normal state of preview.
             mState = STATE_PREVIEW;
-            mCaptureSession.setRepeatingRequest(mPreviewRequestBuilder.build(), captureRequestCallback,null);
+            mCaptureSession.setRepeatingRequest(mPreviewRequestBuilder.build(), captureRequestCallback,mBackgroundHandler);
         } catch (CameraAccessException e) {
             e.printStackTrace();
         }
@@ -389,7 +431,7 @@ public class CameraFragment extends Fragment {
             mPreviewRequestBuilder.set(CaptureRequest.CONTROL_AE_PRECAPTURE_TRIGGER,CaptureRequest.CONTROL_AE_PRECAPTURE_TRIGGER_START);
             // Tell #mCaptureCallback to wait for the precapture sequence to be set.
             mState = STATE_WAITING_PRECAPTURE;
-            mCaptureSession.capture(mPreviewRequestBuilder.build(), captureRequestCallback,null);
+            mCaptureSession.capture(mPreviewRequestBuilder.build(), captureRequestCallback,mBackgroundHandler);
         } catch (CameraAccessException e) {
             e.printStackTrace();
         }
@@ -412,7 +454,7 @@ public class CameraFragment extends Fragment {
             // Orientation
             //int rotation = activity.getWindowManager().getDefaultDisplay().getRotation();
             //captureBuilder.set(CaptureRequest.JPEG_ORIENTATION, getOrientation(rotation));
-
+            //***********************自用回调****************************/
             CameraCaptureSession.CaptureCallback capturePictureCallback
                     = new CameraCaptureSession.CaptureCallback() {
                 @Override
