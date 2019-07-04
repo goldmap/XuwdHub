@@ -100,7 +100,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                     else{
                         String str=permissions[i]+"权限OK";
-                        Toast.makeText(this,str,Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(this,str,Toast.LENGTH_SHORT).show();
                     }
                 }
             } else {

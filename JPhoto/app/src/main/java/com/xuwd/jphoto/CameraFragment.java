@@ -7,7 +7,6 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.ImageFormat;
-import android.graphics.PixelFormat;
 import android.graphics.SurfaceTexture;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraCaptureSession;
@@ -69,10 +68,10 @@ public class CameraFragment extends Fragment {
                                               int width, int height) {
             mTextureWidth=width;
             mTextureHeight=height;
-            Toast.makeText(getContext(), "TextutrView: On", Toast.LENGTH_SHORT).show();
+//            Toast.makeText(getContext(), "TextutrView: On", Toast.LENGTH_SHORT).show();
 
             //!!!!!!!!!!!!!!!!!!!!!!!!!! Joint of framework !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!//
-            igniteCamera(width, height);
+            igniteCamera();
         }
 
         @Override
@@ -106,34 +105,33 @@ public class CameraFragment extends Fragment {
             //         mBackgroundHandler.post(new ImageSaver(reader.acquireNextImage(), mFile));
             Image image = reader.acquireNextImage();
 //            Image image = reader.acquireLatestImage();
-
+//            String str=this.getClass().getName();
             int pixelStride,rowStride,rowPadding,width,height;
             width = image.getWidth();
             height = image.getHeight();
             Image.Plane[] planes = image.getPlanes();
             ByteBuffer buffer = planes[0].getBuffer();
- /*
-            //方法1 ，OK
+            buffer.rewind();
             byte[] bytes = new byte[buffer.remaining()];
             buffer.get(bytes);//由缓冲区存入字节数组
 
-            Bitmap bmp = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
-            mBmp=bmp;
-*/
-          //方法2
-            pixelStride = planes[0].getPixelStride();
-            rowStride = planes[0].getRowStride();
-            rowPadding = rowStride - pixelStride * width;
-            int bmpWidth=width + rowPadding / pixelStride;
+            //设置mImageReader = ImageReader.newInstance(imgWidth, imgHeight, ImageFormat.JPEG, 2);OK!
+            if(image.getFormat()==256){
+                Bitmap bmp = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                mBmp=bmp;
+            }//mImageReader = ImageReader.newInstance(imgWidth, imgHeight, ImageFormat.YUV_420_888, 2);overflow
+            else if(image.getFormat()==35){
+                pixelStride = planes[0].getPixelStride();
+                rowStride = planes[0].getRowStride();
+                rowPadding = rowStride - pixelStride * width;
+                int bmpWidth=width + rowPadding / pixelStride;
+                Toast.makeText(getContext(),"img:"+pixelStride+","+rowStride+","+rowPadding,Toast.LENGTH_SHORT).show();
+                Bitmap cmp = Bitmap.createBitmap(bmpWidth, height, Bitmap.Config.ARGB_8888);
+                cmp.copyPixelsFromBuffer(buffer);
+                // mBmp=cmp;
+            }
 
-            Bitmap cmp = Bitmap.createBitmap(bmpWidth, height, Bitmap.Config.ARGB_8888);
-            cmp.copyPixelsFromBuffer(buffer);
-            mBmp=cmp;
-//            Bitmap cmp = Bitmap.createBitmap(bmp, 0, 0, bmpwidth, height);
-            buffer.rewind();
-        ;
 //            mImageView.setImageBitmap(bmp);  //子线程不能操作UI
-
             image.close();
         }
 
@@ -178,10 +176,10 @@ public class CameraFragment extends Fragment {
             public void onClick(View view) {
                 if(mPreviewing){
                     btnPreview.setText(R.string.previewStart);
-                    closePreviewSession();
+                    closeCamera();
                 }else{
                     btnPreview.setText(R.string.previewClose);
-                    setPreviewSession();
+                    igniteCamera();
                 }
                 mPreviewing=!mPreviewing;
             }
@@ -239,8 +237,24 @@ public class CameraFragment extends Fragment {
         public void onOpened(@NonNull CameraDevice cameraDevice) {
             mCameraDevice = cameraDevice;//!!!!!!!! Joint of framework !!!!!!
             mCameraOpenCloseLock.release();
-//            configureTransform(mTextureView.getWidth(), mTextureView.getHeight());
-            setPreviewSession();
+
+            //建立物理相机和显示设备之间的通道，创建会话（设置会话的回调函数），通过会话启动“会话请求”Request
+            try {
+                SurfaceTexture texture = mTextureView.getSurfaceTexture();
+                assert texture != null;
+                texture.setDefaultBufferSize(mTextureWidth,mTextureHeight);
+                Surface previewSurface = new Surface(texture);
+
+                //建立投射通道
+                mPreviewRequestBuilder = mCameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
+                mPreviewRequestBuilder.addTarget(previewSurface);
+
+                //创建会话，为什么要把ImageReader的surface关联进去？
+                Surface imageSurface = mImageReader.getSurface();
+                mCameraDevice.createCaptureSession(Arrays.asList(previewSurface,imageSurface), sessionStateCallback,mBackgroundHandler);
+            } catch (CameraAccessException e) {
+                e.printStackTrace();
+            }
         }
 
         @Override
@@ -263,7 +277,7 @@ public class CameraFragment extends Fragment {
 
     @SuppressLint("MissingPermission")
     //触发某个相机，为其设置回调函数，该相机开始生命周期
-    private void igniteCamera(int width, int height) {
+    private void igniteCamera() {
         Activity activity = getActivity();
         if (null == activity || activity.isFinishing()) {
             return;
@@ -275,9 +289,15 @@ public class CameraFragment extends Fragment {
             mCharacteristics = manager.getCameraCharacteristics(cameraId);
             StreamConfigurationMap map = mCharacteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
 //            int mSensorOrientation = mCharacteristics.get(CameraCharacteristics.SENSOR_ORIENTATION);
-            Size imageSize = map.getOutputSizes(ImageFormat.JPEG)[0];
-            mImageReader = ImageReader.newInstance(1080, 640, ImageFormat.JPEG, 2);
-//            mImageReader = ImageReader.newInstance(640, 480, ImageFormat.YUV_420_888, 1);
+            Size[] yuv_imageSize = map.getOutputSizes(ImageFormat.YUV_420_888);
+            Size[] jpeg_imageSize = map.getOutputSizes(ImageFormat.JPEG);
+//            Size[] raw_imageSize = map.getOutputSizes(ImageFormat.RAW_SENSOR);
+//            Size[] priv_imageSize = map.getOutputSizes(TextureView.class);
+            int imgWidth=jpeg_imageSize[0].getWidth();
+            int imgHeight=jpeg_imageSize[0].getHeight();
+
+//            mImageReader = ImageReader.newInstance(imgWidth, imgHeight, ImageFormat.JPEG, 2);
+            mImageReader = ImageReader.newInstance(imgWidth, imgHeight, ImageFormat.YUV_420_888, 2);
 //            mImageReader = ImageReader.newInstance(imageSize.getWidth(), imageSize.getHeight(), ImageFormat.JPEG, 2);
             mImageReader.setOnImageAvailableListener(mOnImageAvailableListener, mBackgroundHandler);
 
@@ -316,41 +336,18 @@ public class CameraFragment extends Fragment {
         }
     }
 
-    //建立物理相机和显示设备之间的通道，创建会话（设置会话的回调函数），通过会话启动“会话请求”Request
-    private void setPreviewSession() {
-        if (null == mCameraDevice || !mTextureView.isAvailable()) {
-            return;
-        }
-        try {
-            closePreviewSession();
-            SurfaceTexture texture = mTextureView.getSurfaceTexture();
-            assert texture != null;
-            texture.setDefaultBufferSize(mTextureWidth,mTextureHeight);
-            Surface previewSurface = new Surface(texture);
-
-            //建立投射通道
-            mPreviewRequestBuilder = mCameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
-            mPreviewRequestBuilder.addTarget(previewSurface);
-
-            //创建会话，为什么要把ImageReader的surface关联进去？
-            Surface imageSurface = mImageReader.getSurface();
-            mCameraDevice.createCaptureSession(Arrays.asList(previewSurface,imageSurface), sessionStateCallback,mBackgroundHandler);
-        } catch (CameraAccessException e) {
-            e.printStackTrace();
-        }
-    }
     //**************************** CameraCapture.Session ****************************//
     CameraCaptureSession.StateCallback sessionStateCallback =  new CameraCaptureSession.StateCallback() {
         @Override
         public void onConfigured(@NonNull CameraCaptureSession session) {
-            Toast.makeText(getContext(),"Session configured..",Toast.LENGTH_SHORT).show();
+            //Toast.makeText(getContext(),"Session configured..",Toast.LENGTH_SHORT).show();
             mCaptureSession = session;//向外暴露会话的句柄
+            //启动“浏览”，无事可处理，不需要设置回调函数
             try {
                 // Auto focus & flash should be continuous for camera preview.
                 mPreviewRequestBuilder.set(CaptureRequest.CONTROL_AF_MODE,CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_PICTURE);
                 mPreviewRequestBuilder.set(CaptureRequest.CONTROL_AE_MODE,CaptureRequest.CONTROL_AE_MODE_ON_AUTO_FLASH);
-                //            HandlerThread thread = new HandlerThread("CameraPreview");
-                //            thread.start();
+
                 //启动预览请求-------------------！！！！
                 mCaptureSession.setRepeatingRequest(mPreviewRequestBuilder.build(), null,mBackgroundHandler);
             } catch (CameraAccessException e) {
@@ -367,12 +364,6 @@ public class CameraFragment extends Fragment {
         }
     };
 
-    private void closePreviewSession() {
-        if (mCaptureSession != null) {
-            mCaptureSession.close();
-            mCaptureSession = null;
-        }
-    }
     //*****************通过Session启动的Capture.Request 的共用回调***********************//
     //用真机调试通过，afState=5
     private CameraCaptureSession.CaptureCallback captureRequestCallback
@@ -389,7 +380,7 @@ public class CameraFragment extends Fragment {
                 case STATE_WAITING_LOCK: {
                     Integer afState = result.get(CaptureResult.CONTROL_AF_STATE);
                     Integer aeState = result.get(CaptureResult.CONTROL_AE_STATE);
-                    Toast.makeText(getContext(),"af/aeState:"+afState+"/"+aeState,Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(getContext(),"af/aeState:"+afState+"/"+aeState,Toast.LENGTH_SHORT).show();
 
                     if (afState == null) {
                         captureStillPicture();
