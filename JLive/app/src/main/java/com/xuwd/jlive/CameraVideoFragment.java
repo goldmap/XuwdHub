@@ -91,7 +91,7 @@ public class CameraVideoFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         mContext=view.getContext();
         jFFmpeg =  JFFmpeg.getInstance();
-        int i= jFFmpeg.init("rtmp://203.195.210.150/live/123");
+        int i= jFFmpeg.init("");
         Toast.makeText(getContext(),"init:"+i,Toast.LENGTH_SHORT).show();
 
         mImageView=view.findViewById(R.id.testView);
@@ -129,7 +129,7 @@ public class CameraVideoFragment extends Fragment {
             Toast.makeText(getContext(),"权限OK",Toast.LENGTH_SHORT).show();
 
             Toast.makeText(getContext(),"TextureView:"+mTextureWidth+","+mTextureHeight,Toast.LENGTH_SHORT).show();
-            mImageReader = ImageReader.newInstance(mTextureWidth, mTextureHeight, ImageFormat.YUV_420_888, 1);
+            mImageReader = ImageReader.newInstance(640, 480, ImageFormat.YUV_420_888, 1);
             mImageReader.setOnImageAvailableListener(mOnImageAvailableListener, mBackgroundHandler);
 
             openCamera(mTextureWidth,mTextureHeight);
