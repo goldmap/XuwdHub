@@ -104,33 +104,40 @@ public class CameraFragment extends Fragment {
             //子线程抛出，是对的
             //         mBackgroundHandler.post(new ImageSaver(reader.acquireNextImage(), mFile));
             Image image = reader.acquireNextImage();
-//            Image image = reader.acquireLatestImage();
-//            String str=this.getClass().getName();
+
             int pixelStride,rowStride,rowPadding,width,height;
+            ByteBuffer buffer;
             width = image.getWidth();
             height = image.getHeight();
-            Image.Plane[] planes = image.getPlanes();
-            ByteBuffer buffer = planes[0].getBuffer();
-            buffer.rewind();
-            byte[] bytes = new byte[buffer.remaining()];
-            buffer.get(bytes);//由缓冲区存入字节数组
 
             //设置mImageReader = ImageReader.newInstance(imgWidth, imgHeight, ImageFormat.JPEG, 2);OK!
-            if(image.getFormat()==256){
+            if(image.getFormat()==ImageFormat.JPEG){
+                Image.Plane[] planes = image.getPlanes();
+                buffer = planes[0].getBuffer();
+                buffer.rewind();
+                byte[] bytes=new byte[buffer.remaining()];
+                buffer.get(bytes);
+
                 Bitmap bmp = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
                 mBmp=bmp;
             }//mImageReader = ImageReader.newInstance(imgWidth, imgHeight, ImageFormat.YUV_420_888, 2);overflow
-            else if(image.getFormat()==35){
-                pixelStride = planes[0].getPixelStride();
-                rowStride = planes[0].getRowStride();
-                rowPadding = rowStride - pixelStride * width;
-                int bmpWidth=width + rowPadding / pixelStride;
-                Toast.makeText(getContext(),"img:"+pixelStride+","+rowStride+","+rowPadding,Toast.LENGTH_SHORT).show();
-                Bitmap cmp = Bitmap.createBitmap(bmpWidth, height, Bitmap.Config.ARGB_8888);
-                cmp.copyPixelsFromBuffer(buffer);
-                // mBmp=cmp;
+            else if(image.getFormat()==ImageFormat.YUV_420_888){
+                byte[] yuvBytes = ImageUtil.getBytesFromImage(image,ImageUtil.YUV420P);
+             /*
+                YuvImage yuvImage = new YuvImage(yuvBytes,ImageFormat.YUV_420_888,width,height,null);
+                if(yuvImage!=null){
+                    ByteArrayOutputStream stream=new ByteArrayOutputStream();
+                    yuvImage.compressToJpeg(new Rect(0,0,width,height),80,stream);
+                    Bitmap cmp =BitmapFactory.decodeByteArray(stream.toByteArray(),0,stream.size());
+                    mBmp=cmp;
+                }
+                */
+             int rgb[]=ImageUtil.decodeYUVtoRGB(yuvBytes, width, height);
+             Bitmap cmp = Bitmap.createBitmap(rgb,0,width,width,height, Bitmap.Config.ARGB_8888);
+             mBmp=cmp;
+//                Bitmap cmp = Bitmap.createBitmap(bmpWidth, height, Bitmap.Config.ARGB_8888);
+//                cmp.copyPixelsFromBuffer(buffer);  //溢出！！！
             }
-
 //            mImageView.setImageBitmap(bmp);  //子线程不能操作UI
             image.close();
         }
@@ -290,11 +297,11 @@ public class CameraFragment extends Fragment {
             StreamConfigurationMap map = mCharacteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
 //            int mSensorOrientation = mCharacteristics.get(CameraCharacteristics.SENSOR_ORIENTATION);
             Size[] yuv_imageSize = map.getOutputSizes(ImageFormat.YUV_420_888);
-            Size[] jpeg_imageSize = map.getOutputSizes(ImageFormat.JPEG);
+//            Size[] jpeg_imageSize = map.getOutputSizes(ImageFormat.JPEG);
 //            Size[] raw_imageSize = map.getOutputSizes(ImageFormat.RAW_SENSOR);
 //            Size[] priv_imageSize = map.getOutputSizes(TextureView.class);
-            int imgWidth=jpeg_imageSize[0].getWidth();
-            int imgHeight=jpeg_imageSize[0].getHeight();
+            int imgWidth=yuv_imageSize[0].getWidth();
+            int imgHeight=yuv_imageSize[0].getHeight();
 
 //            mImageReader = ImageReader.newInstance(imgWidth, imgHeight, ImageFormat.JPEG, 2);
             mImageReader = ImageReader.newInstance(imgWidth, imgHeight, ImageFormat.YUV_420_888, 2);
