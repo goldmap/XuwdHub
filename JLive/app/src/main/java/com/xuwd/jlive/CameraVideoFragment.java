@@ -91,7 +91,7 @@ public class CameraVideoFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         mContext=view.getContext();
         jFFmpeg =  JFFmpeg.getInstance();
-        int i= jFFmpeg.init("rtmp://203.195.210.150/live/123");
+        int i= jFFmpeg.init("");
         Toast.makeText(getContext(),"init:"+i,Toast.LENGTH_SHORT).show();
 
         mImageView=view.findViewById(R.id.testView);
