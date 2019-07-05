@@ -123,12 +123,6 @@ public class CameraFragment extends Fragment {
             }//mImageReader = ImageReader.newInstance(imgWidth, imgHeight, ImageFormat.YUV_420_888, 2);overflow
             else if(image.getFormat()==ImageFormat.YUV_420_888){
                 byte[] yuvBytes = ImageUtil.getBytesFromImage(image,ImageUtil.YUV420P);
-<<<<<<< HEAD
-
-             int rgb[]=ImageUtil.decodeYUVtoRGB(yuvBytes, width, height);
-             Bitmap bmp = Bitmap.createBitmap(rgb,0,width,width,height, Bitmap.Config.ARGB_8888);
-             mBmp=bmp;
-=======
              /*
                 YuvImage yuvImage = new YuvImage(yuvBytes,ImageFormat.YUV_420_888,width,height,null);
                 if(yuvImage!=null){
@@ -143,7 +137,6 @@ public class CameraFragment extends Fragment {
              mBmp=cmp;
 //                Bitmap cmp = Bitmap.createBitmap(bmpWidth, height, Bitmap.Config.ARGB_8888);
 //                cmp.copyPixelsFromBuffer(buffer);  //溢出！！！
->>>>>>> bbb3b31def60cb3cc925cf8c94d3e9d562c8c5c7
             }
 //            mImageView.setImageBitmap(bmp);  //子线程不能操作UI
             image.close();
