@@ -1,16 +1,16 @@
 package com.xuwd.jvideo;
-
-import android.Manifest;
-
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.app.Dialog;
-
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.res.Configuration;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.ImageFormat;
 import android.graphics.Matrix;
 import android.graphics.RectF;
+import android.graphics.SurfaceTexture;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraCaptureSession;
 import android.hardware.camera2.CameraCharacteristics;
@@ -18,20 +18,23 @@ import android.hardware.camera2.CameraDevice;
 import android.hardware.camera2.CameraManager;
 import android.hardware.camera2.CameraMetadata;
 import android.hardware.camera2.CaptureRequest;
+import android.hardware.camera2.CaptureResult;
+import android.hardware.camera2.TotalCaptureResult;
 import android.hardware.camera2.params.StreamConfigurationMap;
+import android.media.Image;
+import android.media.ImageReader;
 import android.media.MediaRecorder;
+import android.os.Bundle;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
+import androidx.core.app.ActivityCompat;
+import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.Fragment;
+
 import android.os.Handler;
 import android.os.HandlerThread;
-import android.support.v4.app.ActivityCompat;//
-
-import android.content.DialogInterface;
-import android.content.pm.PackageManager;
-
-import android.graphics.SurfaceTexture;
-import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.v4.app.DialogFragment;
-import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.util.Size;
 import android.view.LayoutInflater;
@@ -40,8 +43,8 @@ import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.Toast;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -59,11 +62,7 @@ public class CameraVideoFragment extends Fragment {
     private Boolean mIsRecordingVideo=false;
     private static final String FRAGMENT_DIALOG = "dialog";
     private static final int REQUEST_VIDEO_PERMISSIONS = 1;
-    private static final String[] VIDEO_PERMISSIONS = {
-            Manifest.permission.CAMERA,
-            Manifest.permission.RECORD_AUDIO,
-            Manifest.permission.WRITE_EXTERNAL_STORAGE,
-    };
+
 
     private HandlerThread mBackgroundThread;
     private Handler mBackgroundHandler;
@@ -211,12 +210,6 @@ public class CameraVideoFragment extends Fragment {
     //
     @SuppressLint("MissingPermission")
     private void openCamera(int width, int height) {
-        //任何一个条件未授权，须转向请求授权
-        if (!hasPermission(VIDEO_PERMISSIONS)) {
-            requestVideoPermissions();
-            return;
-        }
-        Toast.makeText(getContext(),"权限OK",Toast.LENGTH_SHORT).show();
         final Activity activity = getActivity();
         if (null == activity || activity.isFinishing()) {
             return;
@@ -256,62 +249,12 @@ public class CameraVideoFragment extends Fragment {
         } catch (NullPointerException e) {
             // Currently an NPE is thrown when the Camera2API is used but not supported on the
             // device this code runs.
-            ErrorDialog.newInstance(getString(R.string.camera_error))
-                    .show(getChildFragmentManager(), FRAGMENT_DIALOG);
+
         } catch (InterruptedException e) {
             throw new RuntimeException("Interrupted while trying to lock camera opening.");
         }
     }
 
-    //其中任何一个条件未授权，返回值即为false
-    private boolean hasPermission(String[] permissions) {
-        for (String permission : permissions) {
-            if (ActivityCompat.checkSelfPermission(getActivity(), permission) != PackageManager.PERMISSION_GRANTED) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    private void requestVideoPermissions() {
-        if (noPrompt(VIDEO_PERMISSIONS)) {
-            Toast.makeText(getContext(),"需要通过手机的【设置】取得权限",Toast.LENGTH_SHORT).show();
-        } else {
-            requestPermissions(VIDEO_PERMISSIONS, REQUEST_VIDEO_PERMISSIONS);
-        }
-    }
-    private boolean noPrompt(String[] permissions) {
-        for (String permission : permissions) {
-            if (shouldShowRequestPermissionRationale(permission)) {
-                return true;
-            }
-        }
-        return false;//所有请求，之前均未被限制
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
-                                           @NonNull int[] grantResults) {
-        if (requestCode == REQUEST_VIDEO_PERMISSIONS) {
-            if (grantResults.length == VIDEO_PERMISSIONS.length) {
-                for (int i=0;i< grantResults.length;i++) {
-                    int result= grantResults[i];
-                    if (result != PackageManager.PERMISSION_GRANTED) {
-                        ConfirmationDialog dlg=new ConfirmationDialog();
-                        dlg.show(getFragmentManager(),FRAGMENT_DIALOG);
-                        // ErrorDialog.newInstance(getString(R.string.permission_request)).show(getFragmentManager(),FRAGMENT_DIALOG);
-                    }else{
-                        String str=permissions[i]+"设置成功";
-                        Toast.makeText(getContext(), str, Toast.LENGTH_SHORT).show();
-                    }
-                }
-            } else {
-                Toast.makeText(getContext(), "Permission:Error", Toast.LENGTH_SHORT).show();
-            }
-        } else {
-            super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        }
-    }
 
     static class CompareSizesByArea implements Comparator<Size> {
 
@@ -323,52 +266,8 @@ public class CameraVideoFragment extends Fragment {
         }
 
     }
-    public static class ErrorDialog extends DialogFragment {
-        private static final String ARG_MESSAGE = "message";
-        public static ErrorDialog newInstance(String message) {
-            ErrorDialog dialog = new ErrorDialog();
-            Bundle args = new Bundle();
-            args.putString(ARG_MESSAGE, message);
-            dialog.setArguments(args);
-            return dialog;
-        }
 
-        @Override
-        public Dialog onCreateDialog(Bundle savedInstanceState) {
-            final Activity activity = getActivity();
-            return new AlertDialog.Builder(activity)
-                    .setMessage(getArguments().getString(ARG_MESSAGE))
-                    .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {
-                            activity.finish();
-                        }
-                    })
-                    .create();
-        }
-    }
-    public static class ConfirmationDialog extends DialogFragment {
-        @Override
-        public Dialog onCreateDialog(Bundle savedInstanceState) {
-            return new AlertDialog.Builder(getActivity())
-                    .setMessage("重新设置权限")
-                    .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                           ActivityCompat.requestPermissions(getActivity(),VIDEO_PERMISSIONS, REQUEST_VIDEO_PERMISSIONS);
-                        }
-                    })
-                    .setNegativeButton(android.R.string.cancel,
-                            new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    //parent.getActivity().finish();
-                                    Toast.makeText(getContext(), "未获得权限，无法正常运行", Toast.LENGTH_SHORT).show();
-                                }
-                            })
-                    .create();
-        }
-    }
+
 
     private void closePreviewSession() {
         if (mPreviewSession != null) {

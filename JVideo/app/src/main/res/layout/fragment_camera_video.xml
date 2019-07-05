@@ -24,5 +24,11 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:text="@string/record" />
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right"
+            android:id="@+id/btnExit"
+            android:text="@string/exitCamera" />
     </FrameLayout>
 </RelativeLayout>
