@@ -129,7 +129,7 @@ public class CameraVideoFragment extends Fragment {
             Toast.makeText(getContext(),"权限OK",Toast.LENGTH_SHORT).show();
 
             Toast.makeText(getContext(),"TextureView:"+mTextureWidth+","+mTextureHeight,Toast.LENGTH_SHORT).show();
-            mImageReader = ImageReader.newInstance(mTextureWidth, mTextureHeight, ImageFormat.YUV_420_888, 1);
+            mImageReader = ImageReader.newInstance(640, 480, ImageFormat.YUV_420_888, 1);
             mImageReader.setOnImageAvailableListener(mOnImageAvailableListener, mBackgroundHandler);
 
             openCamera(mTextureWidth,mTextureHeight);
