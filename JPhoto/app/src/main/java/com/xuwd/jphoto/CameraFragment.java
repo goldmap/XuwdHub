@@ -55,45 +55,8 @@ public class CameraFragment extends Fragment {
     private static final int STATE_WAITING_NON_PRECAPTURE = 3;
     private static final int STATE_PICTURE_TAKEN = 4;
     private int mState = STATE_PREVIEW;
-
     private ImageView mImageView;
-    //**************************** TextureView ****************************//
-    private TextureView mTextureView;
-    private int mTextureWidth,mTextureHeight;
-    private TextureView.SurfaceTextureListener surfaceTextureListener
-            = new TextureView.SurfaceTextureListener() {
 
-        @Override
-        public void onSurfaceTextureAvailable(SurfaceTexture surfaceTexture,
-                                              int width, int height) {
-            mTextureWidth=width;
-            mTextureHeight=height;
-//            Toast.makeText(getContext(), "TextutrView: On", Toast.LENGTH_SHORT).show();
-
-            //!!!!!!!!!!!!!!!!!!!!!!!!!! Joint of framework !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!//
-            igniteCamera();
-        }
-
-        @Override
-        public void onSurfaceTextureSizeChanged(SurfaceTexture surfaceTexture,
-                                                int width, int height) {
-            Toast.makeText(getContext(), "TextutrViewSize: "+width+":"+height, Toast.LENGTH_SHORT).show();
-        }
-
-        @Override
-        public boolean onSurfaceTextureDestroyed(SurfaceTexture surfaceTexture) {
-            return true;
-        }
-
-        @Override
-        public void onSurfaceTextureUpdated(SurfaceTexture surfaceTexture) {
-//            mBmp= mTextureView.getBitmap();
-            if(mBmp!=null)
-                mImageView.setImageBitmap(mBmp);
-            //int rotation = getActivity().getWindowManager().getDefaultDisplay().getRotation();
-            //Toast.makeText(getContext(),"Rot:"+rotation,Toast.LENGTH_SHORT).show();
-        }
-    };
     //**************************** ImageReader ****************************//
     private ImageReader mImageReader;
     private final ImageReader.OnImageAvailableListener mOnImageAvailableListener
@@ -120,10 +83,10 @@ public class CameraFragment extends Fragment {
 
                 Bitmap bmp = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
                 mBmp=bmp;
-            }//mImageReader = ImageReader.newInstance(imgWidth, imgHeight, ImageFormat.YUV_420_888, 2);overflow
+            }//mImageReader = ImageReader.newInstance(imgWidth, imgHeight, ImageFormat.YUV_420_888, 2)
             else if(image.getFormat()==ImageFormat.YUV_420_888){
                 byte[] yuvBytes = ImageUtil.getBytesFromImage(image,ImageUtil.YUV420P);
-             /*
+             /*这个机制失败，有待分析
                 YuvImage yuvImage = new YuvImage(yuvBytes,ImageFormat.YUV_420_888,width,height,null);
                 if(yuvImage!=null){
                     ByteArrayOutputStream stream=new ByteArrayOutputStream();
@@ -132,113 +95,97 @@ public class CameraFragment extends Fragment {
                     mBmp=cmp;
                 }
                 */
-             int rgb[]=ImageUtil.decodeYUVtoRGB(yuvBytes, width, height);
-             Bitmap cmp = Bitmap.createBitmap(rgb,0,width,width,height, Bitmap.Config.ARGB_8888);
-             mBmp=cmp;
-//                Bitmap cmp = Bitmap.createBitmap(bmpWidth, height, Bitmap.Config.ARGB_8888);
-//                cmp.copyPixelsFromBuffer(buffer);  //溢出！！！
+                int rgb[]=ImageUtil.decodeYUVtoRGB(yuvBytes, width, height);
+                Bitmap cmp = Bitmap.createBitmap(rgb,0,width,width,height, Bitmap.Config.ARGB_8888);
+                mBmp=cmp;
             }
 //            mImageView.setImageBitmap(bmp);  //子线程不能操作UI
             image.close();
         }
 
-
     };
 
-    //**************************** CameraFragment ****************************//
-    public CameraFragment() {
-        // Required empty public constructor
-    }
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_camera, container, false);
-    }
+    //**************************** TextureView ****************************//
+    private TextureView mTextureView;
+    private int mTextureWidth,mTextureHeight;
+    private TextureView.SurfaceTextureListener surfaceTextureListener
+            = new TextureView.SurfaceTextureListener() {
 
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-        mImageView=view.findViewById(R.id.imageView);
+        @Override
+        public void onSurfaceTextureAvailable(SurfaceTexture surfaceTexture,
+                                              int width, int height) {
+            mTextureWidth=width;
+            mTextureHeight=height;
 
-        Button btnExit=view.findViewById(R.id.btnExit);
-        btnExit.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                getFragmentManager().popBackStack();
-            }
-        });
+            //[KeyJoint]
+            igniteCamera();
+        }
 
-        Button btnCapture=view.findViewById(R.id.btnCapture);
-        btnCapture.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                lockFocus();
-            }
-        });
+        @Override
+        public void onSurfaceTextureSizeChanged(SurfaceTexture surfaceTexture,
+                                                int width, int height) {
+            Toast.makeText(getContext(), "TextutrViewSize: "+width+":"+height, Toast.LENGTH_SHORT).show();
+        }
 
-        final Button btnPreview = view.findViewById(R.id.btnPreview);
-        btnPreview.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(mPreviewing){
-                    btnPreview.setText(R.string.previewStart);
-                    closeCamera();
-                }else{
-                    btnPreview.setText(R.string.previewClose);
-                    igniteCamera();
-                }
-                mPreviewing=!mPreviewing;
-            }
-        });
+        @Override
+        public boolean onSurfaceTextureDestroyed(SurfaceTexture surfaceTexture) {
+            return true;
+        }
 
+        @Override
+        public void onSurfaceTextureUpdated(SurfaceTexture surfaceTexture) {
+//            mBmp= mTextureView.getBitmap();
+            if(mBmp!=null)
+                mImageView.setImageBitmap(mBmp);
+        }
+    };
 
-        mTextureView=view.findViewById(R.id.textureView);
-        mTextureView.setSurfaceTextureListener(surfaceTextureListener);
-    }
+    @SuppressLint("MissingPermission")
+    //触发某个相机，为其设置回调函数，该相机开始生命周期
+    private void igniteCamera() {
+        Activity activity = getActivity();
+        if (null == activity || activity.isFinishing()) {
+            return;
+        }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        startBackgroundThread();
-    }
-
-    @Override
-    public void onPause() {
-//        closeCamera();
-        stopBackgroundThread();
-        super.onPause();
-    }
-
-    private HandlerThread mBackgroundThread;
-    private Handler mBackgroundHandler;
-
-    private void startBackgroundThread() {
-        mBackgroundThread = new HandlerThread("CameraBackground");
-        mBackgroundThread.start();
-        mBackgroundHandler = new Handler(mBackgroundThread.getLooper());
-    }
-
-    /**
-     * Stops the background thread and its {@link Handler}.
-     */
-    private void stopBackgroundThread() {
-        mBackgroundThread.quitSafely();
+        CameraManager manager = (CameraManager) activity.getSystemService(Context.CAMERA_SERVICE);
         try {
-            mBackgroundThread.join();
-            mBackgroundThread = null;
-            mBackgroundHandler = null;
-        } catch (InterruptedException e) {
+            String cameraId =  manager.getCameraIdList()[0];
+            CameraCharacteristics mCharacteristics = manager.getCameraCharacteristics(cameraId);
+            StreamConfigurationMap map = mCharacteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
+//            int mSensorOrientation = mCharacteristics.get(CameraCharacteristics.SENSOR_ORIENTATION);
+            Size[] yuv_imageSize = map.getOutputSizes(ImageFormat.YUV_420_888);
+//            Size[] jpeg_imageSize = map.getOutputSizes(ImageFormat.JPEG);
+//            Size[] raw_imageSize = map.getOutputSizes(ImageFormat.RAW_SENSOR);
+//            Size[] priv_imageSize = map.getOutputSizes(TextureView.class);
+            int imgWidth=yuv_imageSize[0].getWidth();
+            int imgHeight=yuv_imageSize[0].getHeight();
+
+//            mImageReader = ImageReader.newInstance(imgWidth, imgHeight, ImageFormat.JPEG, 2);
+            mImageReader = ImageReader.newInstance(imgWidth, imgHeight, ImageFormat.YUV_420_888, 2);
+//            mImageReader = ImageReader.newInstance(imageSize.getWidth(), imageSize.getHeight(), ImageFormat.JPEG, 2);
+            mImageReader.setOnImageAvailableListener(mOnImageAvailableListener, mBackgroundHandler);
+
+            try {
+                if (!mCameraOpenCloseLock.tryAcquire(2500, TimeUnit.MILLISECONDS)) {
+                    throw new RuntimeException("Time out waiting to lock camera opening.");
+                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+            //抛出Camera的回调函数cameraStateCallback，待其破土而出
+            manager.openCamera(cameraId, cameraStateCallback, mBackgroundHandler);
+        } catch (CameraAccessException e) {
             e.printStackTrace();
         }
     }
-    //**************************** CameraDevice ****************************//
+     //**************************** CameraDevice ****************************//
     private Semaphore mCameraOpenCloseLock = new Semaphore(1);
     private Boolean mPreviewing=false;
     private CameraDevice mCameraDevice;
     private CameraCaptureSession mCaptureSession;
     private CaptureRequest.Builder mPreviewRequestBuilder;
-    private CameraCharacteristics mCharacteristics;
     private CameraDevice.StateCallback cameraStateCallback = new CameraDevice.StateCallback() {
         @Override
         public void onOpened(@NonNull CameraDevice cameraDevice) {
@@ -250,15 +197,15 @@ public class CameraFragment extends Fragment {
                 SurfaceTexture texture = mTextureView.getSurfaceTexture();
                 assert texture != null;
                 texture.setDefaultBufferSize(mTextureWidth,mTextureHeight);
-                Surface previewSurface = new Surface(texture);
+                Surface textureSurface = new Surface(texture);
 
                 //建立投射通道
                 mPreviewRequestBuilder = mCameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
-                mPreviewRequestBuilder.addTarget(previewSurface);
+                mPreviewRequestBuilder.addTarget(textureSurface);
 
                 //创建会话，为什么要把ImageReader的surface关联进去？
                 Surface imageSurface = mImageReader.getSurface();
-                mCameraDevice.createCaptureSession(Arrays.asList(previewSurface,imageSurface), sessionStateCallback,mBackgroundHandler);
+                mCameraDevice.createCaptureSession(Arrays.asList(textureSurface,imageSurface), sessionStateCallback,mBackgroundHandler);
             } catch (CameraAccessException e) {
                 e.printStackTrace();
             }
@@ -282,75 +229,15 @@ public class CameraFragment extends Fragment {
         }
     };
 
-    @SuppressLint("MissingPermission")
-    //触发某个相机，为其设置回调函数，该相机开始生命周期
-    private void igniteCamera() {
-        Activity activity = getActivity();
-        if (null == activity || activity.isFinishing()) {
-            return;
-        }
-
-        CameraManager manager = (CameraManager) activity.getSystemService(Context.CAMERA_SERVICE);
-        try {
-            String cameraId =  manager.getCameraIdList()[0];
-            mCharacteristics = manager.getCameraCharacteristics(cameraId);
-            StreamConfigurationMap map = mCharacteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
-//            int mSensorOrientation = mCharacteristics.get(CameraCharacteristics.SENSOR_ORIENTATION);
-            Size[] yuv_imageSize = map.getOutputSizes(ImageFormat.YUV_420_888);
-//            Size[] jpeg_imageSize = map.getOutputSizes(ImageFormat.JPEG);
-//            Size[] raw_imageSize = map.getOutputSizes(ImageFormat.RAW_SENSOR);
-//            Size[] priv_imageSize = map.getOutputSizes(TextureView.class);
-            int imgWidth=yuv_imageSize[0].getWidth();
-            int imgHeight=yuv_imageSize[0].getHeight();
-
-//            mImageReader = ImageReader.newInstance(imgWidth, imgHeight, ImageFormat.JPEG, 2);
-            mImageReader = ImageReader.newInstance(imgWidth, imgHeight, ImageFormat.YUV_420_888, 2);
-//            mImageReader = ImageReader.newInstance(imageSize.getWidth(), imageSize.getHeight(), ImageFormat.JPEG, 2);
-            mImageReader.setOnImageAvailableListener(mOnImageAvailableListener, mBackgroundHandler);
-
-            try {
-                if (!mCameraOpenCloseLock.tryAcquire(2500, TimeUnit.MILLISECONDS)) {
-                    throw new RuntimeException("Time out waiting to lock camera opening.");
-                }
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            manager.openCamera(cameraId, cameraStateCallback, mBackgroundHandler);
-        } catch (CameraAccessException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void closeCamera() {
-        try {
-            mCameraOpenCloseLock.acquire();
-            if (null != mCaptureSession) {
-                mCaptureSession.close();
-                mCaptureSession = null;
-            }
-            if (null != mCameraDevice) {
-                mCameraDevice.close();
-                mCameraDevice = null;
-            }
-            if (null != mImageReader) {
-                mImageReader.close();
-                mImageReader = null;
-            }
-        } catch (InterruptedException e) {
-            throw new RuntimeException("Interrupted while trying to lock camera closing.", e);
-        } finally {
-            mCameraOpenCloseLock.release();
-        }
-    }
 
     //**************************** CameraCapture.Session ****************************//
     CameraCaptureSession.StateCallback sessionStateCallback =  new CameraCaptureSession.StateCallback() {
         @Override
         public void onConfigured(@NonNull CameraCaptureSession session) {
-            //Toast.makeText(getContext(),"Session configured..",Toast.LENGTH_SHORT).show();
-            mCaptureSession = session;//向外暴露会话的句柄
-            //启动“浏览”，无事可处理，不需要设置回调函数
+            mCaptureSession = session;//[KeyJoint]:mCaptureSession的句柄
+            //会话OK，启动“浏览”；浏览无事可处理，不需要设置回调函数
             try {
+                //投射通道在之前已经顺便建立： mPreviewRequestBuilder.addTarget(textureSurface);
                 // Auto focus & flash should be continuous for camera preview.
                 mPreviewRequestBuilder.set(CaptureRequest.CONTROL_AF_MODE,CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_PICTURE);
                 mPreviewRequestBuilder.set(CaptureRequest.CONTROL_AE_MODE,CaptureRequest.CONTROL_AE_MODE_ON_AUTO_FLASH);
@@ -502,7 +389,7 @@ public class CameraFragment extends Fragment {
             // Orientation
             //int rotation = activity.getWindowManager().getDefaultDisplay().getRotation();
             //captureBuilder.set(CaptureRequest.JPEG_ORIENTATION, getOrientation(rotation));
-            //***********************自用回调****************************/
+            //******************自用回调**********************/
             CameraCaptureSession.CaptureCallback capturePictureCallback
                     = new CameraCaptureSession.CaptureCallback() {
                 @Override
@@ -518,6 +405,116 @@ public class CameraFragment extends Fragment {
             mCaptureSession.abortCaptures();
             mCaptureSession.capture(capturePictureBuilder.build(), capturePictureCallback, null);
         } catch (CameraAccessException e) {
+            e.printStackTrace();
+        }
+    }
+
+    //**************************** CameraFragment ****************************//
+    private HandlerThread mBackgroundThread;
+    private Handler mBackgroundHandler;
+
+    public CameraFragment() {
+        // Required empty public constructor
+    }
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
+        return inflater.inflate(R.layout.fragment_camera, container, false);
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        mImageView=view.findViewById(R.id.imageView);
+
+        Button btnExit=view.findViewById(R.id.btnExit);
+        btnExit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                getFragmentManager().popBackStack();
+            }
+        });
+
+        Button btnCapture=view.findViewById(R.id.btnCapture);
+        btnCapture.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                lockFocus();
+            }
+        });
+
+        final Button btnPreview = view.findViewById(R.id.btnPreview);
+        btnPreview.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(mPreviewing){
+                    btnPreview.setText(R.string.previewStart);
+                    closeCamera();
+                }else{
+                    btnPreview.setText(R.string.previewClose);
+                    igniteCamera();
+                }
+                mPreviewing=!mPreviewing;
+            }
+        });
+
+
+        mTextureView=view.findViewById(R.id.textureView);
+        mTextureView.setSurfaceTextureListener(surfaceTextureListener);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        startBackgroundThread();
+    }
+
+    @Override
+    public void onPause() {
+//        closeCamera();
+        stopBackgroundThread();
+        super.onPause();
+    }
+
+    private void closeCamera() {
+        try {
+            mCameraOpenCloseLock.acquire();
+            if (null != mCaptureSession) {
+                mCaptureSession.close();
+                mCaptureSession = null;
+            }
+            if (null != mCameraDevice) {
+                mCameraDevice.close();
+                mCameraDevice = null;
+            }
+            if (null != mImageReader) {
+                mImageReader.close();
+                mImageReader = null;
+            }
+        } catch (InterruptedException e) {
+            throw new RuntimeException("Interrupted while trying to lock camera closing.", e);
+        } finally {
+            mCameraOpenCloseLock.release();
+        }
+    }
+
+    private void startBackgroundThread() {
+        mBackgroundThread = new HandlerThread("CameraBackground");
+        mBackgroundThread.start();
+        mBackgroundHandler = new Handler(mBackgroundThread.getLooper());
+    }
+
+    /**
+     * Stops the background thread and its {@link Handler}.
+     */
+    private void stopBackgroundThread() {
+        mBackgroundThread.quitSafely();
+        try {
+            mBackgroundThread.join();
+            mBackgroundThread = null;
+            mBackgroundHandler = null;
+        } catch (InterruptedException e) {
             e.printStackTrace();
         }
     }
