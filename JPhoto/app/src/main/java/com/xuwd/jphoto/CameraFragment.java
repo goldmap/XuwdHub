@@ -267,11 +267,12 @@ public class CameraFragment extends Fragment {
 //            Toast.makeText(getContext(),"mState"+mState,Toast.LENGTH_SHORT).show();
             switch (mState) {
                 case STATE_PREVIEW: {
-//                    Toast.makeText(getContext(),"previewing",Toast.LENGTH_SHORT).show();
+                    //改编的preview模式不调用这个回调函数，不经过这里;
                     // We have nothing to do when the camera preview is working normally.
                     break;
                 }
-                case STATE_WAITING_LOCK: {
+                case STATE_WAITING_LOCK: //简单可理解为待聚焦成功后调用capture
+                {
                     Integer afState = result.get(CaptureResult.CONTROL_AF_STATE);
                     Integer aeState = result.get(CaptureResult.CONTROL_AE_STATE);
                     //Toast.makeText(getContext(),"af/aeState:"+afState+"/"+aeState,Toast.LENGTH_SHORT).show();
@@ -385,10 +386,6 @@ public class CameraFragment extends Fragment {
             // Use the same AE and AF modes as the preview.
             capturePictureBuilder.set(CaptureRequest.CONTROL_AF_MODE, CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_PICTURE);
             capturePictureBuilder.set(CaptureRequest.CONTROL_AE_MODE, CaptureRequest.CONTROL_AE_MODE_ON_AUTO_FLASH);
-
-            // Orientation
-            //int rotation = activity.getWindowManager().getDefaultDisplay().getRotation();
-            //captureBuilder.set(CaptureRequest.JPEG_ORIENTATION, getOrientation(rotation));
             //******************自用回调**********************/
             CameraCaptureSession.CaptureCallback capturePictureCallback
                     = new CameraCaptureSession.CaptureCallback() {

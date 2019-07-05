@@ -69,7 +69,7 @@ public class CameraVideoFragment extends Fragment {
     private MediaRecorder mMediaRecorder;
     //**************************** MediaRecorder ****************************//
 
-    private void setUpMediaRecorder() throws IOException {
+    private void setUpMediaRecorder()  {
         final Activity activity = getActivity();
         if (null == activity) {
             return;
@@ -96,7 +96,11 @@ public class CameraVideoFragment extends Fragment {
                 mMediaRecorder.setOrientationHint(INVERSE_ORIENTATIONS.get(rotation));
                 break;
         }*/
-        mMediaRecorder.prepare();
+        try {
+            mMediaRecorder.prepare();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     //**************************** ImageReader ****************************//
@@ -206,7 +210,6 @@ public class CameraVideoFragment extends Fragment {
                 mTextureView.setAspectRatio(mPreviewSize.getHeight(), mPreviewSize.getWidth());
             }
             configureTransform(mTextureWidth,mTextureHeight);
-            mMediaRecorder = new MediaRecorder();
 
             manager.openCamera(cameraId, cameraStateCallback, mBackgroundHandler);
         }   catch (CameraAccessException e) {
@@ -318,6 +321,9 @@ public class CameraVideoFragment extends Fragment {
         //parent= getActivity();
         mTextureView = view.findViewById(R.id.textureView);
         mTextureView.setSurfaceTextureListener(surfaceTextureListener);
+        mMediaRecorder = new MediaRecorder();
+        setUpMediaRecorder();
+
         mButtonVideo = view.findViewById(R.id.btnRecord);
         mButtonVideo.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -436,9 +442,6 @@ public class CameraVideoFragment extends Fragment {
         }
     }
 
-
-
-
     private String getVideoFilePath(Context context) {
         final File dir = context.getExternalFilesDir(null);
         return (dir == null ? "" : (dir.getAbsolutePath() + "/"))
@@ -450,11 +453,6 @@ public class CameraVideoFragment extends Fragment {
         }
         try {
             closePreviewSession();
-            setUpMediaRecorder();
-
-            SurfaceTexture texture = mTextureView.getSurfaceTexture();
-            assert texture != null;
-            texture.setDefaultBufferSize(mPreviewSize.getWidth(), mPreviewSize.getHeight());
 
             final CaptureRequest.Builder captureVideoBuilder = mCameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_RECORD);
 
@@ -463,9 +461,8 @@ public class CameraVideoFragment extends Fragment {
 
             captureVideoBuilder.set(CaptureRequest.CONTROL_AF_MODE,CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_VIDEO);
             captureVideoBuilder.set(CaptureRequest.CONTROL_AE_MODE,CaptureRequest.CONTROL_AE_MODE_ON_AUTO_FLASH);
-            // Start a capture session
-            // Once the session starts, we can update the UI and start recording
 
+            //自配回调函数
             CameraCaptureSession.CaptureCallback captureVideoCallback
                     = new CameraCaptureSession.CaptureCallback() {
                 @Override
@@ -480,9 +477,9 @@ public class CameraVideoFragment extends Fragment {
                 }
             };
 
-            mCaptureSession.capture(captureVideoBuilder.build(),captureVideoCallback,mBackgroundHandler);
-
-        } catch (CameraAccessException | IOException e) {
+            // Once the session starts, we can update the UI and start recording
+            mCaptureSession.capture(captureVideoBuilder.build(),captureVideoCallback,null);
+        } catch (CameraAccessException e) {
             e.printStackTrace();
         }
 
