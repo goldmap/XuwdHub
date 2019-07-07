@@ -37,7 +37,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.VideoView;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -61,6 +64,8 @@ public class CameraVideoFragment extends Fragment {
     private String mNextVideoAbsolutePath;
     private CameraCaptureSession mPreviewSession;
     private ImageView mImageView;
+
+    private  MediaPlayer mMediaPlayer;
 
     private MediaRecorder mMediaRecorder;
     //**************************** MediaRecorder ****************************//
@@ -141,7 +146,7 @@ public class CameraVideoFragment extends Fragment {
     };
 
     //**************************** TextureView ****************************//
-    private AutoFitTextureView mTextureView;
+    private TextureView mTextureView;
     private int mTextureWidth,mTextureHeight;
     private TextureView.SurfaceTextureListener surfaceTextureListener
             = new TextureView.SurfaceTextureListener() {
@@ -198,19 +203,42 @@ public class CameraVideoFragment extends Fragment {
                     mTextureWidth,mTextureHeight, mVideoSize);
 
             int orientation = getResources().getConfiguration().orientation;
-            if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+/*            if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
                 mTextureView.setAspectRatio(mPreviewSize.getWidth(), mPreviewSize.getHeight());
             } else {
                 mTextureView.setAspectRatio(mPreviewSize.getHeight(), mPreviewSize.getWidth());
             }
             configureTransform(mTextureWidth,mTextureHeight);
-
+*/
             manager.openCamera(cameraId, cameraStateCallback, mBackgroundHandler);
         }   catch (CameraAccessException e) {
             throw new RuntimeException("Interrupted while trying to lock camera opening.");
         }
     }
 
+    private TextureView.SurfaceTextureListener videoSurfaceTextureListener = new TextureView.SurfaceTextureListener() {
+        @Override
+        public void onSurfaceTextureAvailable(SurfaceTexture surfaceTexture, int width, int height) {
+            initMediaPlayer(surfaceTexture);
+        }
+        @Override
+        public void onSurfaceTextureSizeChanged(SurfaceTexture surfaceTexture, int width, int height) {
+        }
+        @Override
+        public boolean onSurfaceTextureDestroyed(SurfaceTexture surfaceTexture) {
+            return false;
+        }
+        @Override
+        public void onSurfaceTextureUpdated(SurfaceTexture surfaceTexture) {
+        }
+    };
+
+    private void initMediaPlayer(SurfaceTexture surfaceTexture){
+        if (mMediaPlayer==null){
+            mMediaPlayer = new MediaPlayer();
+        }
+        mMediaPlayer.setSurface(new Surface(surfaceTexture));
+    }
      //********************************* CameraDevice *****************************************//
     private Semaphore mCameraOpenCloseLock = new Semaphore(1);
     private Boolean mPreviewing=false;
@@ -307,7 +335,7 @@ public class CameraVideoFragment extends Fragment {
      //****************************** CameraVideoFragment ***********************************//
     private HandlerThread mBackgroundThread;
     private Handler mBackgroundHandler;
-
+    private TextView mVideoView;
     public static CameraVideoFragment newInstance() {
         return new CameraVideoFragment();
     }
@@ -322,6 +350,9 @@ public class CameraVideoFragment extends Fragment {
     @Override
     public void onViewCreated(final View view, Bundle savedInstanceState) {
         //parent= getActivity();
+        TextureView mVideoView=view.findViewById(R.id.videoView);
+        mVideoView.setSurfaceTextureListener(videoSurfaceTextureListener);
+
         mTextureView = view.findViewById(R.id.textureView);
         mTextureView.setSurfaceTextureListener(surfaceTextureListener);
         mMediaRecorder = new MediaRecorder();
@@ -483,13 +514,16 @@ public class CameraVideoFragment extends Fragment {
     }
 
     private void playVideo(){
-        MediaPlayer mPlayer = new MediaPlayer();
         try {
             //使用手机本地视频
-            mPlayer.setDataSource(mNextVideoAbsolutePath);
+            mMediaPlayer.reset();
+            mMediaPlayer.setDataSource(mNextVideoAbsolutePath);
+            mMediaPlayer.prepare();
+
         } catch (Exception e) {
             e.printStackTrace();
         }
+        mMediaPlayer.start();
     }
     private void configureTransform(int viewWidth, int viewHeight) {
         Activity activity = getActivity();
