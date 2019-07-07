@@ -5,6 +5,7 @@
     <string name="shoot">拍照</string>
     <string name="camera">相机</string>
     <string name="recordStart">开始录像</string>
+    <string name="recordPlay">播放</string>
     <string name="recordEnd">结束录像</string>
     <string name="exitCamera">退出</string>
 
