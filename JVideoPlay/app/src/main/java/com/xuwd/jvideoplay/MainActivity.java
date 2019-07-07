@@ -3,6 +3,8 @@ package com.xuwd.jvideoplay;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.Manifest;
+import android.content.res.AssetFileDescriptor;
+import android.content.res.AssetManager;
 import android.graphics.SurfaceTexture;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
@@ -11,7 +13,9 @@ import android.view.Surface;
 import android.view.TextureView;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
+import java.io.File;
 import java.io.IOException;
 
 public class MainActivity extends JActivity {
@@ -66,16 +70,27 @@ public class MainActivity extends JActivity {
     private void initMediaPlayer() {
         if (mMediaPlayer == null) {
             mMediaPlayer = new MediaPlayer();
-            mMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+           // mMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
         }
-        mMediaPlayer.setSurface(new Surface(mSurfaceTexture));
+
+        AssetFileDescriptor afd=null;
+        AssetManager am = getAssets();
         try {
-            mMediaPlayer.setDataSource("h:/boen.mp4");
+            afd = am.openFd("test.mp4");
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        mMediaPlayer.reset();
+        try {
+            mMediaPlayer.setDataSource(afd.getFileDescriptor(),
+                    afd.getStartOffset(), afd.getLength()); ;
+            mMediaPlayer.prepare();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        mMediaPlayer.setSurface(new Surface(mSurfaceTexture));
     }
-
-
 
 }
