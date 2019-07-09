@@ -1,0 +1,30 @@
+﻿Adapter Hatcher:分析各种adapter的用法和机制
+一、根据字符串数组，动态创建按钮；
+二、Intent跳转;
+
+v1:
+public class MainActivity extends AppCompatActivity  implements View.OnClickListener {
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        String items[]={"111","2222","33333","444444"};
+        LinearLayout mainLayout=findViewById(R.id.mainLayout);
+        for(int i=0;i<items.length;i++){
+            Button btn=new Button(this);
+            btn.setText(items[i]);
+            btn.setOnClickListener(this);
+
+            mainLayout.addView(btn);
+        }
+    }
+
+    @Override
+    public void onClick(View view) {
+        Button btn=(Button)view;
+        String str=btn.getText().toString();
+        Toast.makeText(this,str,Toast.LENGTH_SHORT).show();
+    }
+}
