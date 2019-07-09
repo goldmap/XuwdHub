@@ -9,7 +9,10 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".SimpleListActivity"></activity>
+        <activity android:name=".XListActivity"></activity>
+        <activity android:name=".AdvancedListActivity"></activity>
+        <activity android:name=".NormalListActivity"></activity>
+        <activity android:name=".PureListActivity"></activity>
         <activity android:name=".ArrayAdapterActivity"></activity>
         <activity android:name=".MainActivity">
             <intent-filter>
