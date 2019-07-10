@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.xuwd.adapterhacheter">
+    package="com.xuwd.jlistview_click">
 
     <application
         android:allowBackup="true"
@@ -9,12 +9,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".ComplexListActivity"></activity>
-        <activity android:name=".AdvancedListActivity"></activity>
-        <activity android:name=".NormalListActivity"></activity>
-        <activity android:name=".PureListActivity"></activity>
-        <activity android:name=".ArrayAdapterActivity"></activity>
-        <activity android:name=".MainActivity">
+        <activity android:name="com.xuwd.jlistview_click.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

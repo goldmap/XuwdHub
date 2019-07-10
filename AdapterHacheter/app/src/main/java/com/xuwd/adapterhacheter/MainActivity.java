@@ -15,7 +15,7 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        String activities[]={"Array_Adapter","PureListActivity","NormalListActivity","AdvancedListActivity","XListActivity"};
+        String activities[]={"Array_Adapter","PureListActivity","NormalListActivity","AdvancedListActivity","ComplexListActivity"};
         LinearLayout mainLayout=findViewById(R.id.mainLayout);
         for(int i=0;i<activities.length;i++){
             Button btn=new Button(this);
@@ -48,7 +48,7 @@ public class MainActivity extends AppCompatActivity  implements View.OnClickList
                 intent=new Intent(this,AdvancedListActivity.class);
                 break;
             case 2004:
-                intent=new Intent(this,XListActivity.class);
+                intent=new Intent(this, ComplexListActivity.class);
                 break;
         }
         if(intent!=null)

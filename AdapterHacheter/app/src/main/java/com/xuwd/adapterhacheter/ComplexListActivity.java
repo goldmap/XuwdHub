@@ -22,7 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class XListActivity extends ListActivity {
+public class ComplexListActivity extends ListActivity {
 
     private List<Map<String, Object>> mData;
 
@@ -69,10 +69,10 @@ public class XListActivity extends ListActivity {
     /**
      * listview中点击按键弹出对话框
      */
-    public void showInfo(){
+    public void showInfo(String inf){
         new AlertDialog.Builder(this)
                 .setTitle("我的listview")
-                .setMessage("介绍...")
+                .setMessage("介绍..."+inf)
                 .setPositiveButton("确定", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -93,13 +93,11 @@ public class XListActivity extends ListActivity {
 
 
     public class MyAdapter extends BaseAdapter {
-
         private LayoutInflater mInflater;
-
-
         public MyAdapter(Context context){
             this.mInflater = LayoutInflater.from(context);
         }
+
         @Override
         public int getCount() {
             // TODO Auto-generated method stub
@@ -126,7 +124,7 @@ public class XListActivity extends ListActivity {
 
                 holder=new ViewHolder();
 
-                convertView = mInflater.inflate(R.layout.vlist2, null);
+                convertView = mInflater.inflate(R.layout.item_complex, null);
                 holder.img = (ImageView)convertView.findViewById(R.id.img);
                 holder.title = (TextView)convertView.findViewById(R.id.title);
                 holder.info = (TextView)convertView.findViewById(R.id.info);
@@ -142,12 +140,12 @@ public class XListActivity extends ListActivity {
             holder.img.setBackgroundResource((Integer)mData.get(position).get("img"));
             holder.title.setText((String)mData.get(position).get("title"));
             holder.info.setText((String)mData.get(position).get("info"));
-
+            final String str=(String)mData.get(position).get("info");
             holder.viewBtn.setOnClickListener(new View.OnClickListener() {
 
                 @Override
                 public void onClick(View v) {
-                    showInfo();
+                    showInfo(str);
                 }
             });
 

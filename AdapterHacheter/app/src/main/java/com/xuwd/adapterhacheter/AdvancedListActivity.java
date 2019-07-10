@@ -15,7 +15,7 @@ public class AdvancedListActivity extends ListActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        SimpleAdapter adapter = new SimpleAdapter(this,getData(),R.layout.vlist,
+        SimpleAdapter adapter = new SimpleAdapter(this,getData(),R.layout.item_advancedlist,
                 new String[]{"title","info","img"},
                 new int[]{R.id.title,R.id.info,R.id.img});
         setListAdapter(adapter);

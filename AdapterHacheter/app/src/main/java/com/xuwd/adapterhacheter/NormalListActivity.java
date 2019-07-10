@@ -14,7 +14,7 @@ public class NormalListActivity extends ListActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        SimpleAdapter adapter = new SimpleAdapter(this, getData(), R.layout.simple, new String[] { "title",  "img" }, new int[] { R.id.title, R.id.img });
+        SimpleAdapter adapter = new SimpleAdapter(this, getData(), R.layout.item_normallist, new String[] { "title",  "img" }, new int[] { R.id.title, R.id.img });
         setListAdapter(adapter);
     }
 
