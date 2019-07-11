@@ -1,6 +1,7 @@
 package com.xuwd.jrecycleview;
 
 import androidx.appcompat.app.AppCompatActivity;
+//import androidx.;
 
 import android.os.Bundle;
 import android.widget.ArrayAdapter;
@@ -8,7 +9,7 @@ import android.widget.ListView;
 
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity extends AdapterView.OnItemClickListener{
     private String demos[]={"A","B"};
     @Override
     protected void onCreate(Bundle savedInstanceState) {
