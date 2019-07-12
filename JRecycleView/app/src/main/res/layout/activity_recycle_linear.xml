@@ -6,21 +6,19 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".Activity.MainActivity">
+    tools:context=".Activity.RecycleLinearActivity">
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center"
-        android:text="Demo"/>
-    <androidx.cardview.widget.CardView
+        android:text=" in recycle"
+        />
+    <androidx.recyclerview.widget.RecyclerView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:id="@+id/recycleLinear"
+        android:divider="#ffff0000"
+        android:dividerHeight="10dp">
 
-        <ListView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/listView"/>
-    </androidx.cardview.widget.CardView>
-
+    </androidx.recyclerview.widget.RecyclerView>
 </LinearLayout>
