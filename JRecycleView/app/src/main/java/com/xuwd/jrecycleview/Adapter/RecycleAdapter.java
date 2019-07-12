@@ -11,7 +11,10 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.xuwd.jrecycleview.R;
 
 import java.util.ArrayList;
-
+/*  adapter实际上是管理ViewHolder，即一个区块。重写adapter就是根据layout重构ViewHolder
+//  利用父窗口的Inflater载入区块view，将其作为参数传递给重载的ViewHolder，由ViewHolder对区块进行操作
+//  流程：根据getItemCount计数，创建n个ViewHolder,并依次触发onBindViewHolder
+*/
 public class RecycleAdapter extends RecyclerView.Adapter<RecycleAdapter.JViewHolder>{
     private ArrayList<String> mData;
 
@@ -22,17 +25,15 @@ public class RecycleAdapter extends RecyclerView.Adapter<RecycleAdapter.JViewHol
     @NonNull
     @Override
     public RecycleAdapter.JViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view=LayoutInflater.from(parent.getContext()).inflate(R.layout.list_simple_central,parent,false);
+        View view=LayoutInflater.from(parent.getContext()).inflate(R.layout.list_simple_text,parent,false);
         JViewHolder viewHolder=new JViewHolder(view);
         return viewHolder;
     }
 
     @NonNull
-
-
     @Override
     public void onBindViewHolder(@NonNull RecycleAdapter.JViewHolder holder, int position) {
-        holder.tv.setText(mData.get(position));
+        holder.mTextView.setText(mData.get(position));
     }
 
     @Override
@@ -42,11 +43,11 @@ public class RecycleAdapter extends RecyclerView.Adapter<RecycleAdapter.JViewHol
 
     class JViewHolder extends RecyclerView.ViewHolder
     {
-        TextView tv;
+        TextView mTextView;
         public JViewHolder(View view)
         {
             super(view);
-            tv = (TextView) view.findViewById(R.id.simpleList);
+            mTextView = (TextView) view.findViewById(R.id.simpleList);
         }
     }
 

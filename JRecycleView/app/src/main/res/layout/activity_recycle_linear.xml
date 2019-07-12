@@ -7,18 +7,16 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     tools:context=".Activity.RecycleLinearActivity">
-
     <TextView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text=" in recycle"
-        />
+        android:layout_height="50dp"
+        android:gravity="center"
+        android:text="SS"/>
     <androidx.recyclerview.widget.RecyclerView
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/recycleLinear"
-        android:divider="#ffff0000"
-        android:dividerHeight="10dp">
+        android:id="@+id/linearRecycleView"
+        android:layout_gravity="center" >
 
     </androidx.recyclerview.widget.RecyclerView>
 </LinearLayout>

@@ -14,13 +14,13 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.xuwd.jrecycleview.R;
 
 public class MainActivity extends AppCompatActivity implements AdapterView.OnItemClickListener {
-    private String demoItems[]={"Linear Recylce","B"};
+    private String demoItems[]={"Linear Recylce","Grid Rycycle"};
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        ArrayAdapter<String> adapter=new ArrayAdapter<String>(this,R.layout.list_simple_central,R.id.simpleList, demoItems);
+        ArrayAdapter<String> adapter=new ArrayAdapter<String>(this,R.layout.list_simple_text,R.id.simpleList, demoItems);
         ListView listView=findViewById(R.id.listView);
         listView.setAdapter(adapter);
         listView.setOnItemClickListener(this);
@@ -35,6 +35,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         switch(position){
             case 0:
                 intent=new Intent(this,RecycleLinearActivity.class);
+                break;
+            case 1:
+                intent=new Intent(this,RecycleGridActivity.class);
                 break;
         }
         if(intent!=null){
