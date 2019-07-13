@@ -7,6 +7,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Bundle;
+import android.view.View;
+import android.widget.Toast;
 
 import com.xuwd.jrecycleview.Adapter.RecycleAdapter;
 import com.xuwd.jrecycleview.R;
@@ -30,6 +32,18 @@ public class RecycleLinearActivity extends AppCompatActivity {
 //        recyclerLinear.setItemAnimator(new DefaultItemAnimator());
 //        recyclerLinear.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
 
+        adapter.setOnItemClickListener(new RecycleAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(View view, int position) {
+                Toast.makeText(RecycleLinearActivity.this,"Here:"+position,Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onItemLongClick(View view, int position) {
+
+            }
+        });
+
     }
 
     public ArrayList<String> initData(){
@@ -39,4 +53,6 @@ public class RecycleLinearActivity extends AppCompatActivity {
         }
         return data;
     }
+
+
 }

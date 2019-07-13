@@ -17,12 +17,14 @@ import java.util.ArrayList;
 //  流程：根据getItemCount计数，创建n个ViewHolder,并依次触发onBindViewHolder
 */
 public class RecycleAdapter extends RecyclerView.Adapter<RecycleAdapter.JViewHolder>{
-    private ArrayList<String> mData;
 
+    private ArrayList<String> mData;
     private OnItemClickListener onItemClickListener;
+
     public void setOnItemClickListener(RecycleAdapter.OnItemClickListener listener) {
         this.onItemClickListener = listener;
     }
+
     public RecycleAdapter(ArrayList<String> data){
         this.mData=data;
     }
@@ -41,11 +43,30 @@ public class RecycleAdapter extends RecyclerView.Adapter<RecycleAdapter.JViewHol
 */        return viewHolder;
     }
 
-    @NonNull
     @Override
-    public void onBindViewHolder(@NonNull RecycleAdapter.JViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull final RecycleAdapter.JViewHolder holder, int position) {
         holder.mTextView.setText(mData.get(position));
-        //holder.
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(onItemClickListener!=null){
+                    int pos=holder.getLayoutPosition();
+                    onItemClickListener.onItemClick(holder.itemView,pos);
+                }
+            }
+        });
+
+        holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                if(onItemClickListener != null) {
+                    int pos = holder.getLayoutPosition();
+                    onItemClickListener.onItemLongClick(holder.itemView, pos);
+                }
+                //表示此事件已经消费，不会触发单击事件
+                return true;
+            }
+        });
     }
 
     @Override
