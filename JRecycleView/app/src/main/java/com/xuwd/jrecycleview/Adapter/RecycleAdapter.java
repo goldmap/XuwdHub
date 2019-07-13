@@ -19,6 +19,10 @@ import java.util.ArrayList;
 public class RecycleAdapter extends RecyclerView.Adapter<RecycleAdapter.JViewHolder>{
     private ArrayList<String> mData;
 
+    private OnItemClickListener onItemClickListener;
+    public void setOnItemClickListener(RecycleAdapter.OnItemClickListener listener) {
+        this.onItemClickListener = listener;
+    }
     public RecycleAdapter(ArrayList<String> data){
         this.mData=data;
     }
@@ -41,6 +45,7 @@ public class RecycleAdapter extends RecyclerView.Adapter<RecycleAdapter.JViewHol
     @Override
     public void onBindViewHolder(@NonNull RecycleAdapter.JViewHolder holder, int position) {
         holder.mTextView.setText(mData.get(position));
+        //holder.
     }
 
     @Override
@@ -55,13 +60,12 @@ public class RecycleAdapter extends RecyclerView.Adapter<RecycleAdapter.JViewHol
         {
             super(view);
             mTextView = (TextView) view.findViewById(R.id.simpleList);
-            mTextView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    Toast.makeText(view.getContext(),mTextView.getText(),Toast.LENGTH_SHORT).show();
-                }
-            });
+
         }
     }
 
+    public interface OnItemClickListener{
+        void onItemClick(View view,int position);
+        void onItemLongClick(View view, int position);
+    }
 }
