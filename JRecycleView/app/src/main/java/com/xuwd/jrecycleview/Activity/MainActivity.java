@@ -14,7 +14,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.xuwd.jrecycleview.R;
 
 public class MainActivity extends AppCompatActivity implements AdapterView.OnItemClickListener {
-    private String demoItems[]={"Linear Recylce","Grid Rycycle"};
+    private String demoItems[]={"Linear Recylce","Grid Rycycle","Stagger Grid Recycle"};
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -38,6 +38,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 break;
             case 1:
                 intent=new Intent(this,RecycleGridActivity.class);
+                break;
+            case 2:
+                intent=new Intent(this,RecycleStaggerGridActivity.class);
                 break;
         }
         if(intent!=null){

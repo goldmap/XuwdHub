@@ -4,6 +4,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -26,8 +27,14 @@ public class RecycleAdapter extends RecyclerView.Adapter<RecycleAdapter.JViewHol
     @Override
     public RecycleAdapter.JViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view=LayoutInflater.from(parent.getContext()).inflate(R.layout.list_simple_text,parent,false);
-        JViewHolder viewHolder=new JViewHolder(view);
-        return viewHolder;
+        final JViewHolder viewHolder=new JViewHolder(view);
+/*        view.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(view.getContext(),viewHolder.mTextView.getText(),Toast.LENGTH_SHORT).show();
+            }
+       });
+*/        return viewHolder;
     }
 
     @NonNull
@@ -48,6 +55,12 @@ public class RecycleAdapter extends RecyclerView.Adapter<RecycleAdapter.JViewHol
         {
             super(view);
             mTextView = (TextView) view.findViewById(R.id.simpleList);
+            mTextView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Toast.makeText(view.getContext(),mTextView.getText(),Toast.LENGTH_SHORT).show();
+                }
+            });
         }
     }
 
