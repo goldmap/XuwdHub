@@ -20,7 +20,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        ArrayAdapter<String> adapter=new ArrayAdapter<String>(this,R.layout.list_simple_text,R.id.simpleList, demoItems);
+        ArrayAdapter<String> adapter=new ArrayAdapter<String>(this,R.layout.list_simple_text,R.id.simpleStringItem, demoItems);
         ListView listView=findViewById(R.id.listView);
         listView.setAdapter(adapter);
         listView.setOnItemClickListener(this);
@@ -28,7 +28,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
-        TextView tv=view.findViewById(R.id.simpleList);
+        TextView tv=view.findViewById(R.id.simpleStringItem);
         String str= tv.getText().toString();
         Toast.makeText(this,str,Toast.LENGTH_SHORT).show();
         Intent intent=null;
