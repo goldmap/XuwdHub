@@ -14,13 +14,13 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.xuwd.jrecycleview.R;
 
 public class MainActivity extends AppCompatActivity implements AdapterView.OnItemClickListener {
-    private String demoItems[]={"Linear Recylce","Grid Rycycle","Stagger Grid Recycle"};
+    private String demoItems[]={"Linear Recylce","Grid Rycycle","Stagger Grid Recycle","File Manager"};
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        ArrayAdapter<String> adapter=new ArrayAdapter<String>(this,R.layout.list_simple_text,R.id.simpleStringItem, demoItems);
+        ArrayAdapter<String> adapter=new ArrayAdapter<String>(this,R.layout.list_simple_text,R.id.listItemText, demoItems);
         ListView listView=findViewById(R.id.listView);
         listView.setAdapter(adapter);
         listView.setOnItemClickListener(this);
@@ -28,7 +28,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
-        TextView tv=view.findViewById(R.id.simpleStringItem);
+        TextView tv=view.findViewById(R.id.listItemText);
         String str= tv.getText().toString();
         Toast.makeText(this,str,Toast.LENGTH_SHORT).show();
         Intent intent=null;
@@ -41,6 +41,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 break;
             case 2:
                 intent=new Intent(this,RecycleStaggerGridActivity.class);
+                break;
+            case 3:
+                intent=new Intent(this,FileManActivity.class);
                 break;
         }
         if(intent!=null){

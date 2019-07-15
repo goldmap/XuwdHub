@@ -9,9 +9,10 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".Activity.RecycleStaggerGridActivity"></activity>
-        <activity android:name=".Activity.RecycleGridActivity"></activity>
-        <activity android:name=".Activity.RecycleLinearActivity"></activity>
+        <activity android:name=".Activity.FileManActivity"></activity>
+        <activity android:name=".Activity.RecycleStaggerGridActivity" />
+        <activity android:name=".Activity.RecycleGridActivity" />
+        <activity android:name=".Activity.RecycleLinearActivity" />
         <activity android:name=".Activity.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

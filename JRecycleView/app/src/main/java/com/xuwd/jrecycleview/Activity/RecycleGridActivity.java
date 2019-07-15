@@ -26,7 +26,7 @@ public class RecycleGridActivity extends AppCompatActivity {
         RecyclerView.LayoutManager layoutManager=new GridLayoutManager(this, 4, RecyclerView.VERTICAL, false);
         recyclerView.setLayoutManager(layoutManager);
 
-        RecycleAdapter adapter=new RecycleAdapter(initData());
+        RecycleAdapter adapter=new RecycleAdapter(R.layout.list_simple_text,initData());
         recyclerView.setAdapter(adapter);
 
 //        recyclerLinear.setItemAnimator(new DefaultItemAnimator());

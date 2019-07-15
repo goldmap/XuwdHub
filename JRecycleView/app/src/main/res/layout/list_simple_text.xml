@@ -2,14 +2,18 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="120dp"
     android:layout_height="80dp"
-    android:orientation="vertical"
+    android:orientation="horizontal"
     android:gravity="center"
     android:background="@color/colorGrass">
     <TextView
         android:layout_width="100dp"
         android:layout_height="match_parent"
-        android:id="@+id/simpleStringItem"
+        android:id="@+id/listItemText"
         android:gravity="center"
         android:layout_marginVertical="15dp"
         android:background="#ff00ff"/>
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@mipmap/forword"/>
 </LinearLayout>

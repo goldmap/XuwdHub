@@ -16,7 +16,7 @@ import java.util.ArrayList;
 //  流程：根据getItemCount计数，创建n个ViewHolder,并依次触发onBindViewHolder
 */
 public class RecycleAdapter extends RecyclerView.Adapter<RecycleAdapter.JViewHolder>{
-
+    private int listItemId;
     private ArrayList<String> mData;
     private OnItemClickListener onItemClickListener;
 
@@ -24,22 +24,17 @@ public class RecycleAdapter extends RecyclerView.Adapter<RecycleAdapter.JViewHol
         this.onItemClickListener = listener;
     }
 
-    public RecycleAdapter(ArrayList<String> data){
+    public RecycleAdapter(int listItemId,ArrayList<String> data){
+        this.listItemId=listItemId;
         this.mData=data;
     }
 
     @NonNull
     @Override
     public RecycleAdapter.JViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view=LayoutInflater.from(parent.getContext()).inflate(R.layout.list_simple_text,parent,false);
+        View view=LayoutInflater.from(parent.getContext()).inflate(listItemId,parent,false);
         final JViewHolder viewHolder=new JViewHolder(view);
-/*        view.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Toast.makeText(view.getContext(),viewHolder.mTextView.getText(),Toast.LENGTH_SHORT).show();
-            }
-       });
-*/        return viewHolder;
+        return viewHolder;
     }
 
     @Override
@@ -79,7 +74,7 @@ public class RecycleAdapter extends RecyclerView.Adapter<RecycleAdapter.JViewHol
         public JViewHolder(View view)
         {
             super(view);
-            mTextView = (TextView) view.findViewById(R.id.simpleStringItem);
+            mTextView = (TextView) view.findViewById(R.id.listItemText);
 
         }
     }
