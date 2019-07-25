@@ -10,15 +10,23 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.xuwd.jrecycleview.Adapter.RecycleAdapter;
 import com.xuwd.jrecycleview.R;
-
-import java.util.ArrayList;
+import com.xuwd.jrecycleview.Utility.*;
 
 public class FileManActivity extends AppCompatActivity {
     private ArrayAdapter<String> mListAdapter;
     private ListView mListView;
+
+    private List<StorageUtil.FileItem> mFileItemList;
+    private String mDir;
+    private String outSdcard;
+    private String innerSdcard;
+    private static final String SDCARD_ROOT_DEFAULT = "/storage";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
