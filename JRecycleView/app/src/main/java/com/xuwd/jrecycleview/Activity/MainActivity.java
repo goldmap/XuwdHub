@@ -13,7 +13,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.xuwd.jrecycleview.R;
 
-public class MainActivity extends AppCompatActivity implements AdapterView.OnItemClickListener {
+public class MainActivity extends JActivity implements AdapterView.OnItemClickListener {
     private String demoItems[]={"Linear Recylce","Grid Rycycle","Stagger Grid Recycle","File Manager"};
     @Override
     protected void onCreate(Bundle savedInstanceState) {
