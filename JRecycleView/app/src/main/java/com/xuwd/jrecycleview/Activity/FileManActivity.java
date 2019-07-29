@@ -65,15 +65,16 @@ public class FileManActivity extends AppCompatActivity {
         mFileListView.setAdapter(mFileListAdapter);
     }
 
-    public ArrayList<String> initData(int iStart){
+    public ArrayList<StorageUtil.FileItem> initData(int iStart){
         ArrayList<StorageUtil.FileItem> items=new ArrayList<StorageUtil.FileItem>();
 
-        outSdcard = StorageUtil.getStoragePath(this, true);
-        innerSdcard = StorageUtil.getStoragePath(this,true);
+        outSdcard = JUtil.getStoragePath(this, true);
+        innerSdcard = JUtil.getStoragePath(this,true);
 
-        /*for(int i=iStart;i<20;i++){
-            items.add("item"+i);
-        }*/
+        for(int i=iStart;i<20;i++){
+            StorageUtil.FileItem fileItem= new StorageUtil.FileItem("item"+i,"t",false);
+            items.add(fileItem);
+        }
         return items;
     }
 
@@ -86,4 +87,5 @@ public class FileManActivity extends AppCompatActivity {
         mFileListAdapter =new RecycleAdapter(R.layout.list_filelist,initData(position));
         mFileListView.setAdapter(mFileListAdapter);
     }
+
 }

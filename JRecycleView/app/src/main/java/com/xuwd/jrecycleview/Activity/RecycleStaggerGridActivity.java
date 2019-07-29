@@ -26,8 +26,8 @@ public class RecycleStaggerGridActivity extends AppCompatActivity {
         RecyclerView.LayoutManager layoutManager=new StaggeredGridLayoutManager( 3, RecyclerView.VERTICAL);
         recyclerView.setLayoutManager(layoutManager);
 
-        RecycleAdapter adapter=new RecycleAdapter(R.layout.list_simple_text,initData());
-        recyclerView.setAdapter(adapter);
+//        RecycleAdapter adapter=new RecycleAdapter(R.layout.list_simple_text,initData());
+//        recyclerView.setAdapter(adapter);
 
 //        recyclerLinear.setItemAnimator(new DefaultItemAnimator());
 //        recyclerLinear.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));

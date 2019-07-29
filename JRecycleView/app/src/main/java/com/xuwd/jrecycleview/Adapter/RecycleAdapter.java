@@ -8,6 +8,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.xuwd.jrecycleview.Activity.FileManActivity;
 import com.xuwd.jrecycleview.R;
 import com.xuwd.jrecycleview.Utility.StorageUtil;
 
@@ -41,7 +42,7 @@ public class RecycleAdapter extends RecyclerView.Adapter<RecycleAdapter.JViewHol
     @Override
     public void onBindViewHolder(@NonNull final RecycleAdapter.JViewHolder holder, int position) {
         StorageUtil.FileItem fileItem=mData.get(position);
-        holder.mTextView.setText(fileItem.FileName);
+        holder.mTextView.setText(fileItem.fileName);
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

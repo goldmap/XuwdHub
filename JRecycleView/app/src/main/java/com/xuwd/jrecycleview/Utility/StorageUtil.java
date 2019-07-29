@@ -230,10 +230,13 @@ public class StorageUtil {
         }
     }
 
-    public class FileItem {
-        String fileName;
-        String filePath;
-        boolean isZip;
+    public static class FileItem {
+        public String fileName;
+        public String filePath;
+        public boolean isZip;
+        public FileItem(){
+
+        }
 
         public FileItem(String fileName, String filePath, boolean isZip) {
             this.fileName = fileName;
