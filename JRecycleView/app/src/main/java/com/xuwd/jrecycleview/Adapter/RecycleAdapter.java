@@ -9,6 +9,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.xuwd.jrecycleview.R;
+import com.xuwd.jrecycleview.Utility.StorageUtil;
 
 import java.util.ArrayList;
 /*  adapter实际上是管理ViewHolder，即一个区块。重写adapter就是根据layout重构ViewHolder
@@ -17,14 +18,14 @@ import java.util.ArrayList;
 */
 public class RecycleAdapter extends RecyclerView.Adapter<RecycleAdapter.JViewHolder>{
     private int listItemLayout;
-    private ArrayList<String> mData;
+    private ArrayList<StorageUtil.FileItem> mData;
     private OnItemClickListener onItemClickListener;
 
     public void setOnItemClickListener(RecycleAdapter.OnItemClickListener listener) {
         this.onItemClickListener = listener;
     }
 
-    public RecycleAdapter(int listItemLayout, ArrayList<String> data){
+    public RecycleAdapter(int listItemLayout, ArrayList<StorageUtil.FileItem> data){
         this.listItemLayout = listItemLayout;
         this.mData=data;
     }
@@ -39,7 +40,8 @@ public class RecycleAdapter extends RecyclerView.Adapter<RecycleAdapter.JViewHol
 
     @Override
     public void onBindViewHolder(@NonNull final RecycleAdapter.JViewHolder holder, int position) {
-        holder.mTextView.setText(mData.get(position));
+        StorageUtil.FileItem fileItem=mData.get(position);
+        holder.mTextView.setText(fileItem.FileName);
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

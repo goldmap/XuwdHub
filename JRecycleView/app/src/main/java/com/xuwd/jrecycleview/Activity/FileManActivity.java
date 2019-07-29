@@ -7,6 +7,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.os.Bundle;
 import android.view.View;
 
+import java.util.ArrayList;
+
 import com.xuwd.jrecycleview.Adapter.RecycleAdapter;
 import com.xuwd.jrecycleview.R;
 import com.xuwd.jrecycleview.Utility.*;
@@ -14,6 +16,13 @@ import com.xuwd.jrecycleview.Utility.*;
 public class FileManActivity extends AppCompatActivity {
     private RecycleAdapter mFileListAdapter;
     RecyclerView mFileListView;
+
+    private String mDir;
+    private String outSdcard;
+    private String innerSdcard;
+    private static final String SDCARD_ROOT_DEFAULT = "/storage";
+    private static int mPosition;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -57,13 +66,22 @@ public class FileManActivity extends AppCompatActivity {
     }
 
     public ArrayList<String> initData(int iStart){
-        ArrayList<String> data=new ArrayList<String>();
-        for(int i=iStart;i<20;i++){
-            data.add("item"+i);
-        }
-        return data;
+        ArrayList<StorageUtil.FileItem> items=new ArrayList<StorageUtil.FileItem>();
+
+        outSdcard = StorageUtil.getStoragePath(this, true);
+        innerSdcard = StorageUtil.getStoragePath(this,true);
+
+        /*for(int i=iStart;i<20;i++){
+            items.add("item"+i);
+        }*/
+        return items;
     }
 
+    public ArrayList<String> curerentDirItems(){
+        ArrayList<String> items=new ArrayList<String>();
+
+        return items;
+    }
     public void reList(int position){
         mFileListAdapter =new RecycleAdapter(R.layout.list_filelist,initData(position));
         mFileListView.setAdapter(mFileListAdapter);
