@@ -9,8 +9,7 @@ import android.view.View;
 
 import com.xuwd.jrecycleview.Adapter.RecycleAdapter;
 import com.xuwd.jrecycleview.R;
-
-import java.util.ArrayList;
+import com.xuwd.jrecycleview.Utility.*;
 
 public class FileManActivity extends AppCompatActivity {
     private RecycleAdapter mFileListAdapter;
