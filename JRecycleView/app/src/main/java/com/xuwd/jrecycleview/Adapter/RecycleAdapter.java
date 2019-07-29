@@ -16,7 +16,7 @@ import java.util.ArrayList;
 //  流程：根据getItemCount计数，创建n个ViewHolder,并依次触发onBindViewHolder
 */
 public class RecycleAdapter extends RecyclerView.Adapter<RecycleAdapter.JViewHolder>{
-    private int listItemId;
+    private int listItemLayout;
     private ArrayList<String> mData;
     private OnItemClickListener onItemClickListener;
 
@@ -24,15 +24,15 @@ public class RecycleAdapter extends RecyclerView.Adapter<RecycleAdapter.JViewHol
         this.onItemClickListener = listener;
     }
 
-    public RecycleAdapter(int listItemId,ArrayList<String> data){
-        this.listItemId=listItemId;
+    public RecycleAdapter(int listItemLayout, ArrayList<String> data){
+        this.listItemLayout = listItemLayout;
         this.mData=data;
     }
 
     @NonNull
     @Override
     public RecycleAdapter.JViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view=LayoutInflater.from(parent.getContext()).inflate(listItemId,parent,false);
+        View view=LayoutInflater.from(parent.getContext()).inflate(listItemLayout,parent,false);
         final JViewHolder viewHolder=new JViewHolder(view);
         return viewHolder;
     }

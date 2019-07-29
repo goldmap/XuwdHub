@@ -6,10 +6,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Bundle;
 import android.view.View;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import com.xuwd.jrecycleview.Adapter.RecycleAdapter;
 import com.xuwd.jrecycleview.R;
@@ -17,23 +13,29 @@ import com.xuwd.jrecycleview.R;
 import java.util.ArrayList;
 
 public class FileManActivity extends AppCompatActivity {
-    private ArrayAdapter<String> mListAdapter;
-    private ListView mListView;
+    private RecycleAdapter mFileListAdapter;
+    RecyclerView mFileListView;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_file_man);
 
-        RecyclerView dirRcyclerView=findViewById(R.id.dirRecycleView);
+        initDirNavigator();
+        initFileList();
+
+    }
+
+    private void initDirNavigator(){
+        RecyclerView dirRecyclerView=findViewById(R.id.dirRecycleView);
 
         RecyclerView.LayoutManager horizontalLayoutManager=new LinearLayoutManager(this,RecyclerView.HORIZONTAL,false);
-        dirRcyclerView.setLayoutManager(horizontalLayoutManager);
+        dirRecyclerView.setLayoutManager(horizontalLayoutManager);
 
         RecycleAdapter mDirNavigatorAdapter=new RecycleAdapter(R.layout.list_dir_navigator,initData(0));
         mDirNavigatorAdapter.setOnItemClickListener(new RecycleAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
-               reList(position);
+                reList(position);
             }
 
             @Override
@@ -41,12 +43,18 @@ public class FileManActivity extends AppCompatActivity {
 
             }
         });
-//        RecycleAdapter mDirNavigatorAdapter=new RecycleAdapter(R.layout.list_simple_text,initData());
-        dirRcyclerView.setAdapter(mDirNavigatorAdapter);
 
-        mListView =findViewById(R.id.fileListView);
-        //mListAdapter =new ArrayAdapter<String>(this,R.layout.list_pure_text,R.id.listItemText,initData(0));
-        //mListView.setAdapter(mListAdapter);
+        dirRecyclerView.setAdapter(mDirNavigatorAdapter);
+    }
+
+    private void initFileList(){
+        mFileListView =findViewById(R.id.fileListView);
+
+        RecyclerView.LayoutManager verticalLayoutManager = new LinearLayoutManager(this,RecyclerView.VERTICAL,false);
+        mFileListView.setLayoutManager(verticalLayoutManager);
+
+        RecycleAdapter mFileListAdapter=new RecycleAdapter(R.layout.list_filelist,initData(0));
+        mFileListView.setAdapter(mFileListAdapter);
     }
 
     public ArrayList<String> initData(int iStart){
@@ -58,7 +66,7 @@ public class FileManActivity extends AppCompatActivity {
     }
 
     public void reList(int position){
-        mListAdapter =new ArrayAdapter<String>(this,R.layout.list_pure_text,R.id.listItemText,initData(position));
-        mListView.setAdapter(mListAdapter);
+        mFileListAdapter =new RecycleAdapter(R.layout.list_filelist,initData(position));
+        mFileListView.setAdapter(mFileListAdapter);
     }
 }
