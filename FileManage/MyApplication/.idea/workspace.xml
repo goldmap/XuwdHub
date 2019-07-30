@@ -39,22 +39,7 @@
     <last-search-timestamp>1563075404922</last-search-timestamp>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="1fd4ad4b-d76a-46f4-afd0-16fcf31bfd2e" name="Default" comment="">
-      <change afterPath="$PROJECT_DIR$/../../JRecycleView/app/src/main/java/com/xuwd/jrecycleview/Utility/JUtil.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gradle/5.1.1/executionHistory/executionHistory.bin" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/5.1.1/executionHistory/executionHistory.bin" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gradle/5.1.1/executionHistory/executionHistory.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/5.1.1/executionHistory/executionHistory.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gradle/5.1.1/fileHashes/fileHashes.bin" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/5.1.1/fileHashes/fileHashes.bin" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gradle/5.1.1/fileHashes/fileHashes.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/5.1.1/fileHashes/fileHashes.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../JRecycleView/app/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/../../JRecycleView/app/build.gradle" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../JRecycleView/app/src/main/java/com/xuwd/jrecycleview/Activity/FileManActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../JRecycleView/app/src/main/java/com/xuwd/jrecycleview/Activity/FileManActivity.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../JRecycleView/app/src/main/java/com/xuwd/jrecycleview/Activity/RecycleGridActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../JRecycleView/app/src/main/java/com/xuwd/jrecycleview/Activity/RecycleGridActivity.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../JRecycleView/app/src/main/java/com/xuwd/jrecycleview/Activity/RecycleLinearActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../JRecycleView/app/src/main/java/com/xuwd/jrecycleview/Activity/RecycleLinearActivity.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../JRecycleView/app/src/main/java/com/xuwd/jrecycleview/Activity/RecycleStaggerGridActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../JRecycleView/app/src/main/java/com/xuwd/jrecycleview/Activity/RecycleStaggerGridActivity.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../JRecycleView/app/src/main/java/com/xuwd/jrecycleview/Adapter/RecycleAdapter.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../JRecycleView/app/src/main/java/com/xuwd/jrecycleview/Adapter/RecycleAdapter.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../JRecycleView/app/src/main/java/com/xuwd/jrecycleview/Utility/StorageUtil.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../JRecycleView/app/src/main/java/com/xuwd/jrecycleview/Utility/StorageUtil.java" afterDir="false" />
-    </list>
+    <list default="true" id="1fd4ad4b-d76a-46f4-afd0-16fcf31bfd2e" name="Default" comment="" />
     <ignored path="My Application.iws" />
     <ignored path=".idea/workspace.xml" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -142,7 +127,7 @@
       </list>
     </option>
   </component>
-  <component name="ProjectFrameBounds" extendedState="1">
+  <component name="ProjectFrameBounds">
     <option name="x" value="757" />
     <option name="width" value="1111" />
     <option name="height" value="1064" />
@@ -386,8 +371,7 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="757" y="0" width="1111" height="1064" extended-state="1" />
-    <editor active="true" />
+    <frame x="757" y="0" width="1111" height="1064" extended-state="0" />
     <layout>
       <window_info active="true" id="Project" order="0" visible="true" weight="0.3463368" />
       <window_info id="Structure" order="1" weight="0.25" />
