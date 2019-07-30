@@ -26,12 +26,12 @@ public class RecycleLinearActivity extends AppCompatActivity {
         RecyclerView.LayoutManager layoutManager=new LinearLayoutManager(this,RecyclerView.VERTICAL,false);
         recyclerLinear.setLayoutManager(layoutManager);
 
-        RecycleAdapter adapter=new RecycleAdapter(R.layout.list_simple_text,initData());
-        recyclerLinear.setAdapter(adapter);
+//        RecycleAdapter adapter=new RecycleAdapter(R.layout.list_simple_text,initData());
+ //       recyclerLinear.setAdapter(adapter);
 
 //        recyclerLinear.setItemAnimator(new DefaultItemAnimator());
 //        recyclerLinear.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
-
+/*
         adapter.setOnItemClickListener(new RecycleAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
@@ -43,7 +43,7 @@ public class RecycleLinearActivity extends AppCompatActivity {
 
             }
         });
-
+*/
     }
 
     public ArrayList<String> initData(){

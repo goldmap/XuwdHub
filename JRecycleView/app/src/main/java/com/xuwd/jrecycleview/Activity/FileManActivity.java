@@ -6,33 +6,33 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Bundle;
 import android.view.View;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import com.xuwd.jrecycleview.Adapter.RecycleAdapter;
 import com.xuwd.jrecycleview.R;
 import com.xuwd.jrecycleview.Utility.*;
 
 public class FileManActivity extends AppCompatActivity {
-    private ArrayAdapter<String> mListAdapter;
-    private ListView mListView;
+    private RecycleAdapter mFileListAdapter;
+    RecyclerView mFileListView;
 
-    private List<StorageUtil.FileItem> mFileItemList;
     private String mDir;
     private String outSdcard;
     private String innerSdcard;
     private static final String SDCARD_ROOT_DEFAULT = "/storage";
+    private static int mPosition;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_file_man);
+
         initDirNavigator();
-        initDirList();
+        initFileList();
+
     }
+
     private void initDirNavigator(){
         RecyclerView dirRecyclerView=findViewById(R.id.dirRecycleView);
 
@@ -51,39 +51,41 @@ public class FileManActivity extends AppCompatActivity {
 
             }
         });
+
         dirRecyclerView.setAdapter(mDirNavigatorAdapter);
     }
 
-    private void initDirList(){
-        mListView =findViewById(R.id.fileListView);
-        mListAdapter =new ArrayAdapter<String>(this,R.layout.list_pure_text,R.id.listItemText,initData(0));
+    private void initFileList(){
+        mFileListView =findViewById(R.id.fileListView);
 
-        RecycleAdapter mDirNavigatorAdapter=new RecycleAdapter(R.layout.list_dir_navigator,initData(0));
-        mDirNavigatorAdapter.setOnItemClickListener(new RecycleAdapter.OnItemClickListener() {
-            @Override
-            public void onItemClick(View view, int position) {
-                reList(position);
-            }
+        RecyclerView.LayoutManager verticalLayoutManager = new LinearLayoutManager(this,RecyclerView.VERTICAL,false);
+        mFileListView.setLayoutManager(verticalLayoutManager);
 
-            @Override
-            public void onItemLongClick(View view, int position) {
-
-            }
-        });
-        dirRecyclerView.setAdapter(mDirNavigatorAdapter);
-
+        RecycleAdapter mFileListAdapter=new RecycleAdapter(R.layout.list_filelist,initData(0));
+        mFileListView.setAdapter(mFileListAdapter);
     }
 
-    public ArrayList<String> initData(int iStart){
-        ArrayList<String> data=new ArrayList<String>();
+    public ArrayList<StorageUtil.FileItem> initData(int iStart){
+        ArrayList<StorageUtil.FileItem> items=new ArrayList<StorageUtil.FileItem>();
+
+        outSdcard = StorageUtil.getStoragePath(this, true);
+        innerSdcard = StorageUtil.getStoragePath(this,true);
+
         for(int i=iStart;i<20;i++){
-            data.add("item"+i);
+            StorageUtil.FileItem fileItem= new StorageUtil.FileItem("item"+i,"t",false);
+            items.add(fileItem);
         }
-        return data;
+        return items;
     }
 
-    public void reList(int position){
-        mListAdapter =new ArrayAdapter<String>(this,R.layout.list_pure_text,R.id.listItemText,initData(position));
-        mListView.setAdapter(mListAdapter);
+    public ArrayList<String> curerentDirItems(){
+        ArrayList<String> items=new ArrayList<String>();
+
+        return items;
     }
+    public void reList(int position){
+        mFileListAdapter =new RecycleAdapter(R.layout.list_filelist,initData(position));
+        mFileListView.setAdapter(mFileListAdapter);
+    }
+
 }

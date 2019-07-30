@@ -8,7 +8,9 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.xuwd.jrecycleview.Activity.FileManActivity;
 import com.xuwd.jrecycleview.R;
+import com.xuwd.jrecycleview.Utility.StorageUtil;
 
 import java.util.ArrayList;
 /*  adapter实际上是管理ViewHolder，即一个区块。重写adapter就是根据layout重构ViewHolder
@@ -16,30 +18,31 @@ import java.util.ArrayList;
 //  流程：根据getItemCount计数，创建n个ViewHolder,并依次触发onBindViewHolder
 */
 public class RecycleAdapter extends RecyclerView.Adapter<RecycleAdapter.JViewHolder>{
-    private int listItemId;
-    private ArrayList<String> mData;
+    private int listItemLayout;
+    private ArrayList<StorageUtil.FileItem> mData;
     private OnItemClickListener onItemClickListener;
 
     public void setOnItemClickListener(RecycleAdapter.OnItemClickListener listener) {
         this.onItemClickListener = listener;
     }
 
-    public RecycleAdapter(int listItemId,ArrayList<String> data){
-        this.listItemId=listItemId;
+    public RecycleAdapter(int listItemLayout, ArrayList<StorageUtil.FileItem> data){
+        this.listItemLayout = listItemLayout;
         this.mData=data;
     }
 
     @NonNull
     @Override
     public RecycleAdapter.JViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view=LayoutInflater.from(parent.getContext()).inflate(listItemId,parent,false);
+        View view=LayoutInflater.from(parent.getContext()).inflate(listItemLayout,parent,false);
         final JViewHolder viewHolder=new JViewHolder(view);
         return viewHolder;
     }
 
     @Override
     public void onBindViewHolder(@NonNull final RecycleAdapter.JViewHolder holder, int position) {
-        holder.mTextView.setText(mData.get(position));
+        StorageUtil.FileItem fileItem=mData.get(position);
+        holder.mTextView.setText(fileItem.fileName);
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

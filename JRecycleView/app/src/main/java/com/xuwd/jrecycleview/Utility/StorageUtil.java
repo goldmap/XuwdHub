@@ -29,7 +29,7 @@ import java.util.StringTokenizer;
 public class StorageUtil {
     private static final String LOG_TAG ="StorageUtil:" ;
 
-    public static String getStoragePath(Context mContext, boolean is_removale) {
+    public static String getStoragePath(Context mContext, boolean is_removable) {
 
         StorageManager mStorageManager = (StorageManager) mContext.getSystemService(Context.STORAGE_SERVICE);
         Class<?> storageVolumeClazz = null;
@@ -44,7 +44,7 @@ public class StorageUtil {
                 Object storageVolumeElement = Array.get(result, i);
                 String path = (String) getPath.invoke(storageVolumeElement);
                 boolean removable = (Boolean) isRemovable.invoke(storageVolumeElement);
-                if (is_removale == removable) {
+                if (is_removable == removable) {
                     return path;
                 }
             }
@@ -230,10 +230,14 @@ public class StorageUtil {
         }
     }
 
-    public class FileItem {
-        String fileName;
-        String filePath;
-        boolean isZip;
+    public static class FileItem {
+        public String fileName;
+        public String filePath;
+        public boolean isZip;
+
+        public FileItem(){
+
+        }
 
         public FileItem(String fileName, String filePath, boolean isZip) {
             this.fileName = fileName;
