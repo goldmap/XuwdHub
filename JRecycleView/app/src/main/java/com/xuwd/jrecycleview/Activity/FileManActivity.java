@@ -68,8 +68,8 @@ public class FileManActivity extends AppCompatActivity {
     public ArrayList<StorageUtil.FileItem> initData(int iStart){
         ArrayList<StorageUtil.FileItem> items=new ArrayList<StorageUtil.FileItem>();
 
-        outSdcard = StorageUtil.getStoragePath(this, true);
-        innerSdcard = StorageUtil.getStoragePath(this,true);
+        outSdcard = JUtil.getStoragePath(this, true);
+        innerSdcard = JUtil.getStoragePath(this,true);
 
         for(int i=iStart;i<20;i++){
             StorageUtil.FileItem fileItem= new StorageUtil.FileItem("item"+i,"t",false);

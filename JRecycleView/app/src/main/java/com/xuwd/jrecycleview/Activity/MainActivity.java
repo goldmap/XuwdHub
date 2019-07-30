@@ -20,6 +20,8 @@ public class MainActivity extends JActivity implements AdapterView.OnItemClickLi
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        initPermission();
+
         ArrayAdapter<String> adapter=new ArrayAdapter<String>(this,R.layout.list_simple_text,R.id.listItemText, demoItems);
         ListView listView=findViewById(R.id.listView);
         listView.setAdapter(adapter);

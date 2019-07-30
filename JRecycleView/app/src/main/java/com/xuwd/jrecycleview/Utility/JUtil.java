@@ -14,6 +14,8 @@ public class JUtil {
         List<StorageVolume> volumList=mStorageManager.getStorageVolumes();
         for(int i=0;i<volumList.size();i++){
             StorageVolume storageVolume=volumList.get(i);
+            storageVolume
+            int j=0;
         }
         return "";
     }
