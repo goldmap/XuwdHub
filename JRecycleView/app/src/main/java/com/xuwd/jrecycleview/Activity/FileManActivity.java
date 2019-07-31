@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.view.View;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import com.xuwd.jrecycleview.Adapter.RecycleAdapter;
 import com.xuwd.jrecycleview.R;
@@ -28,7 +29,7 @@ public class FileManActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_file_man);
 
-        initDirNavigator();
+//        initDirNavigator();
         initFileList();
 
     }
@@ -39,7 +40,7 @@ public class FileManActivity extends AppCompatActivity {
         RecyclerView.LayoutManager horizontalLayoutManager=new LinearLayoutManager(this,RecyclerView.HORIZONTAL,false);
         dirRecyclerView.setLayoutManager(horizontalLayoutManager);
 
-        RecycleAdapter mDirNavigatorAdapter=new RecycleAdapter(R.layout.list_dir_navigator,initData(0));
+        RecycleAdapter mDirNavigatorAdapter=new RecycleAdapter(R.layout.list_dir_navigator,initData());
         mDirNavigatorAdapter.setOnItemClickListener(new RecycleAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
@@ -61,21 +62,27 @@ public class FileManActivity extends AppCompatActivity {
         RecyclerView.LayoutManager verticalLayoutManager = new LinearLayoutManager(this,RecyclerView.VERTICAL,false);
         mFileListView.setLayoutManager(verticalLayoutManager);
 
-        RecycleAdapter mFileListAdapter=new RecycleAdapter(R.layout.list_filelist,initData(0));
+        RecycleAdapter mFileListAdapter=new RecycleAdapter(R.layout.list_filelist,initData());
         mFileListView.setAdapter(mFileListAdapter);
     }
 
-    public ArrayList<StorageUtil.FileItem> initData(int iStart){
-        ArrayList<StorageUtil.FileItem> items=new ArrayList<StorageUtil.FileItem>();
+    public ArrayList<StorageUtil.FileItem> initData(){
+        ArrayList<StorageUtil.FileItem> fileItemList=new ArrayList<>();
+        StorageUtil.FileItem fileItem=null;
 
         outSdcard = JUtil.getStoragePath(this, true);
-        innerSdcard = JUtil.getStoragePath(this,true);
+        innerSdcard = JUtil.getStoragePath(this,false);
 
-        for(int i=iStart;i<20;i++){
-            StorageUtil.FileItem fileItem= new StorageUtil.FileItem("item"+i,"t",false);
-            items.add(fileItem);
+        if(outSdcard!=null){
+            fileItem=new StorageUtil.FileItem("SD card",outSdcard,false);
+            fileItemList.add(fileItem);
         }
-        return items;
+        if(innerSdcard!=null){
+            fileItem=new StorageUtil.FileItem("Internal storage",innerSdcard,false);
+            fileItemList.add(fileItem);
+        }
+
+        return fileItemList;
     }
 
     public ArrayList<String> curerentDirItems(){
@@ -84,7 +91,7 @@ public class FileManActivity extends AppCompatActivity {
         return items;
     }
     public void reList(int position){
-        mFileListAdapter =new RecycleAdapter(R.layout.list_filelist,initData(position));
+        mFileListAdapter =new RecycleAdapter(R.layout.list_filelist,initData());
         mFileListView.setAdapter(mFileListAdapter);
     }
 
