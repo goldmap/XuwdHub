@@ -48,9 +48,6 @@
       <change beforePath="$PROJECT_DIR$/.idea/caches/gradle_models.ser" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/caches/gradle_models.ser" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../../JRecycleView/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../../JRecycleView/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../JRecycleView/app/src/main/AndroidManifest.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../../JRecycleView/app/src/main/AndroidManifest.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../JRecycleView/app/src/main/java/com/xuwd/jrecycleview/Activity/FileManActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../JRecycleView/app/src/main/java/com/xuwd/jrecycleview/Activity/FileManActivity.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../JRecycleView/app/src/main/java/com/xuwd/jrecycleview/Activity/MainActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../JRecycleView/app/src/main/java/com/xuwd/jrecycleview/Activity/MainActivity.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../../JRecycleView/app/src/main/java/com/xuwd/jrecycleview/Utility/JUtil.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../JRecycleView/app/src/main/java/com/xuwd/jrecycleview/Utility/JUtil.java" afterDir="false" />
     </list>
     <ignored path="My Application.iws" />
@@ -84,13 +81,13 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/app/src/main/java/com/ui/myapplication/MainActivity.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="284">
-              <caret line="66" selection-start-line="66" selection-end-line="66" />
+            <state relative-caret-position="214">
+              <caret line="166" selection-start-line="166" selection-end-line="166" />
               <folding>
                 <element signature="imports" expanded="true" />
-                <element signature="e#2317#2349#0" expanded="true" />
-                <element signature="e#2922#3599#0" expanded="true" />
-                <element signature="e#3598#3599#0" expanded="true" />
+                <element signature="e#5539#5571#0" expanded="true" />
+                <element signature="e#5915#6419#0" expanded="true" />
+                <element signature="e#6418#6419#0" expanded="true" />
                 <element signature="e#8854#8855#0" expanded="true" />
                 <element signature="e#8923#8924#0" expanded="true" />
               </folding>
@@ -101,8 +98,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/app/src/main/java/com/ui/myapplication/StorageUtil.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="357">
-              <caret line="49" column="13" selection-start-line="49" selection-start-column="13" selection-end-line="49" selection-end-column="13" />
+            <state relative-caret-position="72">
+              <caret line="148" column="39" selection-start-line="148" selection-start-column="39" selection-end-line="148" selection-end-column="39" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -150,6 +147,7 @@
     </option>
   </component>
   <component name="ProjectFrameBounds">
+    <option name="x" value="341" />
     <option name="width" value="1504" />
     <option name="height" value="1072" />
   </component>
@@ -161,7 +159,6 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="PackagesPane" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -199,8 +196,9 @@
           <select />
         </subPane>
       </pane>
-      <pane id="AndroidView" />
+      <pane id="PackagesPane" />
       <pane id="Scope" />
+      <pane id="AndroidView" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -392,9 +390,10 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="0" y="0" width="1504" height="1072" extended-state="0" />
+    <frame x="341" y="0" width="1504" height="1072" extended-state="0" />
+    <editor active="true" />
     <layout>
-      <window_info id="Project" order="0" visible="true" weight="0.25207755" />
+      <window_info id="Project" order="0" visible="true" weight="0.25138503" />
       <window_info id="Structure" order="1" weight="0.25" />
       <window_info id="Captures" order="2" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="3" side_tool="true" />
@@ -406,7 +405,7 @@
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.32962137" />
       <window_info anchor="bottom" id="Run" order="2" weight="0.32936078" />
-      <window_info anchor="bottom" id="Debug" order="3" weight="0.32374868" />
+      <window_info anchor="bottom" id="Debug" order="3" weight="0.38125667" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" weight="0.32936078" />
@@ -416,9 +415,9 @@
       <window_info anchor="bottom" id="Version Control" order="10" />
       <window_info anchor="bottom" id="Gradle Console" order="11" side_tool="true" />
       <window_info anchor="bottom" id="Messages" order="12" weight="0.32962137" />
-      <window_info anchor="bottom" id="Build" order="13" weight="0.24060151" />
+      <window_info anchor="bottom" id="Build" order="13" weight="0.23961662" />
       <window_info anchor="bottom" id="Android Profiler" order="14" />
-      <window_info anchor="bottom" id="Logcat" order="15" weight="0.32936078" />
+      <window_info anchor="bottom" id="Logcat" order="15" weight="0.23322684" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
@@ -445,15 +444,15 @@
       <breakpoints>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/app/src/main/java/com/ui/myapplication/MainActivity.java</url>
-          <line>66</line>
-          <properties />
-          <option name="timeStamp" value="1" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/app/src/main/java/com/ui/myapplication/MainActivity.java</url>
           <line>103</line>
           <properties />
           <option name="timeStamp" value="2" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/app/src/main/java/com/ui/myapplication/MainActivity.java</url>
+          <line>164</line>
+          <properties />
+          <option name="timeStamp" value="3" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
@@ -544,12 +543,12 @@
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/AndroidManifest.xml">
-      <provider editor-type-id="android-manifest" />
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="95">
           <caret line="5" column="32" selection-start-line="5" selection-start-column="32" selection-end-line="5" selection-end-column="32" />
         </state>
       </provider>
+      <provider editor-type-id="android-manifest" />
     </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/res/layout/activity_file_browser.xml">
       <provider editor-type-id="android-designer2" />
@@ -598,23 +597,30 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/java/com/ui/myapplication/StorageUtil.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="357">
-          <caret line="49" column="13" selection-start-line="49" selection-start-column="13" selection-end-line="49" selection-end-column="13" />
+        <state relative-caret-position="72">
+          <caret line="148" column="39" selection-start-line="148" selection-start-column="39" selection-end-line="148" selection-end-column="39" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
+    <entry file="file://D:/Android/Sdk/sources/android-28/java/io/File.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="303">
+          <caret line="1214" column="18" selection-start-line="1214" selection-start-column="18" selection-end-line="1214" selection-end-column="18" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/java/com/ui/myapplication/MainActivity.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="284">
-          <caret line="66" selection-start-line="66" selection-end-line="66" />
+        <state relative-caret-position="214">
+          <caret line="166" selection-start-line="166" selection-end-line="166" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#2317#2349#0" expanded="true" />
-            <element signature="e#2922#3599#0" expanded="true" />
-            <element signature="e#3598#3599#0" expanded="true" />
+            <element signature="e#5539#5571#0" expanded="true" />
+            <element signature="e#5915#6419#0" expanded="true" />
+            <element signature="e#6418#6419#0" expanded="true" />
             <element signature="e#8854#8855#0" expanded="true" />
             <element signature="e#8923#8924#0" expanded="true" />
           </folding>
