@@ -18,6 +18,7 @@ import com.xuwd.jrecycleview.Utility.*;
 public class FileManActivity extends AppCompatActivity {
     private RecycleAdapter mFileListAdapter;
     RecyclerView mFileListView;
+    RecyclerView mDirNavigatorView;
 
     private String mDir;
     private String outSdcard;
@@ -30,23 +31,25 @@ public class FileManActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_file_man);
 
-//        initDirNavigator();
-        initFileList();
+        mDirNavigatorView=findViewById(R.id.dirRecycleView);
+        RecyclerView.LayoutManager horizontalLayoutManager=new LinearLayoutManager(this,RecyclerView.HORIZONTAL,false);
+        mDirNavigatorView.setLayoutManager(horizontalLayoutManager);
+        setDirNavigatoraAdapter("root");
 
+        mFileListView =findViewById(R.id.fileListView);
+        RecyclerView.LayoutManager verticalLayoutManager = new LinearLayoutManager(this,RecyclerView.VERTICAL,false);
+        mFileListView.setLayoutManager(verticalLayoutManager);
+        setFileListAdpter("root");
     }
 
-    private void initDirNavigator(){
-        RecyclerView dirRecyclerView=findViewById(R.id.dirRecycleView);
-
-        RecyclerView.LayoutManager horizontalLayoutManager=new LinearLayoutManager(this,RecyclerView.HORIZONTAL,false);
-        dirRecyclerView.setLayoutManager(horizontalLayoutManager);
-
+    private void setDirNavigatoraAdapter(String dirPath){
         RecycleAdapter mDirNavigatorAdapter=new RecycleAdapter(R.layout.list_dir_navigator, getDirList("root"));
         mDirNavigatorAdapter.setOnItemClickListener(new RecycleAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
-
-
+                StorageUtil.FileItem fileItem=mFileListAdapter.mData.get(position);
+                Toast.makeText(getBaseContext(),fileItem.fileName+"|"+fileItem.filePath,Toast.LENGTH_SHORT).show();
+                setDirNavigatoraAdapter(fileItem.filePath);
             }
 
             @Override
@@ -54,23 +57,17 @@ public class FileManActivity extends AppCompatActivity {
 
             }
         });
-
-        dirRecyclerView.setAdapter(mDirNavigatorAdapter);
+        mDirNavigatorView.setAdapter(mDirNavigatorAdapter);
     }
 
-    private void initFileList(){
-        mFileListView =findViewById(R.id.fileListView);
-
-        RecyclerView.LayoutManager verticalLayoutManager = new LinearLayoutManager(this,RecyclerView.VERTICAL,false);
-        mFileListView.setLayoutManager(verticalLayoutManager);
-
-        final RecycleAdapter mFileListAdapter=new RecycleAdapter(R.layout.list_filelist, getDirList("root"));
+    private void setFileListAdpter(String dirPath){
+        final RecycleAdapter mFileListAdapter=new RecycleAdapter(R.layout.list_filelist, getDirList(dirPath));
         mFileListAdapter.setOnItemClickListener(new RecycleAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
                 StorageUtil.FileItem fileItem=mFileListAdapter.mData.get(position);
                 Toast.makeText(getBaseContext(),fileItem.fileName+"|"+fileItem.filePath,Toast.LENGTH_SHORT).show();
-                reList(fileItem.filePath);
+                setFileListAdpter(fileItem.filePath);
             }
 
             @Override
@@ -90,11 +87,11 @@ public class FileManActivity extends AppCompatActivity {
             innerSdcard = JUtil.getStoragePath(this,false);
 
             if(outSdcard!=null){
-                fileItem=new StorageUtil.FileItem("SD card",outSdcard,false);
+                fileItem=new StorageUtil.FileItem("SD card",outSdcard,true);
                 fileItemList.add(fileItem);
             }
             if(innerSdcard!=null){
-                fileItem=new StorageUtil.FileItem("Internal storage",innerSdcard,false);
+                fileItem=new StorageUtil.FileItem("Internal storage",innerSdcard,true);
                 fileItemList.add(fileItem);
             }
         }else{
