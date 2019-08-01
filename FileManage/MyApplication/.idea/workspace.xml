@@ -40,15 +40,14 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="1fd4ad4b-d76a-46f4-afd0-16fcf31bfd2e" name="Default" comment="">
-      <change beforePath="$PROJECT_DIR$/.gradle/5.1.1/executionHistory/executionHistory.bin" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/5.1.1/executionHistory/executionHistory.bin" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gradle/5.1.1/executionHistory/executionHistory.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/5.1.1/executionHistory/executionHistory.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gradle/5.1.1/fileHashes/fileHashes.bin" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/5.1.1/fileHashes/fileHashes.bin" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gradle/5.1.1/fileHashes/fileHashes.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/5.1.1/fileHashes/fileHashes.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/caches/gradle_models.ser" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/caches/gradle_models.ser" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../../JRecycleView/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../../JRecycleView/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../JRecycleView/app/src/main/java/com/xuwd/jrecycleview/Utility/JUtil.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../JRecycleView/app/src/main/java/com/xuwd/jrecycleview/Utility/JUtil.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../JRecycleView/app/src/main/java/com/xuwd/jrecycleview/Activity/FileManActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../JRecycleView/app/src/main/java/com/xuwd/jrecycleview/Activity/FileManActivity.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../JRecycleView/app/src/main/java/com/xuwd/jrecycleview/Activity/RecycleGridActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../JRecycleView/app/src/main/java/com/xuwd/jrecycleview/Activity/RecycleGridActivity.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../JRecycleView/app/src/main/java/com/xuwd/jrecycleview/Activity/RecycleLinearActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../JRecycleView/app/src/main/java/com/xuwd/jrecycleview/Activity/RecycleLinearActivity.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../JRecycleView/app/src/main/java/com/xuwd/jrecycleview/Activity/RecycleStaggerGridActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../JRecycleView/app/src/main/java/com/xuwd/jrecycleview/Activity/RecycleStaggerGridActivity.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../JRecycleView/app/src/main/java/com/xuwd/jrecycleview/Adapter/RecycleAdapter.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../JRecycleView/app/src/main/java/com/xuwd/jrecycleview/Adapter/RecycleAdapter.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../JRecycleView/app/src/main/res/layout/list_filelist.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../../JRecycleView/app/src/main/res/layout/list_filelist.xml" afterDir="false" />
     </list>
     <ignored path="My Application.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -81,13 +80,10 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/app/src/main/java/com/ui/myapplication/MainActivity.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="214">
-              <caret line="166" selection-start-line="166" selection-end-line="166" />
+            <state relative-caret-position="290">
+              <caret line="184" column="17" lean-forward="true" selection-start-line="184" selection-start-column="17" selection-end-line="184" selection-end-column="17" />
               <folding>
                 <element signature="imports" expanded="true" />
-                <element signature="e#5539#5571#0" expanded="true" />
-                <element signature="e#5915#6419#0" expanded="true" />
-                <element signature="e#6418#6419#0" expanded="true" />
                 <element signature="e#8854#8855#0" expanded="true" />
                 <element signature="e#8923#8924#0" expanded="true" />
               </folding>
@@ -139,10 +135,10 @@
         <option value="$PROJECT_DIR$/app/src/main/res/layout/activity_file_browser.xml" />
         <option value="$PROJECT_DIR$/app/src/main/AndroidManifest.xml" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/ui/myapplication/MyApplication.java" />
-        <option value="$PROJECT_DIR$/app/src/main/java/com/ui/myapplication/MainActivity.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/ui/myapplication/CrashHandler.java" />
         <option value="$PROJECT_DIR$/app/build.gradle" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/ui/myapplication/StorageUtil.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/ui/myapplication/MainActivity.java" />
       </list>
     </option>
   </component>
@@ -391,9 +387,8 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="341" y="0" width="1504" height="1072" extended-state="0" />
-    <editor active="true" />
     <layout>
-      <window_info id="Project" order="0" visible="true" weight="0.25138503" />
+      <window_info active="true" id="Project" order="0" visible="true" weight="0.25138503" />
       <window_info id="Structure" order="1" weight="0.25" />
       <window_info id="Captures" order="2" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="3" side_tool="true" />
@@ -416,7 +411,7 @@
       <window_info anchor="bottom" id="Gradle Console" order="11" side_tool="true" />
       <window_info anchor="bottom" id="Messages" order="12" weight="0.32962137" />
       <window_info anchor="bottom" id="Build" order="13" weight="0.23961662" />
-      <window_info anchor="bottom" id="Android Profiler" order="14" />
+      <window_info anchor="bottom" id="Android Profiler" order="14" show_stripe_button="false" />
       <window_info anchor="bottom" id="Logcat" order="15" weight="0.23322684" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
@@ -595,6 +590,13 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://D:/Android/Sdk/sources/android-28/java/io/File.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="303">
+          <caret line="1214" column="18" selection-start-line="1214" selection-start-column="18" selection-end-line="1214" selection-end-column="18" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/java/com/ui/myapplication/StorageUtil.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="72">
@@ -605,22 +607,12 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://D:/Android/Sdk/sources/android-28/java/io/File.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="303">
-          <caret line="1214" column="18" selection-start-line="1214" selection-start-column="18" selection-end-line="1214" selection-end-column="18" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/java/com/ui/myapplication/MainActivity.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="214">
-          <caret line="166" selection-start-line="166" selection-end-line="166" />
+        <state relative-caret-position="290">
+          <caret line="184" column="17" lean-forward="true" selection-start-line="184" selection-start-column="17" selection-end-line="184" selection-end-column="17" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#5539#5571#0" expanded="true" />
-            <element signature="e#5915#6419#0" expanded="true" />
-            <element signature="e#6418#6419#0" expanded="true" />
             <element signature="e#8854#8855#0" expanded="true" />
             <element signature="e#8923#8924#0" expanded="true" />
           </folding>

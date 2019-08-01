@@ -26,7 +26,7 @@ public class RecycleLinearActivity extends AppCompatActivity {
         RecyclerView.LayoutManager layoutManager=new LinearLayoutManager(this,RecyclerView.VERTICAL,false);
         recyclerLinear.setLayoutManager(layoutManager);
 
-//        RecycleAdapter adapter=new RecycleAdapter(R.layout.list_simple_text,initData());
+//        RecycleAdapter adapter=new RecycleAdapter(R.layout.list_simple_text,getDirList());
  //       recyclerLinear.setAdapter(adapter);
 
 //        recyclerLinear.setItemAnimator(new DefaultItemAnimator());

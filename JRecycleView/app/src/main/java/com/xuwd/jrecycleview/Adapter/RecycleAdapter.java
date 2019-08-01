@@ -3,6 +3,7 @@ package com.xuwd.jrecycleview.Adapter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -19,7 +20,7 @@ import java.util.ArrayList;
 */
 public class RecycleAdapter extends RecyclerView.Adapter<RecycleAdapter.JViewHolder>{
     private int listItemLayout;
-    private ArrayList<StorageUtil.FileItem> mData;
+    public ArrayList<StorageUtil.FileItem> mData;
     private OnItemClickListener onItemClickListener;
 
     public void setOnItemClickListener(RecycleAdapter.OnItemClickListener listener) {
@@ -42,7 +43,14 @@ public class RecycleAdapter extends RecyclerView.Adapter<RecycleAdapter.JViewHol
     @Override
     public void onBindViewHolder(@NonNull final RecycleAdapter.JViewHolder holder, int position) {
         StorageUtil.FileItem fileItem=mData.get(position);
+
         holder.mTextView.setText(fileItem.fileName);
+        if(fileItem.isZip){
+            holder.mImageView.setImageResource(R.mipmap.ex_folder);
+        } else{
+            holder.mImageView.setImageResource(R.mipmap.ex_doc);
+        }
+
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -74,11 +82,12 @@ public class RecycleAdapter extends RecyclerView.Adapter<RecycleAdapter.JViewHol
     class JViewHolder extends RecyclerView.ViewHolder
     {
         TextView mTextView;
+        ImageView mImageView;
         public JViewHolder(View view)
         {
             super(view);
             mTextView = (TextView) view.findViewById(R.id.listItemText);
-
+            mImageView=view.findViewById(R.id.listItemImage);
         }
     }
 

@@ -6,9 +6,10 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Toast;
 
+import java.io.File;
 import java.util.ArrayList;
-import java.util.List;
 
 import com.xuwd.jrecycleview.Adapter.RecycleAdapter;
 import com.xuwd.jrecycleview.R;
@@ -40,11 +41,12 @@ public class FileManActivity extends AppCompatActivity {
         RecyclerView.LayoutManager horizontalLayoutManager=new LinearLayoutManager(this,RecyclerView.HORIZONTAL,false);
         dirRecyclerView.setLayoutManager(horizontalLayoutManager);
 
-        RecycleAdapter mDirNavigatorAdapter=new RecycleAdapter(R.layout.list_dir_navigator,initData());
+        RecycleAdapter mDirNavigatorAdapter=new RecycleAdapter(R.layout.list_dir_navigator, getDirList("root"));
         mDirNavigatorAdapter.setOnItemClickListener(new RecycleAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
-                reList(position);
+
+
             }
 
             @Override
@@ -62,36 +64,61 @@ public class FileManActivity extends AppCompatActivity {
         RecyclerView.LayoutManager verticalLayoutManager = new LinearLayoutManager(this,RecyclerView.VERTICAL,false);
         mFileListView.setLayoutManager(verticalLayoutManager);
 
-        RecycleAdapter mFileListAdapter=new RecycleAdapter(R.layout.list_filelist,initData());
+        final RecycleAdapter mFileListAdapter=new RecycleAdapter(R.layout.list_filelist, getDirList("root"));
+        mFileListAdapter.setOnItemClickListener(new RecycleAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(View view, int position) {
+                StorageUtil.FileItem fileItem=mFileListAdapter.mData.get(position);
+                Toast.makeText(getBaseContext(),fileItem.fileName+"|"+fileItem.filePath,Toast.LENGTH_SHORT).show();
+                reList(fileItem.filePath);
+            }
+
+            @Override
+            public void onItemLongClick(View view, int position) {
+
+            }
+        });
         mFileListView.setAdapter(mFileListAdapter);
     }
 
-    public ArrayList<StorageUtil.FileItem> initData(){
+    public ArrayList<StorageUtil.FileItem> getDirList(String dirPath){
         ArrayList<StorageUtil.FileItem> fileItemList=new ArrayList<>();
         StorageUtil.FileItem fileItem=null;
 
-        outSdcard = JUtil.getStoragePath(this, true);
-        innerSdcard = JUtil.getStoragePath(this,false);
+        if(dirPath=="root"){
+            outSdcard = JUtil.getStoragePath(this, true);
+            innerSdcard = JUtil.getStoragePath(this,false);
 
-        if(outSdcard!=null){
-            fileItem=new StorageUtil.FileItem("SD card",outSdcard,false);
-            fileItemList.add(fileItem);
+            if(outSdcard!=null){
+                fileItem=new StorageUtil.FileItem("SD card",outSdcard,false);
+                fileItemList.add(fileItem);
+            }
+            if(innerSdcard!=null){
+                fileItem=new StorageUtil.FileItem("Internal storage",innerSdcard,false);
+                fileItemList.add(fileItem);
+            }
+        }else{
+            File dirNow=new File(dirPath);
+            File[] files=dirNow.listFiles();
+            if(files != null){
+                for(int i=0;i<files.length;i++){
+                    if(files[i].isDirectory()){
+                        fileItemList.add(new StorageUtil.FileItem(files[i].getName(),files[i].getPath(),true));
+                    }else{
+                        fileItemList.add(new StorageUtil.FileItem(files[i].getName(),files[i].getPath(),false));
+                    }
+                }
+            }
         }
-        if(innerSdcard!=null){
-            fileItem=new StorageUtil.FileItem("Internal storage",innerSdcard,false);
-            fileItemList.add(fileItem);
-        }
-
         return fileItemList;
     }
 
     public ArrayList<String> curerentDirItems(){
         ArrayList<String> items=new ArrayList<String>();
-
         return items;
     }
-    public void reList(int position){
-        mFileListAdapter =new RecycleAdapter(R.layout.list_filelist,initData());
+    public void reList(String dirPath){
+        mFileListAdapter =new RecycleAdapter(R.layout.list_filelist, getDirList(dirPath));
         mFileListView.setAdapter(mFileListAdapter);
     }
 

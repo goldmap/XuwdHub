@@ -196,15 +196,12 @@ public class MainActivity extends AppCompatActivity {
 
         if (files != null) {
             for (int i = 0; i < files.length; i++) {
-
                 if (files[i].isDirectory()) {
-
                     list.add(new FileItem(files[i].getName(), files[i].getPath(), false));
                 } else {
                     if (files[i].getName().toLowerCase(Locale.US).endsWith(".zip")) {
                         list.add(new FileItem(files[i].getName(), files[i].getPath(), true));
                     }
-
                 }
             }
         }
