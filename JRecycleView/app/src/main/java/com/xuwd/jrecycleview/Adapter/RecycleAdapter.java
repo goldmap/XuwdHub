@@ -14,12 +14,16 @@ import com.xuwd.jrecycleview.R;
 import com.xuwd.jrecycleview.Utility.StorageUtil;
 
 import java.util.ArrayList;
+import java.util.List;
+
 /*  adapter实际上是管理ViewHolder，即一个区块。重写adapter就是根据layout重构ViewHolder
 //  利用父窗口的Inflater载入区块view，将其作为参数传递给重载的ViewHolder，由ViewHolder对区块进行操作
 //  流程：根据getItemCount计数，创建n个ViewHolder,并依次触发onBindViewHolder
 */
 public class RecycleAdapter extends RecyclerView.Adapter<RecycleAdapter.JViewHolder>{
     private int listItemLayout;
+    private int mTrueIcon=R.mipmap.ex_folder;
+    private int mFalseIcon=R.mipmap.ex_doc;
     public ArrayList<StorageUtil.FileItem> mData;
     private OnItemClickListener onItemClickListener;
 
@@ -30,6 +34,11 @@ public class RecycleAdapter extends RecyclerView.Adapter<RecycleAdapter.JViewHol
     public RecycleAdapter(int listItemLayout, ArrayList<StorageUtil.FileItem> data){
         this.listItemLayout = listItemLayout;
         this.mData=data;
+    }
+
+    public void setIcon(int trueIcon,int falseIcon){
+        mTrueIcon=trueIcon;
+        mFalseIcon=falseIcon;
     }
 
     @NonNull
@@ -43,12 +52,15 @@ public class RecycleAdapter extends RecyclerView.Adapter<RecycleAdapter.JViewHol
     @Override
     public void onBindViewHolder(@NonNull final RecycleAdapter.JViewHolder holder, int position) {
         StorageUtil.FileItem fileItem=mData.get(position);
+        if(holder.mImageView==null||holder.mTextView==null)
+            return;
 
         holder.mTextView.setText(fileItem.fileName);
+
         if(fileItem.isZip){
-            holder.mImageView.setImageResource(R.mipmap.ex_folder);
+            holder.mImageView.setImageResource(mTrueIcon);
         } else{
-            holder.mImageView.setImageResource(R.mipmap.ex_doc);
+            holder.mImageView.setImageResource(mFalseIcon);
         }
 
         holder.itemView.setOnClickListener(new View.OnClickListener() {
@@ -86,8 +98,22 @@ public class RecycleAdapter extends RecyclerView.Adapter<RecycleAdapter.JViewHol
         public JViewHolder(View view)
         {
             super(view);
-            mTextView = (TextView) view.findViewById(R.id.listItemText);
-            mImageView=view.findViewById(R.id.listItemImage);
+            List<View> viewList=new ArrayList<View>();
+            if(view instanceof ViewGroup){
+                ViewGroup vp=(ViewGroup) view;
+                for(int i=0;i<vp.getChildCount();i++){
+                    View viewChild=vp.getChildAt(i);
+                    if(viewChild instanceof TextView){
+                        mTextView=(TextView) viewChild;
+                    } else if(viewChild instanceof ImageView){
+                        mImageView=(ImageView) viewChild;
+                    }else{
+
+                    }
+                }
+            }
+            //mTextView = (TextView) view.findViewById(R.id.listItemText);
+            //mImageView=view.findViewById(R.id.listItemImage);
         }
     }
 

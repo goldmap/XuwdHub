@@ -10,6 +10,7 @@ import android.widget.Toast;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.List;
 
 import com.xuwd.jrecycleview.Adapter.RecycleAdapter;
 import com.xuwd.jrecycleview.R;
@@ -19,6 +20,7 @@ public class FileManActivity extends AppCompatActivity {
     private RecycleAdapter mFileListAdapter;
     RecyclerView mFileListView;
     RecyclerView mDirNavigatorView;
+    ArrayList<StorageUtil.FileItem> dirList=new ArrayList<>();
 
     private String mDir;
     private String outSdcard;
@@ -30,6 +32,8 @@ public class FileManActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_file_man);
+
+        dirList.add(new StorageUtil.FileItem("root","root",true));
 
         mDirNavigatorView=findViewById(R.id.dirRecycleView);
         RecyclerView.LayoutManager horizontalLayoutManager=new LinearLayoutManager(this,RecyclerView.HORIZONTAL,false);
@@ -43,13 +47,16 @@ public class FileManActivity extends AppCompatActivity {
     }
 
     private void setDirNavigatoraAdapter(String dirPath){
-        RecycleAdapter mDirNavigatorAdapter=new RecycleAdapter(R.layout.list_dir_navigator, getDirList("root"));
+        RecycleAdapter mDirNavigatorAdapter=new RecycleAdapter(R.layout.list_dir_navigator, dirList);
+       mDirNavigatorAdapter.setIcon(R.mipmap.forword,R.mipmap.forword);
+
         mDirNavigatorAdapter.setOnItemClickListener(new RecycleAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
-                StorageUtil.FileItem fileItem=mFileListAdapter.mData.get(position);
+                StorageUtil.FileItem dirItem=dirList.get(position);
                 Toast.makeText(getBaseContext(),fileItem.fileName+"|"+fileItem.filePath,Toast.LENGTH_SHORT).show();
                 setDirNavigatoraAdapter(fileItem.filePath);
+                setFileListAdpter();
             }
 
             @Override
@@ -60,7 +67,7 @@ public class FileManActivity extends AppCompatActivity {
         mDirNavigatorView.setAdapter(mDirNavigatorAdapter);
     }
 
-    private void setFileListAdpter(String dirPath){
+    private void setFileListAdpter(final String dirPath){
         final RecycleAdapter mFileListAdapter=new RecycleAdapter(R.layout.list_filelist, getDirList(dirPath));
         mFileListAdapter.setOnItemClickListener(new RecycleAdapter.OnItemClickListener() {
             @Override
@@ -68,6 +75,7 @@ public class FileManActivity extends AppCompatActivity {
                 StorageUtil.FileItem fileItem=mFileListAdapter.mData.get(position);
                 Toast.makeText(getBaseContext(),fileItem.fileName+"|"+fileItem.filePath,Toast.LENGTH_SHORT).show();
                 setFileListAdpter(fileItem.filePath);
+                setDirNavigatoraAdapter(dirPath);
             }
 
             @Override
