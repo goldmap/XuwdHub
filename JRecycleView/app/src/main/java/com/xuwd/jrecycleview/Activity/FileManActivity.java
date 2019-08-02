@@ -20,7 +20,7 @@ public class FileManActivity extends AppCompatActivity {
     private RecycleAdapter mFileListAdapter;
     RecyclerView mFileListView;
     RecyclerView mDirNavigatorView;
-    ArrayList<StorageUtil.FileItem> dirList=new ArrayList<>();
+    ArrayList<JUtil.FileItem> dirList=new ArrayList<>();
 
     private String mDir;
     private String outSdcard;
@@ -33,7 +33,7 @@ public class FileManActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_file_man);
 
-        dirList.add(new StorageUtil.FileItem("root","root",true));
+        dirList.add(new JUtil.FileItem("root","root",true));
 
         mDirNavigatorView=findViewById(R.id.dirRecycleView);
         RecyclerView.LayoutManager horizontalLayoutManager=new LinearLayoutManager(this,RecyclerView.HORIZONTAL,false);
@@ -53,10 +53,17 @@ public class FileManActivity extends AppCompatActivity {
         mDirNavigatorAdapter.setOnItemClickListener(new RecycleAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
-                StorageUtil.FileItem dirItem=dirList.get(position);
-                Toast.makeText(getBaseContext(),fileItem.fileName+"|"+fileItem.filePath,Toast.LENGTH_SHORT).show();
-                setDirNavigatoraAdapter(fileItem.filePath);
-                setFileListAdpter();
+                JUtil.FileItem dirItem=dirList.get(position);
+                while(dirList!=null) {
+                    if (dirList.get(dirList.size() - 1).fileName != dirItem.fileName) {
+                        dirList.remove(dirList.get(dirList.size() - 1));
+                    }else{
+                        break;
+                    }
+                }
+                Toast.makeText(getBaseContext(),dirItem.fileName+"|"+dirItem.filePath,Toast.LENGTH_SHORT).show();
+                setDirNavigatoraAdapter(dirItem.filePath);
+                setFileListAdpter(dirItem.filePath);
             }
 
             @Override
@@ -72,9 +79,14 @@ public class FileManActivity extends AppCompatActivity {
         mFileListAdapter.setOnItemClickListener(new RecycleAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
-                StorageUtil.FileItem fileItem=mFileListAdapter.mData.get(position);
+                JUtil.FileItem fileItem=mFileListAdapter.mData.get(position);
+                if(!fileItem.isZip)
+                    return;
+
                 Toast.makeText(getBaseContext(),fileItem.fileName+"|"+fileItem.filePath,Toast.LENGTH_SHORT).show();
                 setFileListAdpter(fileItem.filePath);
+
+                dirList.add(fileItem);
                 setDirNavigatoraAdapter(dirPath);
             }
 
@@ -86,20 +98,20 @@ public class FileManActivity extends AppCompatActivity {
         mFileListView.setAdapter(mFileListAdapter);
     }
 
-    public ArrayList<StorageUtil.FileItem> getDirList(String dirPath){
-        ArrayList<StorageUtil.FileItem> fileItemList=new ArrayList<>();
-        StorageUtil.FileItem fileItem=null;
+    public ArrayList<JUtil.FileItem> getDirList(String dirPath){
+        ArrayList<JUtil.FileItem> fileItemList=new ArrayList<>();
+        JUtil.FileItem fileItem=null;
 
         if(dirPath=="root"){
             outSdcard = JUtil.getStoragePath(this, true);
             innerSdcard = JUtil.getStoragePath(this,false);
 
             if(outSdcard!=null){
-                fileItem=new StorageUtil.FileItem("SD card",outSdcard,true);
+                fileItem=new JUtil.FileItem("SD card",outSdcard,true);
                 fileItemList.add(fileItem);
             }
             if(innerSdcard!=null){
-                fileItem=new StorageUtil.FileItem("Internal storage",innerSdcard,true);
+                fileItem=new JUtil.FileItem("Internal storage",innerSdcard,true);
                 fileItemList.add(fileItem);
             }
         }else{
@@ -108,9 +120,12 @@ public class FileManActivity extends AppCompatActivity {
             if(files != null){
                 for(int i=0;i<files.length;i++){
                     if(files[i].isDirectory()){
-                        fileItemList.add(new StorageUtil.FileItem(files[i].getName(),files[i].getPath(),true));
-                    }else{
-                        fileItemList.add(new StorageUtil.FileItem(files[i].getName(),files[i].getPath(),false));
+                        fileItemList.add(new JUtil.FileItem(files[i].getName(),files[i].getPath(),true));
+                    }
+                }
+                for(int i=0;i<files.length;i++){
+                    if(!files[i].isDirectory()){
+                        fileItemList.add(new JUtil.FileItem(files[i].getName(),files[i].getPath(),false));
                     }
                 }
             }

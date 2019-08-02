@@ -35,9 +35,19 @@ public class JUtil {
         return null;
     }
 
-    public List<StorageUtil.FileItem> enlistDir(String dirNow){
-        List<StorageUtil.FileItem> fileItemList = new ArrayList<>();
+    public static class FileItem {
+        public String fileName;
+        public String filePath;
+        public boolean isZip;
 
-        return fileItemList;
+        public FileItem(){
+
+        }
+
+        public FileItem(String fileName, String filePath, boolean isZip) {
+            this.fileName = fileName;
+            this.filePath = filePath;
+            this.isZip = isZip;
+        }
     }
 }

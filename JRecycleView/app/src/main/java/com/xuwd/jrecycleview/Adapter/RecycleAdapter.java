@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.xuwd.jrecycleview.Activity.FileManActivity;
 import com.xuwd.jrecycleview.R;
+import com.xuwd.jrecycleview.Utility.JUtil;
 import com.xuwd.jrecycleview.Utility.StorageUtil;
 
 import java.util.ArrayList;
@@ -24,14 +25,14 @@ public class RecycleAdapter extends RecyclerView.Adapter<RecycleAdapter.JViewHol
     private int listItemLayout;
     private int mTrueIcon=R.mipmap.ex_folder;
     private int mFalseIcon=R.mipmap.ex_doc;
-    public ArrayList<StorageUtil.FileItem> mData;
+    public ArrayList<JUtil.FileItem> mData;
     private OnItemClickListener onItemClickListener;
 
     public void setOnItemClickListener(RecycleAdapter.OnItemClickListener listener) {
         this.onItemClickListener = listener;
     }
 
-    public RecycleAdapter(int listItemLayout, ArrayList<StorageUtil.FileItem> data){
+    public RecycleAdapter(int listItemLayout, ArrayList<JUtil.FileItem> data){
         this.listItemLayout = listItemLayout;
         this.mData=data;
     }
@@ -51,7 +52,7 @@ public class RecycleAdapter extends RecyclerView.Adapter<RecycleAdapter.JViewHol
 
     @Override
     public void onBindViewHolder(@NonNull final RecycleAdapter.JViewHolder holder, int position) {
-        StorageUtil.FileItem fileItem=mData.get(position);
+        JUtil.FileItem fileItem=mData.get(position);
         if(holder.mImageView==null||holder.mTextView==null)
             return;
 
