@@ -48,7 +48,7 @@ public class FileManActivity extends AppCompatActivity {
 
     private void setDirNavigatoraAdapter(String dirPath){
         RecycleAdapter mDirNavigatorAdapter=new RecycleAdapter(R.layout.list_dir_navigator, dirList);
-       mDirNavigatorAdapter.setIcon(R.mipmap.forword,R.mipmap.forword);
+        mDirNavigatorAdapter.setIcon(R.mipmap.forword,R.mipmap.forword);
 
         mDirNavigatorAdapter.setOnItemClickListener(new RecycleAdapter.OnItemClickListener() {
             @Override
@@ -72,6 +72,7 @@ public class FileManActivity extends AppCompatActivity {
             }
         });
         mDirNavigatorView.setAdapter(mDirNavigatorAdapter);
+        mDirNavigatorView.smoothScrollToPosition(dirList.size()-1);
     }
 
     private void setFileListAdpter(final String dirPath){
@@ -131,15 +132,6 @@ public class FileManActivity extends AppCompatActivity {
             }
         }
         return fileItemList;
-    }
-
-    public ArrayList<String> curerentDirItems(){
-        ArrayList<String> items=new ArrayList<String>();
-        return items;
-    }
-    public void reList(String dirPath){
-        mFileListAdapter =new RecycleAdapter(R.layout.list_filelist, getDirList(dirPath));
-        mFileListView.setAdapter(mFileListAdapter);
     }
 
 }
