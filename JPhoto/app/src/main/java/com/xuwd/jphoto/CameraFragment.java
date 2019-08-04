@@ -201,7 +201,7 @@ public class CameraFragment extends Fragment {
 
                 //建立投射通道
                 mPreviewRequestBuilder = mCameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
-                mPreviewRequestBuilder.addTarget(textureSurface);
+                mPreviewRequestBuilder.addTarget(textureSurface);//textureSurface已经得到，顺便设置mPreviewRequestBuilder
 
                 //创建会话，为什么要把ImageReader的surface关联进去？
                 Surface imageSurface = mImageReader.getSurface();
