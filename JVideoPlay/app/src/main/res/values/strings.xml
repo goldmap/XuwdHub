@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">JVideoPlay</string>
+    <string name="fileManager">文件管理器</string>
     <string name="playVideo">播放</string>
 </resources>
