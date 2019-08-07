@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">JMap</string>
+    <string name="mapOpen">打开地图</string>
 </resources>
