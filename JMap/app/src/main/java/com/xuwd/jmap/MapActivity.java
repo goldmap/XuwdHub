@@ -13,11 +13,14 @@ import com.baidu.location.LocationClient;
 import com.baidu.location.LocationClientOption;
 import com.baidu.mapapi.SDKInitializer;
 import com.baidu.mapapi.map.BaiduMap;
+import com.baidu.mapapi.map.BitmapDescriptor;
+import com.baidu.mapapi.map.BitmapDescriptorFactory;
 import com.baidu.mapapi.map.MapPoi;
 import com.baidu.mapapi.map.MapStatus;
 import com.baidu.mapapi.map.MapStatusUpdate;
 import com.baidu.mapapi.map.MapStatusUpdateFactory;
 import com.baidu.mapapi.map.MapView;
+import com.baidu.mapapi.map.MyLocationConfiguration;
 import com.baidu.mapapi.map.MyLocationData;
 import com.baidu.mapapi.model.LatLng;
 
@@ -26,6 +29,9 @@ public class MapActivity extends AppCompatActivity {
     private TextView positionText;
     private MapView mapView;
     private BaiduMap baiduMap;
+    BitmapDescriptor mCurrentMarker;
+    private static final int accuracyCircleFillColor = 0xAAFFFF88;
+    private static final int accuracyCircleStrokeColor = 0xAA00FF00;
     private boolean isFirstLocate=true;
     private  MyLocationData locationData;
 
@@ -60,9 +66,12 @@ public class MapActivity extends AppCompatActivity {
             }
         });
 
+        mCurrentMarker = BitmapDescriptorFactory.fromResource(R.drawable.icon_geo);
+        baiduMap.setMyLocationConfiguration(new MyLocationConfiguration(MyLocationConfiguration.LocationMode.NORMAL, true, mCurrentMarker,
+                accuracyCircleFillColor, accuracyCircleStrokeColor));
+
         locationClient = new LocationClient(getApplicationContext());     //声明LocationClient类
         locationClient.registerLocationListener(listener);    //注册监听函数
-
         initLocation();
     }
 
@@ -85,17 +94,18 @@ public class MapActivity extends AppCompatActivity {
                 Toast.makeText(getBaseContext(),"XXX",Toast.LENGTH_SHORT).show();
                 return;
             }
-            //baiduMap.setMapStatus(MapStatusUpdateFactory.newLatLng(latLng));
-            //String inf=""+location.getLatitude();
-            //Toast.makeText(getBaseContext(),inf,Toast.LENGTH_SHORT).show();
 
-            if (isFirstLocate) {
+            MyLocationData locationData = new MyLocationData.Builder().latitude(latLng.latitude)
+                    .longitude(latLng.longitude)
+                    .accuracy(location.getRadius()).build();
+            Toast.makeText(getBaseContext(),"YYY",Toast.LENGTH_SHORT).show();
+
+            //if (isFirstLocate) {
                 isFirstLocate = false;
-                LatLng ll = new LatLng(location.getLatitude(), location.getLongitude());
-                MapStatus.Builder builder = new MapStatus.Builder();
-                builder.target(ll).zoom(18.0f);
-                baiduMap.animateMapStatus(MapStatusUpdateFactory.newMapStatus(builder.build()));
-            }
+                MapStatus.Builder mapStatusBuilder = new MapStatus.Builder();
+                mapStatusBuilder.target(latLng).zoom(18.0f);
+                baiduMap.animateMapStatus(MapStatusUpdateFactory.newMapStatus(mapStatusBuilder.build()));
+            //}
         }
     }
 
