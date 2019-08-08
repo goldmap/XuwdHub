@@ -3,6 +3,8 @@ package com.xuwd.jmap;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -34,6 +36,7 @@ public class MapActivity extends AppCompatActivity {
     private static final int accuracyCircleStrokeColor = 0xAA00FF00;
     private boolean isFirstLocate=true;
     private  MyLocationData locationData;
+    public LatLng latLng;
 
     public MyLocationListener listener=new MyLocationListener();
     @Override
@@ -41,6 +44,16 @@ public class MapActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         SDKInitializer.initialize(getApplicationContext());
         setContentView(R.layout.activity_map);
+
+        Button btnPin=findViewById(R.id.btnMapPin);
+        btnPin.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                MapStatus.Builder mapStatusBuilder = new MapStatus.Builder();
+                mapStatusBuilder.target(latLng).zoom(18.0f);
+                baiduMap.animateMapStatus(MapStatusUpdateFactory.newMapStatus(mapStatusBuilder.build()));
+            }
+        });
 
         mapView=findViewById(R.id.mapView);
         positionText=findViewById(R.id.positionTextView);
@@ -89,7 +102,7 @@ public class MapActivity extends AppCompatActivity {
 
         @Override
         public void onReceiveLocation(BDLocation location) {
-            LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
+            latLng = new LatLng(location.getLatitude(), location.getLongitude());
             if(location==null){
                 Toast.makeText(getBaseContext(),"XXX",Toast.LENGTH_SHORT).show();
                 return;
@@ -98,6 +111,7 @@ public class MapActivity extends AppCompatActivity {
             MyLocationData locationData = new MyLocationData.Builder().latitude(latLng.latitude)
                     .longitude(latLng.longitude)
                     .accuracy(location.getRadius()).build();
+            baiduMap.setMyLocationData(locationData);
             Toast.makeText(getBaseContext(),"YYY",Toast.LENGTH_SHORT).show();
 
             //if (isFirstLocate) {

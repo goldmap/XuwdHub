@@ -9,6 +9,12 @@
         android:id="@+id/positionTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"  />
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/btnMapPin"
+        android:text="@string/mapPin"
+        android:layout_gravity="left"/>
 
     <com.baidu.mapapi.map.MapView
         android:id="@+id/mapView"
