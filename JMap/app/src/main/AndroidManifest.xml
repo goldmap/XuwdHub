@@ -23,7 +23,7 @@
 
         <meta-data
             android:name="com.baidu.lbsapi.API_KEY"
-            android:value="yp5woHDdW6DqttxBbz6ZUkdycRxZX00G" />
+            android:value="Q8HHT8FKSh4Gqq1f0KioVBr11b5yPS7x" />
 
         <activity android:name=".MainActivity">
             <intent-filter>
@@ -32,6 +32,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <service
+            android:name="com.baidu.location.f"
+            android:enabled="true"
+            android:process=":remote" >
+        </service>
     </application>
 
 </manifest>
