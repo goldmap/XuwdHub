@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.app.Activity;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.view.View;
@@ -96,7 +97,11 @@ public class MapActivity extends AppCompatActivity {
 
     private void initLocation() {
         //自定义图标
-        mCurrentMarker = BitmapDescriptorFactory.fromResource(R.drawable.pin02);
+        //mCurrentMarker = BitmapDescriptorFactory.fromResource(R.drawable.pin02);
+        Bitmap bmp=BitmapFactory.decodeResource(getResources(),R.drawable.pin02);
+        bmp=fixBitmap(bmp,32,32);
+        mCurrentMarker = BitmapDescriptorFactory.fromBitmap(bmp);
+
         MyLocationConfiguration configuration =new MyLocationConfiguration(MyLocationConfiguration.LocationMode.NORMAL, true, mCurrentMarker);
         baiduMap.setMyLocationConfiguration(configuration);
 
@@ -146,14 +151,24 @@ public class MapActivity extends AppCompatActivity {
         //}
     }
 
-    public BitmapDrawable getNewDrawable(Activity context, int restId, int dstWidth, int dstHeight){
-        Bitmap Bmp = BitmapFactory.decodeResource(context.getResources(), restId);
-        Bitmap bmp = Bmp.createScaledBitmap(Bmp, dstWidth, dstHeight, true);
-        BitmapDrawable d = new BitmapDrawable(bmp);
-        Bitmap bitmap = d.getBitmap();
-        if (bitmap.getDensity() == Bitmap.DENSITY_NONE) {
-            d.setTargetDensity(context.getResources().getDisplayMetrics());
+    private Bitmap fixBitmap(Bitmap bmpOrigin,int nWidth,int nHeight){
+        if(bmpOrigin==null){
+            return null;
         }
-        return d;
+        int bmpWidth=bmpOrigin.getWidth();
+        int bmpHeight=bmpOrigin.getHeight();
+        float scaleWidth=(float) nWidth/bmpWidth;
+        float scaleHeight=(float) nHeight/bmpHeight;
+
+        Matrix matrix=new Matrix();
+        matrix.postScale(scaleWidth,scaleHeight);
+
+        Bitmap bmp=Bitmap.createBitmap(bmpOrigin,0,0,bmpWidth,bmpHeight,matrix,false);
+        if(!bmpOrigin.isRecycled()){
+            bmpOrigin.recycle();
+        }
+
+        return bmp;
     }
+
 }
