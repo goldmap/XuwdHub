@@ -2,6 +2,10 @@ package com.xuwd.jmap;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.Activity;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -91,21 +95,26 @@ public class MapActivity extends AppCompatActivity {
     }
 
     private void initLocation() {
-        mCurrentMarker = BitmapDescriptorFactory.fromResource(R.drawable.icon_geo);
+        //自定义图标
+        mCurrentMarker = BitmapDescriptorFactory.fromResource(R.drawable.pin02);
         MyLocationConfiguration configuration =new MyLocationConfiguration(MyLocationConfiguration.LocationMode.NORMAL, true, mCurrentMarker);
         baiduMap.setMyLocationConfiguration(configuration);
 
+        //定位管理、配置
         locationClient = new LocationClient(getApplicationContext());     //声明LocationClient类
         locationClient.registerLocationListener(listener);    //注册监听函数
 
         LocationClientOption option=new LocationClientOption();
+        option.setLocationMode(LocationClientOption.LocationMode.Hight_Accuracy);
+        option.setOpenGps(true);
+        option.setCoorType("bd09ll");
         option.setScanSpan(5000);//表示每5秒更新一下当前位置
         option.setIsNeedAddress(true);
-        option.setLocationMode(LocationClientOption.LocationMode.Hight_Accuracy);
         locationClient.setLocOption(option);
 
         locationClient.start();
     }
+
 
     public class MyLocationListener extends BDAbstractLocationListener {
 
@@ -137,4 +146,14 @@ public class MapActivity extends AppCompatActivity {
         //}
     }
 
+    public BitmapDrawable getNewDrawable(Activity context, int restId, int dstWidth, int dstHeight){
+        Bitmap Bmp = BitmapFactory.decodeResource(context.getResources(), restId);
+        Bitmap bmp = Bmp.createScaledBitmap(Bmp, dstWidth, dstHeight, true);
+        BitmapDrawable d = new BitmapDrawable(bmp);
+        Bitmap bitmap = d.getBitmap();
+        if (bitmap.getDensity() == Bitmap.DENSITY_NONE) {
+            d.setTargetDensity(context.getResources().getDisplayMetrics());
+        }
+        return d;
+    }
 }
