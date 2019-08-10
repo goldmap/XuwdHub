@@ -45,7 +45,7 @@ import com.baidu.mapapi.map.Stroke;
 import com.baidu.mapapi.model.LatLng;
 import com.baidu.mapapi.model.inner.GeoPoint;
 
-public class MapActivity extends AppCompatActivity {
+public class JMapActivity extends AppCompatActivity {
     public LocationClient locationClient;
     private TextView positionText;
     private MapView mapView;
@@ -208,70 +208,7 @@ public class MapActivity extends AppCompatActivity {
     }
     class MyOverLay extends Overlay {
 
-        private Location location;
-        public void setLocation(Location location){
-            this.location=location;
-        }
 
-        @Override
-        public boolean draw(Canvas canvas, MapView mapView, boolean shadow,
-                            long when) {
-            // TODO Auto-generated method stub
-            super.draw(canvas, mapView, shadow);
-            Paint paint=new Paint();
-            Point myScreen=new Point();
-            //将经纬度换成实际屏幕的坐标。
-            GeoPoint geoPoint=new GeoPoint((int)(location.getLatitude()*1E6), (int)(location.getLongitude()*1E6));
-            mapView.getProjection().toPixels(geoPoint, myScreen);
-            paint.setStrokeWidth(1);
-            paint.setARGB(255, 255, 0, 0);
-            paint.setStyle(Paint.Style.STROKE);
-            Bitmap bmp=BitmapFactory.decodeResource(getResources(), R.drawable.mypicture);
-            //把这张图片画到相应的位置。
-            canvas.drawBitmap(bmp, myScreen.x, myScreen.y,paint);
-            canvas.drawText("天堂没有路", myScreen.x, myScreen.y, paint);
-            return true;
-
-        }
-    }
-    @Override
-    protected boolean isRouteDisplayed() {
-        // TODO Auto-generated method stub
-        return false;
-    }
-    @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-        // TODO Auto-generated method stub
-
-        if (keyCode == KeyEvent.KEYCODE_BACK) {
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setMessage("你确定退出吗？")
-                    .setCancelable(false)
-                    .setPositiveButton("确定",
-                            new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog,
-                                                    int id) {
-                                    MapActivity.this.finish();
-                                    android.os.Process
-                                            .killProcess(android.os.Process
-                                                    .myPid());
-                                    android.os.Process.killProcess(android.os.Process.myTid());
-                                    android.os.Process.killProcess(android.os.Process.myUid());
-                                }
-                            })
-                    .setNegativeButton("返回",
-                            new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog,
-                                                    int id) {
-                                    dialog.cancel();
-                                }
-                            });
-            AlertDialog alert = builder.create();
-            alert.show();
-            return true;
-        }
-
-        return super.onKeyDown(keyCode, event);
     }
 
 }

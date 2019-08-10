@@ -5,10 +5,27 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-    <TextView
-        android:id="@+id/positionTextView"
+    <RadioGroup
+        android:id="@+id/radioMapType"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"  />
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="45dip"
+        android:orientation="horizontal" >
+
+        <RadioButton
+            android:id="@+id/rb_man"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="普通图"       />
+
+        <RadioButton
+            android:id="@+id/rb_woman"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="卫星图"/>
+
+    </RadioGroup>
+
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
