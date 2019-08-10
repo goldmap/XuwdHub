@@ -65,6 +65,18 @@ public class MapActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onStart() {
+        locationClient.start();
+        super.onStart();
+    }
+
+    @Override
+    protected void onPause() {
+        locationClient.stop();
+        super.onPause();
+    }
+
+    @Override
     protected void onDestroy() {
         super.onDestroy();
         mapView.onDestroy();
@@ -89,7 +101,7 @@ public class MapActivity extends AppCompatActivity {
         });
 
         MapStatus.Builder mapStatusBuilder = new MapStatus.Builder();
-        mapStatusBuilder.target(latLng).zoom(18.0f);
+        mapStatusBuilder.target(latLng).zoom(20.0f);
         baiduMap.animateMapStatus(MapStatusUpdateFactory.newMapStatus(mapStatusBuilder.build()));
 
         initLocation();
@@ -97,13 +109,13 @@ public class MapActivity extends AppCompatActivity {
 
     private void initLocation() {
         //自定义图标
-        //mCurrentMarker = BitmapDescriptorFactory.fromResource(R.drawable.pin02);
         Bitmap bmp=BitmapFactory.decodeResource(getResources(),R.drawable.pin02);
         bmp=fixBitmap(bmp,32,32);
         mCurrentMarker = BitmapDescriptorFactory.fromBitmap(bmp);
 
         MyLocationConfiguration configuration =new MyLocationConfiguration(MyLocationConfiguration.LocationMode.NORMAL, true, mCurrentMarker);
         baiduMap.setMyLocationConfiguration(configuration);
+        baiduMap.setMyLocationEnabled(true);
 
         //定位管理、配置
         locationClient = new LocationClient(getApplicationContext());     //声明LocationClient类
@@ -126,9 +138,13 @@ public class MapActivity extends AppCompatActivity {
         @Override
         public void onReceiveLocation(BDLocation location) {
             latLng = new LatLng(location.getLatitude(), location.getLongitude());
+            float radius=location.getRadius();
             if(location==null){
                 Toast.makeText(getBaseContext(),"XXX",Toast.LENGTH_SHORT).show();
                 return;
+            }
+            if(location.getLocType()==BDLocation.TypeNetWorkLocation){
+                positionText.setText(location.getAddrStr());
             }
             fixMap();
         }
@@ -140,7 +156,7 @@ public class MapActivity extends AppCompatActivity {
         baiduMap.setMyLocationData(locationData);
 
         Toast.makeText(getBaseContext(),"YYY",Toast.LENGTH_SHORT).show();
-        positionText.setText(latLng.toString());
+        positionText.setText(latLng.toString()+", Zoom:"+baiduMap.getMapStatus().zoom);
 
         //if (isFirstLocate) {
         isFirstLocate = false;
