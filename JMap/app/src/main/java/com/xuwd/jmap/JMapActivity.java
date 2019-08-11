@@ -19,6 +19,9 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -45,76 +48,69 @@ import com.baidu.mapapi.map.Stroke;
 import com.baidu.mapapi.model.LatLng;
 import com.baidu.mapapi.model.inner.GeoPoint;
 
-public class JMapActivity extends AppCompatActivity {
+public class JMapActivity extends Activity {
+
     public LocationClient locationClient;
-    private TextView positionText;
+    //private TextView positionText;
     private MapView mapView;
     private BaiduMap baiduMap;
     BitmapDescriptor mCurrentMarker;
     private float radius;
 
-    private static final int accuracyCircleFillColor = 0xAAFFFF88;
-    private static final int accuracyCircleStrokeColor = 0xAA00FF00;
     private boolean isFirstLocate=true;
     private  MyLocationData locationData;
-    public LatLng latLng=new LatLng(23,114);
+    public LatLng latLng;
 
     public MyLocationListener listener=new MyLocationListener();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        SDKInitializer.initialize(getApplicationContext());
+        //SDKInitializer.initialize(getApplicationContext());
         setContentView(R.layout.activity_map);
+
+        initView();
+        initMap();
+    }
+    private void initView(){
+        mapView=findViewById(R.id.mapView);
+        baiduMap = mapView.getMap();
+
+        RadioGroup rdMapType=findViewById(R.id.radioMapType);
+        rdMapType.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup radioGroup, int checkId) {
+                if(baiduMap==null)
+                    initMap();
+
+                if(checkId==R.id.radioNomalMap){
+                    baiduMap.setMapType(BaiduMap.MAP_TYPE_NORMAL);
+                }else{
+                    baiduMap.setMapType(BaiduMap.MAP_TYPE_SATELLITE);
+                }
+            }
+        });
+
+        CheckBox chkBoxTraffic=findViewById(R.id.chkBoxTraffic);
+        chkBoxTraffic.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean checked) {
+                baiduMap.setTrafficEnabled(checked);
+            }
+        });
 
         Button btnPin=findViewById(R.id.btnMapPin);
         btnPin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-              fixMap();
+                fixMap();
             }
         });
 
-        mapView=findViewById(R.id.mapView);
-        positionText=findViewById(R.id.positionTextView);
-
-        initMap();
-    }
-
-    @Override
-    protected void onStart() {
-        //locationClient.start();
-        super.onStart();
-    }
-
-    @Override
-    protected void onPause() {
-        //locationClient.stop();
-        super.onPause();
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-       // mapView.onDestroy();
-        //locationClient.unRegisterLocationListener(listener);
-        //取消位置提醒
-        //locationClient.removeNotifyEvent(notifyListener);
-        //locationClient.stop();
     }
 
     private void initMap() {
-        baiduMap = mapView.getMap();
         baiduMap.setMapType(BaiduMap.MAP_TYPE_NORMAL);
         baiduMap.setMyLocationEnabled(true);
-        baiduMap.setOnMapClickListener(new BaiduMap.OnMapClickListener() {
-            @Override
-            public void onMapClick(LatLng latLng) {
-            }
-            @Override
-            public boolean onMapPoiClick(MapPoi mapPoi) {
-                return false;
-            }
-        });
 
         MapStatus.Builder mapStatusBuilder = new MapStatus.Builder();
         mapStatusBuilder.target(latLng).zoom(20.0f);
@@ -125,11 +121,6 @@ public class JMapActivity extends AppCompatActivity {
 
     private void initLocation() {
         //自定义图标
-        /*
-        Bitmap bmp=BitmapFactory.decodeResource(getResources(),R.drawable.pin02);
-        bmp=fixBitmap(bmp,32,32);
-        mCurrentMarker = BitmapDescriptorFactory.fromBitmap(bmp);
-*/
         //MyLocationConfiguration configuration =new MyLocationConfiguration(MyLocationConfiguration.LocationMode.NORMAL, true, mCurrentMarker);
         //MyLocationConfiguration configuration =new MyLocationConfiguration(MyLocationConfiguration.LocationMode.NORMAL, true, mCurrentMarker);
         //baiduMap.setMyLocationConfiguration(configuration);
@@ -137,15 +128,20 @@ public class JMapActivity extends AppCompatActivity {
 
         //定位管理、配置
         locationClient = new LocationClient(getApplicationContext());     //声明LocationClient类
-        locationClient.registerLocationListener(listener);    //注册监听函数
 
         LocationClientOption option=new LocationClientOption();
         option.setLocationMode(LocationClientOption.LocationMode.Hight_Accuracy);
         option.setOpenGps(true);
-        option.setCoorType("bd09ll");
         option.setScanSpan(5000);//表示每5秒更新一下当前位置
         option.setIsNeedAddress(true);
         locationClient.setLocOption(option);
+        locationClient.registerLocationListener(listener);    //注册监听函数
+
+        Bitmap bmp=BitmapFactory.decodeResource(getResources(),R.drawable.pin02);
+        bmp=fixBitmap(bmp,32,32);
+        mCurrentMarker = BitmapDescriptorFactory.fromBitmap(bmp);
+        MyLocationConfiguration locationConfiguration=new MyLocationConfiguration( MyLocationConfiguration.LocationMode.NORMAL,true,mCurrentMarker,0xAAFFFF88,0xAA00FF00);
+        baiduMap.setMyLocationConfiguration(locationConfiguration);
 
         locationClient.start();
     }
@@ -157,14 +153,18 @@ public class JMapActivity extends AppCompatActivity {
         public void onReceiveLocation(BDLocation location) {
             latLng = new LatLng(location.getLatitude(), location.getLongitude());
             radius=location.getRadius();
-            if(location==null){
+            if(location==null || mapView==null){
                 Toast.makeText(getBaseContext(),"XXX",Toast.LENGTH_SHORT).show();
                 return;
             }
             Toast.makeText(getBaseContext(),"YYY",Toast.LENGTH_SHORT).show();
-            if(location.getLocType()==BDLocation.TypeNetWorkLocation){
-                positionText.setText(location.getAddrStr());
-            }
+            MyLocationData locData = new MyLocationData.Builder()
+            //        .accuracy(location.getRadius())
+                    // 此处设置开发者获取到的方向信息，顺时针0-360
+                    .direction(location.getDirection())
+                    .latitude(location.getLatitude())
+                    .longitude(location.getLongitude()).build();
+            baiduMap.setMyLocationData(locData);
             //fixMap();
         }
     }
@@ -176,7 +176,7 @@ public class JMapActivity extends AppCompatActivity {
         baiduMap.setMyLocationData(locationData);
 
 
-        positionText.setText(latLng.toString()+", Zoom:"+baiduMap.getMapStatus().zoom);
+        //positionText.setText(latLng.toString()+", Zoom:"+baiduMap.getMapStatus().zoom);
 
         //if (isFirstLocate) {
         isFirstLocate = false;
@@ -211,4 +211,34 @@ public class JMapActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    protected void onResume() {
+        mapView.onResume();
+        super.onResume();
+    }
+
+    @Override
+    protected void onStart() {
+        locationClient.start();
+        super.onStart();
+    }
+
+    @Override
+    protected void onPause() {
+        locationClient.stop();
+        mapView.onPause();
+        super.onPause();
+    }
+
+    @Override
+    protected void onDestroy() {
+        locationClient.stop();
+        //locationClient.unRegisterLocationListener(listener);
+        baiduMap.setMyLocationEnabled(false);
+         mapView.onDestroy();
+         mapView=null;
+        //取消位置提醒
+        //locationClient.removeNotifyEvent(notifyListener);
+        super.onDestroy();
+    }
 }

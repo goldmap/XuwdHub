@@ -5,33 +5,44 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-    <RadioGroup
-        android:id="@+id/radioMapType"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="45dip"
-        android:orientation="horizontal" >
-
-        <RadioButton
-            android:id="@+id/rb_man"
+        android:orientation="horizontal">
+        <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="普通图"       />
-
-        <RadioButton
-            android:id="@+id/rb_woman"
+            android:id="@+id/btnMapPin"
+            android:text="@string/mapPin"
+            android:layout_gravity="left"/>
+        <RadioGroup
+            android:id="@+id/radioMapType"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="卫星图"/>
+            android:orientation="horizontal"
+            android:layout_gravity="center">
 
-    </RadioGroup>
+            <RadioButton
+                android:id="@+id/radioNomalMap"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="true"
+                android:text="普通图"       />
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/btnMapPin"
-        android:text="@string/mapPin"
-        android:layout_gravity="left"/>
+            <RadioButton
+                android:id="@+id/radioSatelliteMap"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="卫星图"/>
+        </RadioGroup>
+        <CheckBox
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/chkBoxTraffic"
+            android:layout_gravity="center|right"
+            android:text="交通状况"/>
+
+    </LinearLayout>
 
     <com.baidu.mapapi.map.MapView
         android:id="@+id/mapView"

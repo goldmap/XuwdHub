@@ -4,11 +4,11 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.RadioGroup;
 
 import com.baidu.mapapi.SDKInitializer;
 
 public class MainActivity extends JActivity {
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
