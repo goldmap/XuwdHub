@@ -120,10 +120,6 @@ public class JMapActivity extends Activity {
     }
 
     private void initLocation() {
-        //自定义图标
-        //MyLocationConfiguration configuration =new MyLocationConfiguration(MyLocationConfiguration.LocationMode.NORMAL, true, mCurrentMarker);
-        //MyLocationConfiguration configuration =new MyLocationConfiguration(MyLocationConfiguration.LocationMode.NORMAL, true, mCurrentMarker);
-        //baiduMap.setMyLocationConfiguration(configuration);
         baiduMap.setMyLocationEnabled(true);
 
         //定位管理、配置
@@ -137,10 +133,12 @@ public class JMapActivity extends Activity {
         locationClient.setLocOption(option);
         locationClient.registerLocationListener(listener);    //注册监听函数
 
+        //自定义图标
+        //MyLocationConfiguration configuration =new MyLocationConfiguration(MyLocationConfiguration.LocationMode.NORMAL, true, mCurrentMarker);
         Bitmap bmp=BitmapFactory.decodeResource(getResources(),R.drawable.pin02);
         bmp=fixBitmap(bmp,32,32);
         mCurrentMarker = BitmapDescriptorFactory.fromBitmap(bmp);
-        MyLocationConfiguration locationConfiguration=new MyLocationConfiguration( MyLocationConfiguration.LocationMode.NORMAL,true,mCurrentMarker,0xAAFFFF88,0xAA00FF00);
+        MyLocationConfiguration locationConfiguration=new MyLocationConfiguration( MyLocationConfiguration.LocationMode.FOLLOWING,true,mCurrentMarker,0xAAFFFF88,0xAA00FF00);
         baiduMap.setMyLocationConfiguration(locationConfiguration);
 
         locationClient.start();
@@ -159,7 +157,7 @@ public class JMapActivity extends Activity {
             }
             Toast.makeText(getBaseContext(),"YYY",Toast.LENGTH_SHORT).show();
             MyLocationData locData = new MyLocationData.Builder()
-            //        .accuracy(location.getRadius())
+                    .accuracy(location.getRadius())
                     // 此处设置开发者获取到的方向信息，顺时针0-360
                     .direction(location.getDirection())
                     .latitude(location.getLatitude())
