@@ -14,6 +14,7 @@ import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.drawable.BitmapDrawable;
 import android.location.Location;
+import android.opengl.GLES20;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.View;
@@ -47,6 +48,8 @@ import com.baidu.mapapi.map.OverlayOptions;
 import com.baidu.mapapi.map.Stroke;
 import com.baidu.mapapi.model.LatLng;
 import com.baidu.mapapi.model.inner.GeoPoint;
+
+import javax.microedition.khronos.opengles.GL10;
 
 public class JMapActivity extends Activity {
 
@@ -110,6 +113,7 @@ public class JMapActivity extends Activity {
 
     private void initMap() {
         baiduMap.setMapType(BaiduMap.MAP_TYPE_NORMAL);
+        //baiduMap.setViewPadding(10,10,20,20);
         baiduMap.setMyLocationEnabled(true);
 
         MapStatus.Builder mapStatusBuilder = new MapStatus.Builder();
@@ -239,4 +243,25 @@ public class JMapActivity extends Activity {
         //locationClient.removeNotifyEvent(notifyListener);
         super.onDestroy();
     }
+
+    private void drawTest(MapStatus mapStatus){
+        float[] mvpMatrix=new float[16];
+        //GLES20.glDrawArrays();
+    }
+
+    BaiduMap.OnMapDrawFrameCallback jCallback=new BaiduMap.OnMapDrawFrameCallback() {
+        @Override
+        public void onMapDrawFrame(GL10 gl10, MapStatus mapStatus) {
+
+        }
+
+        @Override
+        public void onMapDrawFrame(MapStatus mapStatus) {
+            if(baiduMap.getProjection()==null){
+                return;
+            }
+            drawTest(mapStatus);
+        }
+    };
+
 }
