@@ -10,6 +10,6 @@ public class JMapApplication  extends Application {
     public void onCreate() {
         super.onCreate();
         SDKInitializer.initialize(this);
-        SDKInitializer.setCoordType(CoordType.BD09LL);
+        SDKInitializer.setCoordType(CoordType.GCJ02);
     }
 }

@@ -19,6 +19,7 @@ import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Interpolator;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
@@ -32,6 +33,7 @@ import com.baidu.location.BDLocationListener;
 import com.baidu.location.LocationClient;
 import com.baidu.location.LocationClientOption;
 import com.baidu.mapapi.SDKInitializer;
+import com.baidu.mapapi.animation.Animation;
 import com.baidu.mapapi.map.BaiduMap;
 import com.baidu.mapapi.map.BitmapDescriptor;
 import com.baidu.mapapi.map.BitmapDescriptorFactory;
@@ -41,6 +43,8 @@ import com.baidu.mapapi.map.MapStatus;
 import com.baidu.mapapi.map.MapStatusUpdate;
 import com.baidu.mapapi.map.MapStatusUpdateFactory;
 import com.baidu.mapapi.map.MapView;
+import com.baidu.mapapi.map.Marker;
+import com.baidu.mapapi.map.MarkerOptions;
 import com.baidu.mapapi.map.MyLocationConfiguration;
 import com.baidu.mapapi.map.MyLocationData;
 import com.baidu.mapapi.map.Overlay;
@@ -52,7 +56,7 @@ import com.baidu.mapapi.model.inner.GeoPoint;
 import javax.microedition.khronos.opengles.GL10;
 
 public class JMapActivity extends Activity {
-
+    private Marker oMarker;
     public LocationClient locationClient;
     //private TextView positionText;
     private MapView mapView;
@@ -119,6 +123,27 @@ public class JMapActivity extends Activity {
         MapStatus.Builder mapStatusBuilder = new MapStatus.Builder();
         mapStatusBuilder.target(latLng).zoom(20.0f);
         baiduMap.animateMapStatus(MapStatusUpdateFactory.newMapStatus(mapStatusBuilder.build()));
+        baiduMap.setOnMapStatusChangeListener(new BaiduMap.OnMapStatusChangeListener() {
+            @Override
+            public void onMapStatusChangeStart(MapStatus mapStatus) {
+
+            }
+
+            @Override
+            public void onMapStatusChangeStart(MapStatus mapStatus, int i) {
+
+            }
+
+            @Override
+            public void onMapStatusChange(MapStatus mapStatus) {
+                oMarker.setPosition(mapStatus.target);
+            }
+
+            @Override
+            public void onMapStatusChangeFinish(MapStatus mapStatus) {
+                oMarker.setPosition(mapStatus.target);
+            }
+        });
 
         initLocation();
     }
@@ -139,8 +164,8 @@ public class JMapActivity extends Activity {
 
         //自定义图标
         //MyLocationConfiguration configuration =new MyLocationConfiguration(MyLocationConfiguration.LocationMode.NORMAL, true, mCurrentMarker);
-        Bitmap bmp=BitmapFactory.decodeResource(getResources(),R.drawable.pin02);
-        bmp=fixBitmap(bmp,32,32);
+        Bitmap bmp=BitmapFactory.decodeResource(getResources(),R.drawable.pin04);
+        bmp=fixBitmap(bmp,48,48);
         mCurrentMarker = BitmapDescriptorFactory.fromBitmap(bmp);
         MyLocationConfiguration locationConfiguration=new MyLocationConfiguration( MyLocationConfiguration.LocationMode.FOLLOWING,true,mCurrentMarker,0xAAFFFF88,0xAA00FF00);
         baiduMap.setMyLocationConfiguration(locationConfiguration);
@@ -160,33 +185,33 @@ public class JMapActivity extends Activity {
                 return;
             }
             Toast.makeText(getBaseContext(),"YYY",Toast.LENGTH_SHORT).show();
-            MyLocationData locData = new MyLocationData.Builder()
-                    .accuracy(location.getRadius())
-                    // 此处设置开发者获取到的方向信息，顺时针0-360
-                    .direction(location.getDirection())
-                    .latitude(location.getLatitude())
-                    .longitude(location.getLongitude()).build();
-            baiduMap.setMyLocationData(locData);
-            //fixMap();
+
+            if(isFirstLocate){
+                Bitmap bmp=BitmapFactory.decodeResource(getResources(),R.drawable.pin07);
+                bmp=fixBitmap(bmp,64,64);
+                OverlayOptions ooA=new MarkerOptions().position(latLng)
+                        .icon(BitmapDescriptorFactory.fromBitmap(bmp))
+                        .animateType(MarkerOptions.MarkerAnimateType.jump)
+                        .draggable(true);
+                oMarker=(Marker) baiduMap.addOverlay(ooA);
+
+                isFirstLocate=false;
+                fixMap();
+            }
         }
     }
     private void fixMap(){
         //为标志设置坐标
         MyLocationData locationData = new MyLocationData.Builder().latitude(latLng.latitude)
                 .longitude(latLng.longitude)
-                .accuracy(radius).build();
+//                .accuracy(radius)
+                .build();
         baiduMap.setMyLocationData(locationData);
 
-
-        //positionText.setText(latLng.toString()+", Zoom:"+baiduMap.getMapStatus().zoom);
-
-        //if (isFirstLocate) {
-        isFirstLocate = false;
         //设置地图中心坐标，并依照其显示地图
-        MapStatus.Builder mapStatusBuilder = new MapStatus.Builder();
-        mapStatusBuilder.target(latLng);
-        baiduMap.animateMapStatus(MapStatusUpdateFactory.newMapStatus(mapStatusBuilder.build()));
-        //}
+//        MapStatus.Builder mapStatusBuilder = new MapStatus.Builder();
+//        mapStatusBuilder.target(latLng);
+//        baiduMap.animateMapStatus(MapStatusUpdateFactory.newMapStatus(mapStatusBuilder.build()));
     }
 
     private Bitmap fixBitmap(Bitmap bmpOrigin,int nWidth,int nHeight){
@@ -243,25 +268,5 @@ public class JMapActivity extends Activity {
         //locationClient.removeNotifyEvent(notifyListener);
         super.onDestroy();
     }
-
-    private void drawTest(MapStatus mapStatus){
-        float[] mvpMatrix=new float[16];
-        //GLES20.glDrawArrays();
-    }
-
-    BaiduMap.OnMapDrawFrameCallback jCallback=new BaiduMap.OnMapDrawFrameCallback() {
-        @Override
-        public void onMapDrawFrame(GL10 gl10, MapStatus mapStatus) {
-
-        }
-
-        @Override
-        public void onMapDrawFrame(MapStatus mapStatus) {
-            if(baiduMap.getProjection()==null){
-                return;
-            }
-            drawTest(mapStatus);
-        }
-    };
 
 }
