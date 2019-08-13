@@ -38,6 +38,7 @@ import com.baidu.mapapi.map.BaiduMap;
 import com.baidu.mapapi.map.BitmapDescriptor;
 import com.baidu.mapapi.map.BitmapDescriptorFactory;
 import com.baidu.mapapi.map.CircleOptions;
+import com.baidu.mapapi.map.InfoWindow;
 import com.baidu.mapapi.map.MapPoi;
 import com.baidu.mapapi.map.MapStatus;
 import com.baidu.mapapi.map.MapStatusUpdate;
@@ -50,6 +51,7 @@ import com.baidu.mapapi.map.MyLocationData;
 import com.baidu.mapapi.map.Overlay;
 import com.baidu.mapapi.map.OverlayOptions;
 import com.baidu.mapapi.map.Stroke;
+import com.baidu.mapapi.map.TextOptions;
 import com.baidu.mapapi.model.LatLng;
 import com.baidu.mapapi.model.inner.GeoPoint;
 
@@ -117,11 +119,10 @@ public class JMapActivity extends Activity {
 
     private void initMap() {
         baiduMap.setMapType(BaiduMap.MAP_TYPE_NORMAL);
-        //baiduMap.setViewPadding(10,10,20,20);
         baiduMap.setMyLocationEnabled(true);
 
         MapStatus.Builder mapStatusBuilder = new MapStatus.Builder();
-        mapStatusBuilder.target(latLng).zoom(20.0f);
+        mapStatusBuilder.zoom(19.0f);
         baiduMap.animateMapStatus(MapStatusUpdateFactory.newMapStatus(mapStatusBuilder.build()));
         baiduMap.setOnMapStatusChangeListener(new BaiduMap.OnMapStatusChangeListener() {
             @Override
@@ -146,6 +147,7 @@ public class JMapActivity extends Activity {
         });
 
         initLocation();
+
     }
 
     private void initLocation() {
@@ -184,19 +186,28 @@ public class JMapActivity extends Activity {
                 Toast.makeText(getBaseContext(),"XXX",Toast.LENGTH_SHORT).show();
                 return;
             }
-            Toast.makeText(getBaseContext(),"YYY",Toast.LENGTH_SHORT).show();
+            //Toast.makeText(getBaseContext(),"YYY",Toast.LENGTH_SHORT).show();
 
             if(isFirstLocate){
                 Bitmap bmp=BitmapFactory.decodeResource(getResources(),R.drawable.pin07);
                 bmp=fixBitmap(bmp,64,64);
                 OverlayOptions ooA=new MarkerOptions().position(latLng)
                         .icon(BitmapDescriptorFactory.fromBitmap(bmp))
-                        .animateType(MarkerOptions.MarkerAnimateType.jump)
-                        .draggable(true);
+                        .animateType(MarkerOptions.MarkerAnimateType.jump).draggable(true);
                 oMarker=(Marker) baiduMap.addOverlay(ooA);
 
                 isFirstLocate=false;
                 fixMap();
+                /*
+                OverlayOptions textOption= new TextOptions()
+                        .text("gggggggggggggggHHHH").bgColor(0xAAFFFF00).fontSize(24) //字号
+                        .fontColor(0xFFFF00FF).position(latLng);
+                baiduMap.addOverlay(textOption);
+
+                Button button=new Button(getApplicationContext());
+                button.setBackgroundResource(R.drawable.pin07);
+                baiduMap.showInfoWindow(new InfoWindow(button,latLng,-100));
+                */
             }
         }
     }
@@ -204,7 +215,7 @@ public class JMapActivity extends Activity {
         //为标志设置坐标
         MyLocationData locationData = new MyLocationData.Builder().latitude(latLng.latitude)
                 .longitude(latLng.longitude)
-//                .accuracy(radius)
+                .accuracy(radius)
                 .build();
         baiduMap.setMyLocationData(locationData);
 
