@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">JScan</string>
+    <string name="scan">扫描二维码</string>
+</resources>
