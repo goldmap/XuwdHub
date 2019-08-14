@@ -29,6 +29,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.Arrays;
+import java.util.TimerTask;
 import java.util.concurrent.Semaphore;
 
 public class ScanActivity extends AppCompatActivity {
@@ -282,4 +283,9 @@ public class ScanActivity extends AppCompatActivity {
             e.printStackTrace();
         }
     }
+    TimerTask timerTask=new TimerTask() {
+        @Override
+        public void run() {
+        }
+    };
 }
