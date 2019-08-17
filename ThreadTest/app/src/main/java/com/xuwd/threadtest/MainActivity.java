@@ -11,6 +11,9 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     private TextView textView;
     private Handler mHandler;
@@ -20,6 +23,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_main);
 
         textView=findViewById(R.id.textView);
+      //  Log.d("AAA", "main: "+Thread.currentThread().getId());
+
+        /*
+        Timer timer=new Timer();
+        TimerTask timerTask=new TimerTask() {
+            @Override
+            public void run() {
+                Log.d("AAA", " timer run:"+Thread.currentThread().getId());
+            }
+        };
+        timer.schedule(timerTask,0,10000);*/
 
         Button btnThread=findViewById(R.id.btnThread);
         btnThread.setOnClickListener(this);
@@ -27,7 +41,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public void handleMessage(@NonNull Message msg) {
                 super.handleMessage(msg);
-                Log.d("AAA", "handleMessage: "+msg.arg1+","+msg.obj);
+                Log.d("AAA", "handleMessage from: "+msg.obj+" ,"+msg.arg1);
             }
         };
     }
@@ -36,26 +50,32 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View view) {
         switch(view.getId()){
             case R.id.btnThread:
-                JThread thread=new JThread("AAA");
-                thread.start();
+                JThread thread1=new JThread("BBB");
+                JThread thread2=new JThread("CCC");
+                thread1.start();
+                thread2.start();
                 break;
         }
     }
 
     class JThread extends Thread{
         String name;
-        JThread(String name){
+        public JThread(String name){
+            super();
             this.name=name;
         }
 
         @Override
         public void run() {
             super.run();
-            Message msg=Message.obtain();
-            for(int i=0;i<10;i++){
+            Log.d("AAA", "thread: "+Thread.currentThread().getId());
+            for(int i=0;i<100;i++){
+//                Log.d("AAA", "run: "+i);
+                Message msg=Message.obtain();
                 msg.arg1=i;
                 msg.obj=name;
-                mHandler.sendMessageDelayed(msg,1000);
+
+                mHandler.sendMessage(msg);
             }
         }
     }
