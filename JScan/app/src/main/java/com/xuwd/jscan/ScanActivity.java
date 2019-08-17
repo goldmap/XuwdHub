@@ -33,9 +33,9 @@ import java.util.TimerTask;
 import java.util.concurrent.Semaphore;
 
 public class ScanActivity extends AppCompatActivity {
-    private HandlerThread mBackgroundThread;
-    private Handler mBackgroundHandler;
-    private CameraCaptureSession mPreviewSession;
+    //private HandlerThread mBackgroundThread;
+    //private Handler mBackgroundHandler;
+    //private CameraCaptureSession mPreviewSession;
     private TextView mVideoView;
     private Size mPreviewSize;
     private Size mVideoSize;
@@ -121,7 +121,8 @@ public class ScanActivity extends AppCompatActivity {
             }
             configureTransform(mTextureWidth,mTextureHeight);
 */
-            manager.openCamera(cameraId, cameraStateCallback, mBackgroundHandler);
+//            manager.openCamera(cameraId, cameraStateCallback, mBackgroundHandler);
+            manager.openCamera(cameraId, cameraStateCallback, null);
         }   catch (CameraAccessException e) {
             throw new RuntimeException("Interrupted while trying to lock camera opening.");
         }
@@ -176,8 +177,7 @@ public class ScanActivity extends AppCompatActivity {
                 mPreviewRequestBuilder.addTarget(textureSurface);
 
                 //创建相机设备的会话，抛出去，待其回调函数出声
-                mCameraDevice.createCaptureSession(Arrays.asList(textureSurface),
-                        sessionStateCallback, mBackgroundHandler);
+                mCameraDevice.createCaptureSession(Arrays.asList(textureSurface),sessionStateCallback, null);
             } catch (CameraAccessException e) {
                 e.printStackTrace();
             }
@@ -229,7 +229,7 @@ public class ScanActivity extends AppCompatActivity {
             mPreviewRequestBuilder.set(CaptureRequest.CONTROL_AE_MODE,CaptureRequest.CONTROL_AE_MODE_ON_AUTO_FLASH);
 
             //启动预览请求----浏览无事可处理，不需要设置回调函数---------------！！！！
-            mCaptureSession.setRepeatingRequest(mPreviewRequestBuilder.build(), null,mBackgroundHandler);
+            mCaptureSession.setRepeatingRequest(mPreviewRequestBuilder.build(), null,null);
         } catch (CameraAccessException e) {
             e.printStackTrace();
         }
@@ -239,13 +239,13 @@ public class ScanActivity extends AppCompatActivity {
     @Override
     public void onResume() {
         super.onResume();
-        startBackgroundThread();
+        //startBackgroundThread();
     }
 
     @Override
     public void onPause() {
         closeCamera();
-        stopBackgroundThread();
+        //stopBackgroundThread();
         super.onPause();
     }
 
@@ -267,12 +267,14 @@ public class ScanActivity extends AppCompatActivity {
             mCameraOpenCloseLock.release();
         }
     }
+    /*
     private void startBackgroundThread() {
-        mBackgroundThread = new HandlerThread("CameraBackground");
-        mBackgroundThread.start();
-        mBackgroundHandler = new Handler(mBackgroundThread.getLooper());
+       // mBackgroundThread = new HandlerThread("CameraBackground");
+        //mBackgroundThread.start();
+        //mBackgroundHandler = new Handler(mBackgroundThread.getLooper());
     }
-
+    */
+    /*
     private void stopBackgroundThread() {
         mBackgroundThread.quitSafely();
         try {
@@ -283,6 +285,7 @@ public class ScanActivity extends AppCompatActivity {
             e.printStackTrace();
         }
     }
+    */
     TimerTask timerTask=new TimerTask() {
         @Override
         public void run() {
