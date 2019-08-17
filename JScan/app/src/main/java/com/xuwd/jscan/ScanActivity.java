@@ -19,6 +19,7 @@ import android.media.MediaRecorder;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
+import android.os.Message;
 import android.util.Size;
 import android.view.Surface;
 import android.view.TextureView;
@@ -33,6 +34,7 @@ import java.util.TimerTask;
 import java.util.concurrent.Semaphore;
 
 public class ScanActivity extends AppCompatActivity {
+    private ScanHandler mScanHandler;
     //private HandlerThread mBackgroundThread;
     //private Handler mBackgroundHandler;
     //private CameraCaptureSession mPreviewSession;
@@ -46,6 +48,7 @@ public class ScanActivity extends AppCompatActivity {
 
         mTextureView=findViewById(R.id.capture_preview);
         mTextureView.setSurfaceTextureListener(surfaceTextureListener);
+        mScanHandler=new ScanHandler();
 
         TranslateAnimation animation=new TranslateAnimation(Animation.RELATIVE_TO_PARENT, 0.0f, Animation
                 .RELATIVE_TO_PARENT, 0.0f, Animation.RELATIVE_TO_PARENT, 0.0f, Animation.RELATIVE_TO_PARENT,
@@ -84,9 +87,9 @@ public class ScanActivity extends AppCompatActivity {
         }
         @Override
         public void onSurfaceTextureUpdated(SurfaceTexture surfaceTexture) {
-            /*mBmp= mTextureView.getBitmap();
-            if(mBmp!=null)
-                mImageView.setImageBitmap(mBmp);*/
+            Message msg= mScanHandler.obtainMessage();
+            msg.obj=mTextureView.getBitmap();
+            mScanHandler.sendMessage(msg);
         }
 
     };
