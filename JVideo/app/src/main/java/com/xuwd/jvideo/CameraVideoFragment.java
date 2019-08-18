@@ -138,7 +138,7 @@ public class CameraVideoFragment extends Fragment {
                 Bitmap cmp = Bitmap.createBitmap(rgb,0,width,width,height, Bitmap.Config.ARGB_8888);
                 mBmp=cmp;
             }
-//            mImageView.setImageBitmap(bmp);  //子线程不能操作UI
+            mImageView.setImageBitmap(mBmp);  //子线程不能操作UI
             image.close();
         }
 
@@ -202,6 +202,15 @@ public class CameraVideoFragment extends Fragment {
             mPreviewSize = chooseOptimalSize(map.getOutputSizes(SurfaceTexture.class),
                     mTextureWidth,mTextureHeight, mVideoSize);
 
+
+            Size[] yuv_imageSize = map.getOutputSizes(ImageFormat.YUV_420_888);
+//            Size[] jpeg_imageSize = map.getOutputSizes(ImageFormat.JPEG);
+//            Size[] raw_imageSize = map.getOutputSizes(ImageFormat.RAW_SENSOR);
+//            Size[] priv_imageSize = map.getOutputSizes(TextureView.class);
+            int imgWidth=yuv_imageSize[0].getWidth();
+            int imgHeight=yuv_imageSize[0].getHeight();
+            mImageReader = ImageReader.newInstance(imgWidth, imgHeight, ImageFormat.YUV_420_888, 2);
+
             int orientation = getResources().getConfiguration().orientation;
 /*            if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
                 mTextureView.setAspectRatio(mPreviewSize.getWidth(), mPreviewSize.getHeight());
@@ -210,7 +219,8 @@ public class CameraVideoFragment extends Fragment {
             }
             configureTransform(mTextureWidth,mTextureHeight);
 */
-            manager.openCamera(cameraId, cameraStateCallback, mBackgroundHandler);
+//            manager.openCamera(cameraId, cameraStateCallback, mBackgroundHandler);
+            manager.openCamera(cameraId, cameraStateCallback, null);
         }   catch (CameraAccessException e) {
             throw new RuntimeException("Interrupted while trying to lock camera opening.");
         }
@@ -263,18 +273,19 @@ public class CameraVideoFragment extends Fragment {
                 assert texture != null;
                 texture.setDefaultBufferSize(mPreviewSize.getWidth(), mPreviewSize.getHeight());
                 Surface textureSurface = new Surface(texture);
-//                Surface imageSurface = mImageReader.getSurface();
+                Surface imageSurface = mImageReader.getSurface();
                 Surface recorderSurface = mMediaRecorder.getSurface();
 
 
                 //这个动作不是建立会话的必要，但要生成并关联两个Surface，所以顺便addTarget
                 mPreviewRequestBuilder = mCameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
                 mPreviewRequestBuilder.addTarget(textureSurface);
+                mPreviewRequestBuilder.addTarget(imageSurface);
                 mPreviewRequestBuilder.addTarget(recorderSurface);
 
                 //创建相机设备的会话，抛出去，待其回调函数出声
-                mCameraDevice.createCaptureSession(Arrays.asList(textureSurface,recorderSurface),
-                       sessionStateCallback, mBackgroundHandler);
+ //               mCameraDevice.createCaptureSession(Arrays.asList(textureSurface,recorderSurface),sessionStateCallback, mBackgroundHandler);
+                mCameraDevice.createCaptureSession(Arrays.asList(textureSurface,recorderSurface,imageSurface),sessionStateCallback, null);
             } catch (CameraAccessException e) {
                 e.printStackTrace();
             }
@@ -326,7 +337,8 @@ public class CameraVideoFragment extends Fragment {
             mPreviewRequestBuilder.set(CaptureRequest.CONTROL_AE_MODE,CaptureRequest.CONTROL_AE_MODE_ON_AUTO_FLASH);
 
             //启动预览请求----浏览无事可处理，不需要设置回调函数---------------！！！！
-            mCaptureSession.setRepeatingRequest(mPreviewRequestBuilder.build(), null,mBackgroundHandler);
+//            mCaptureSession.setRepeatingRequest(mPreviewRequestBuilder.build(), null,mBackgroundHandler);
+            mCaptureSession.setRepeatingRequest(mPreviewRequestBuilder.build(), null,null);
         } catch (CameraAccessException e) {
             e.printStackTrace();
         }

@@ -80,12 +80,13 @@ public class CameraFragment extends Fragment {
                 buffer.rewind();
                 byte[] bytes=new byte[buffer.remaining()];
                 buffer.get(bytes);
-
                 Bitmap bmp = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+
                 mBmp=bmp;
             }//mImageReader = ImageReader.newInstance(imgWidth, imgHeight, ImageFormat.YUV_420_888, 2)
             else if(image.getFormat()==ImageFormat.YUV_420_888){
                 byte[] yuvBytes = ImageUtil.getBytesFromImage(image,ImageUtil.YUV420P);
+                //yuvBytes=rotateGraph(yuvBytes,width,height);
              /*这个机制失败，有待分析
                 YuvImage yuvImage = new YuvImage(yuvBytes,ImageFormat.YUV_420_888,width,height,null);
                 if(yuvImage!=null){
@@ -100,10 +101,20 @@ public class CameraFragment extends Fragment {
                 mBmp=cmp;
             }
 //            mImageView.setImageBitmap(bmp);  //子线程不能操作UI
+
             image.close();
         }
 
     };
+
+    private byte[] rotateGraph(byte[] rawData,int width,int height){
+        byte[] rotatedData = new byte[rawData.length];
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++)
+                rotatedData[x * height + height - y - 1] = rawData[x + y * width];
+        }
+        return rotatedData;
+    }
 
     //**************************** TextureView ****************************//
     private TextureView mTextureView;
@@ -161,8 +172,8 @@ public class CameraFragment extends Fragment {
             int imgWidth=yuv_imageSize[0].getWidth();
             int imgHeight=yuv_imageSize[0].getHeight();
 
-//            mImageReader = ImageReader.newInstance(imgWidth, imgHeight, ImageFormat.JPEG, 2);
-            mImageReader = ImageReader.newInstance(imgWidth, imgHeight, ImageFormat.YUV_420_888, 2);
+            mImageReader = ImageReader.newInstance(imgWidth, imgHeight, ImageFormat.JPEG, 2);
+//            mImageReader = ImageReader.newInstance(imgWidth, imgHeight, ImageFormat.YUV_420_888, 2);
 //            mImageReader = ImageReader.newInstance(imageSize.getWidth(), imageSize.getHeight(), ImageFormat.JPEG, 2);
             mImageReader.setOnImageAvailableListener(mOnImageAvailableListener, mBackgroundHandler);
 

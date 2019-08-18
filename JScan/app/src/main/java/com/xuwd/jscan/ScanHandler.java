@@ -1,5 +1,7 @@
 package com.xuwd.jscan;
 
+import android.graphics.PixelFormat;
+import android.graphics.Rect;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -37,7 +39,7 @@ public class ScanHandler extends Handler {
         width = height;
         height = tmp;
 
-        PlanarYUVLuminanceSource source = CameraManager.get().buildLuminanceSource(rotatedData, width, height);
+        PlanarYUVLuminanceSource source =buildLuminanceSource(rotatedData, width, height);
         BinaryBitmap bitmap = new BinaryBitmap(new HybridBinarizer(source));
         try {
             rawResult = multiFormatReader.decodeWithState(bitmap);
@@ -49,7 +51,7 @@ public class ScanHandler extends Handler {
 
         if (rawResult != null) {
             long end = System.currentTimeMillis();
-            Log.d(TAG, "Found barcode (" + (end - start) + " ms):\n" + rawResult.toString());
+            //Log.d(TAG, "Found barcode (" + (end - start) + " ms):\n" + rawResult.toString());
             Message message = Message.obtain(activity.getHandler(), R.id.decode_succeeded, rawResult);
             Bundle bundle = new Bundle();
             bundle.putParcelable(DecodeThread.BARCODE_BITMAP, source.renderCroppedGreyscaleBitmap());
@@ -60,5 +62,28 @@ public class ScanHandler extends Handler {
             Message message = Message.obtain(activity.getHandler(), R.id.decode_failed);
             message.sendToTarget();
         }
+    }
+
+    public PlanarYUVLuminanceSource buildLuminanceSource(byte[] data, int width, int height) {
+        Rect rect = getFramingRectInPreview();
+        int previewFormat = configManager.getPreviewFormat();
+        String previewFormatString = configManager.getPreviewFormatString();
+        switch (previewFormat) {
+            // This is the standard Android format which all devices are REQUIRED to support.
+            // In theory, it's the only one we should ever care about.
+            case PixelFormat.YCbCr_420_SP:
+                // This format has never been seen in the wild, but is compatible as we only care
+                // about the Y channel, so allow it.
+            case PixelFormat.YCbCr_422_SP:
+                return new PlanarYUVLuminanceSource(data, width, height, 0, 0, width, height);
+            default:
+                // The Samsung Moment incorrectly uses this variant instead of the 'sp' version.
+                // Fortunately, it too has all the Y data up front, so we can read it.
+                if ("yuv420p".equals(previewFormatString)) {
+                    return new PlanarYUVLuminanceSource(data, width, height, 0, 0, width, height);
+                }
+        }
+        throw new IllegalArgumentException("Unsupported picture format: " +
+                previewFormat + '/' + previewFormatString);
     }
 }
