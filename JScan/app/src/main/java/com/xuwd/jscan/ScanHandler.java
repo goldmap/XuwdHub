@@ -10,20 +10,52 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 
 import com.google.zxing.BinaryBitmap;
+import com.google.zxing.DecodeHintType;
 import com.google.zxing.PlanarYUVLuminanceSource;
+import com.google.zxing.MultiFormatReader;
 import com.google.zxing.ReaderException;
 import com.google.zxing.Result;
 import com.google.zxing.common.HybridBinarizer;
 
-public class ScanHandler extends Handler {
-    ScanHandler(){
+import java.util.Hashtable;
 
+public class ScanHandler extends Handler {
+    private final MultiFormatReader multiFormatReader;
+    private final ScanActivity activity;
+    private State state;
+
+    private enum State {
+        PREVIEW,
+        SUCCESS,
+        DONE
+    }
+    ScanHandler(ScanActivity activity, Hashtable<DecodeHintType, Object> hints){
+        multiFormatReader = new MultiFormatReader();
+        multiFormatReader.setHints(hints);
+        this.activity=activity;
+        state = State.SUCCESS;
     }
 
     @Override
     public void handleMessage(@NonNull Message msg) {
         super.handleMessage(msg);
 
+    }
+
+    public void quitSynchronously() {
+        state = State.DONE;
+        //CameraManager.get().stopPreview();
+        Message quit = Message.obtain(decodeThread.getHandler(), R.id.quit);
+        quit.sendToTarget();
+        try {
+            decodeThread.join();
+        } catch (InterruptedException e) {
+            // continue
+        }
+
+        // Be absolutely sure we don't send any queued up messages
+        removeMessages(R.id.decode_succeeded);
+        removeMessages(R.id.decode_failed);
     }
     private void decode(byte[] data, int width, int height) {
         long start = System.currentTimeMillis();

@@ -23,7 +23,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_main);
 
         textView=findViewById(R.id.textView);
-      //  Log.d("AAA", "main: "+Thread.currentThread().getId());
+        Log.d("AAA", "main: "+Thread.currentThread().getId());
 
         /*
         Timer timer=new Timer();
@@ -37,11 +37,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         Button btnThread=findViewById(R.id.btnThread);
         btnThread.setOnClickListener(this);
+
         mHandler=new Handler(){
             @Override
             public void handleMessage(@NonNull Message msg) {
                 super.handleMessage(msg);
-                Log.d("AAA", "handleMessage from: "+msg.obj+" ,"+msg.arg1);
+                Log.d("AAA", "handleMessage from: "+msg.obj+" ,"+msg.arg1+"thread:"+Thread.currentThread().getId());
             }
         };
     }

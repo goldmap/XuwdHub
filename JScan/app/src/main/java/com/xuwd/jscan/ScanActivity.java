@@ -48,7 +48,6 @@ public class ScanActivity extends AppCompatActivity {
 
         mTextureView=findViewById(R.id.capture_preview);
         mTextureView.setSurfaceTextureListener(surfaceTextureListener);
-        mScanHandler=new ScanHandler();
 
         TranslateAnimation animation=new TranslateAnimation(Animation.RELATIVE_TO_PARENT, 0.0f, Animation
                 .RELATIVE_TO_PARENT, 0.0f, Animation.RELATIVE_TO_PARENT, 0.0f, Animation.RELATIVE_TO_PARENT,
@@ -59,6 +58,23 @@ public class ScanActivity extends AppCompatActivity {
         ImageView scanLine = findViewById(R.id.capture_scan_line);
         scanLine.startAnimation(animation);
     }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        //startBackgroundThread();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        //closeCamera();
+        //stopBackgroundThread();
+        if(mScanHandler!=null){
+            mScanHandler.quit
+        }
+    }
+
 
     //**************************** TextureView ****************************//
     private TextureView mTextureView;
@@ -236,20 +252,6 @@ public class ScanActivity extends AppCompatActivity {
         } catch (CameraAccessException e) {
             e.printStackTrace();
         }
-    }
-
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        //startBackgroundThread();
-    }
-
-    @Override
-    public void onPause() {
-        closeCamera();
-        //stopBackgroundThread();
-        super.onPause();
     }
 
     private void closeCamera() {
