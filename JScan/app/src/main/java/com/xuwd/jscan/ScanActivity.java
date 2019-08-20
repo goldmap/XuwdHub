@@ -29,15 +29,20 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.zxing.BarcodeFormat;
+
 import java.util.Arrays;
 import java.util.TimerTask;
+import java.util.Vector;
 import java.util.concurrent.Semaphore;
 
 public class ScanActivity extends AppCompatActivity {
-    private ScanHandler mScanHandler;
+    private ScanActivityHandler mScanHandler;
     //private HandlerThread mBackgroundThread;
     //private Handler mBackgroundHandler;
     //private CameraCaptureSession mPreviewSession;
+    private Vector<BarcodeFormat> decodeFormats;
+    private String characterSet;
     private TextView mVideoView;
     private Size mPreviewSize;
     private Size mVideoSize;
@@ -57,11 +62,17 @@ public class ScanActivity extends AppCompatActivity {
         animation.setRepeatMode(Animation.RESTART);
         ImageView scanLine = findViewById(R.id.capture_scan_line);
         scanLine.startAnimation(animation);
+
+        if(mScanHandler==null){
+            mScanHandler=new ScanActivityHandler(this,decodeFormats,characterSet);
+        }
     }
 
     @Override
     public void onResume() {
         super.onResume();
+        decodeFormats = null;
+        characterSet = null;
         //startBackgroundThread();
     }
 
@@ -71,10 +82,14 @@ public class ScanActivity extends AppCompatActivity {
         //closeCamera();
         //stopBackgroundThread();
         if(mScanHandler!=null){
-            mScanHandler.quit
+            mScanHandler.quitSynchronously();
+            mScanHandler=null;
         }
     }
 
+    public Handler getHandler() {
+        return mScanHandler;
+    }
 
     //**************************** TextureView ****************************//
     private TextureView mTextureView;
@@ -87,6 +102,7 @@ public class ScanActivity extends AppCompatActivity {
                                               int width, int height) {
             mTextureWidth =width;
             mTextureHeight =height;
+
 
             //[KeyJoint]
             igniteCamera();

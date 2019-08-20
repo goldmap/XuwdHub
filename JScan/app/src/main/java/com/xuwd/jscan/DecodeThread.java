@@ -22,7 +22,6 @@ import android.os.Looper;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.DecodeHintType;
 import com.google.zxing.ResultPointCallback;
-import com.google.zxing.activity.CaptureActivity;
 
 import java.util.Hashtable;
 import java.util.Vector;
@@ -42,8 +41,7 @@ final class DecodeThread extends Thread {
 
   DecodeThread(ScanActivity activity,
                Vector<BarcodeFormat> decodeFormats,
-               String characterSet,
-               ResultPointCallback resultPointCallback) {
+               String characterSet) {
 
     this.activity = activity;
     handlerInitLatch = new CountDownLatch(1);
@@ -63,7 +61,7 @@ final class DecodeThread extends Thread {
       hints.put(DecodeHintType.CHARACTER_SET, characterSet);
     }
 
-    hints.put(DecodeHintType.NEED_RESULT_POINT_CALLBACK, resultPointCallback);
+    //hints.put(DecodeHintType.NEED_RESULT_POINT_CALLBACK, resultPointCallback);
   }
 
   Handler getHandler() {
