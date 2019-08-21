@@ -144,7 +144,7 @@ public class ScanActivity extends AppCompatActivity {
             if (map == null) {
                 throw new RuntimeException("Cannot get available preview/video sizes");
             }
-           // mVideoSize = chooseVideoSize(map.getOutputSizes(MediaRecorder.class));
+           //mVideoSize = chooseVideoSize(map.getOutputSizes(MediaRecorder.class));
            // mPreviewSize = chooseOptimalSize(map.getOutputSizes(SurfaceTexture.class),mTextureWidth,mTextureHeight, mVideoSize);
 
 //            int orientation = getResources().getConfiguration().orientation;
