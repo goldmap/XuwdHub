@@ -1,7 +1,4 @@
-package com.xuwd.jscan;
-
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
+package com.xuwd.jscan.JCamera;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -14,11 +11,8 @@ import android.hardware.camera2.CameraDevice;
 import android.hardware.camera2.CameraManager;
 import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.params.StreamConfigurationMap;
-import android.media.MediaPlayer;
-import android.media.MediaRecorder;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.HandlerThread;
 import android.os.Message;
 import android.util.Log;
 import android.util.Size;
@@ -30,32 +24,116 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.google.zxing.BarcodeFormat;
+import com.xuwd.jscan.R;
+import com.xuwd.jscan.ScanActivityHandler;
 
 import java.util.Arrays;
 import java.util.TimerTask;
 import java.util.Vector;
 import java.util.concurrent.Semaphore;
 
-public class JCamera extends HandlerThread{
+public class CameraActivity extends AppCompatActivity {
     private ScanActivityHandler mScanHandler;
-    private TextureView mTexture;
-    private Activity mActivity;
     //private HandlerThread mBackgroundThread;
     //private Handler mBackgroundHandler;
-    public JCamera(TextureView texture,Activity activity){
-        this.mTexture=texture;
-        this.mActivity=activity;
-    }
+    //private CameraCaptureSession mPreviewSession;
     private Vector<BarcodeFormat> decodeFormats;
     private String characterSet;
     private TextView mVideoView;
     private Size mPreviewSize;
     private Size mVideoSize;
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_scan);
+
+        mTextureView=findViewById(R.id.capture_preview);
+        mTextureView.setSurfaceTextureListener(surfaceTextureListener);
+
+        TranslateAnimation animation=new TranslateAnimation(Animation.RELATIVE_TO_PARENT, 0.0f, Animation
+                .RELATIVE_TO_PARENT, 0.0f, Animation.RELATIVE_TO_PARENT, 0.0f, Animation.RELATIVE_TO_PARENT,
+                0.9f);
+        animation.setDuration(4500);
+        animation.setRepeatCount(-1);
+        animation.setRepeatMode(Animation.RESTART);
+        ImageView scanLine = findViewById(R.id.capture_scan_line);
+        scanLine.startAnimation(animation);
+
+        if(mScanHandler==null){
+            //mScanHandler=new ScanActivityHandler(this,decodeFormats,characterSet);
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        decodeFormats = null;
+        characterSet = null;
+        //startBackgroundThread();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        //closeCamera();
+        //stopBackgroundThread();
+        if(mScanHandler!=null){
+            mScanHandler.quitSynchronously();
+            mScanHandler=null;
+        }
+    }
+
+    public Handler getHandler() {
+        return mScanHandler;
+    }
+
+    //**************************** TextureView ****************************//
+    private TextureView mTextureView;
+    private int mTextureWidth,mTextureHeight;
+    private TextureView.SurfaceTextureListener surfaceTextureListener
+            = new TextureView.SurfaceTextureListener() {
+
+        @Override
+        public void onSurfaceTextureAvailable(SurfaceTexture surfaceTexture,
+                                              int width, int height) {
+            mTextureWidth =width;
+            mTextureHeight =height;
+            Log.d("AAA", "onSurfaceTextureAvailable:(mTextureWidth,mTextureHeight) "+mTextureWidth+","+mTextureHeight);
+            //[KeyJoint]
+            igniteCamera();
+        }
+
+        @Override
+        public void onSurfaceTextureSizeChanged(SurfaceTexture surfaceTexture,
+                                                int width, int height) {
+        }
+
+        @Override
+        public boolean onSurfaceTextureDestroyed(SurfaceTexture surfaceTexture) {
+            return true;
+        }
+        @Override
+        public void onSurfaceTextureUpdated(SurfaceTexture surfaceTexture) {
+            Message msg= mScanHandler.obtainMessage();
+            msg.obj=mTextureView.getBitmap();
+            //msg.what=
+            mScanHandler.sendMessage(msg);
+        }
+
+    };
 
     @SuppressLint("MissingPermission")
-    private void initCamera() {
-        CameraManager manager = (CameraManager) mActivity.getSystemService(Context.CAMERA_SERVICE);
+    private void igniteCamera() {
+        final Activity activity = this;
+        if (null == activity || activity.isFinishing()) {
+            return;
+        }
+
+        CameraManager manager = (CameraManager) activity.getSystemService(Context.CAMERA_SERVICE);
         try {
             String cameraId = manager.getCameraIdList()[0];
 
