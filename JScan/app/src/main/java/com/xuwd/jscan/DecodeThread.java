@@ -16,6 +16,7 @@
 
 package com.xuwd.jscan;
 
+import android.app.Activity;
 import android.os.Handler;
 import android.os.Looper;
 
@@ -34,12 +35,12 @@ import java.util.concurrent.CountDownLatch;
 final class DecodeThread extends Thread {
 
   public static final String BARCODE_BITMAP = "barcode_bitmap";
-  private final ScanActivity activity;
+  private final Activity activity;
   private final Hashtable<DecodeHintType, Object> hints;
   private Handler handler;
   private final CountDownLatch handlerInitLatch;
 
-  DecodeThread(ScanActivity activity,
+  DecodeThread(Activity activity,
                Vector<BarcodeFormat> decodeFormats,
                String characterSet) {
 

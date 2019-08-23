@@ -46,3 +46,4 @@ public class MainActivity extends JActivity {
 
 
 //https://blog.csdn.net/qq_17475155/article/details/51607141
+//    implementation 'com.google.zxing:core:3.3.0'

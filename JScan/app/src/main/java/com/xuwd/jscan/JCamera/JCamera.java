@@ -11,129 +11,32 @@ import android.hardware.camera2.CameraDevice;
 import android.hardware.camera2.CameraManager;
 import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.params.StreamConfigurationMap;
-import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
-import android.util.Log;
 import android.util.Size;
 import android.view.Surface;
 import android.view.TextureView;
-import android.view.animation.Animation;
-import android.view.animation.TranslateAnimation;
-import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-
-import com.google.zxing.BarcodeFormat;
-import com.xuwd.jscan.R;
-import com.xuwd.jscan.ScanActivityHandler;
 
 import java.util.Arrays;
 import java.util.TimerTask;
 import java.util.Vector;
 import java.util.concurrent.Semaphore;
 
-public class CameraActivity extends AppCompatActivity {
-    private ScanActivityHandler mScanHandler;
+public class JCamera {
+    private TextureView mTextureView;
+    private Activity mActivity;
     //private HandlerThread mBackgroundThread;
     //private Handler mBackgroundHandler;
-    //private CameraCaptureSession mPreviewSession;
-    private Vector<BarcodeFormat> decodeFormats;
-    private String characterSet;
-    private TextView mVideoView;
-    private Size mPreviewSize;
-    private Size mVideoSize;
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_scan);
-
-        mTextureView=findViewById(R.id.capture_preview);
-        mTextureView.setSurfaceTextureListener(surfaceTextureListener);
-
-        TranslateAnimation animation=new TranslateAnimation(Animation.RELATIVE_TO_PARENT, 0.0f, Animation
-                .RELATIVE_TO_PARENT, 0.0f, Animation.RELATIVE_TO_PARENT, 0.0f, Animation.RELATIVE_TO_PARENT,
-                0.9f);
-        animation.setDuration(4500);
-        animation.setRepeatCount(-1);
-        animation.setRepeatMode(Animation.RESTART);
-        ImageView scanLine = findViewById(R.id.capture_scan_line);
-        scanLine.startAnimation(animation);
-
-        if(mScanHandler==null){
-            //mScanHandler=new ScanActivityHandler(this,decodeFormats,characterSet);
-        }
+    public JCamera(TextureView textureView, Activity activity){
+        this.mTextureView=textureView;
+        this.mActivity=activity;
     }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        decodeFormats = null;
-        characterSet = null;
-        //startBackgroundThread();
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        //closeCamera();
-        //stopBackgroundThread();
-        if(mScanHandler!=null){
-            mScanHandler.quitSynchronously();
-            mScanHandler=null;
-        }
-    }
-
-    public Handler getHandler() {
-        return mScanHandler;
-    }
-
-    //**************************** TextureView ****************************//
-    private TextureView mTextureView;
-    private int mTextureWidth,mTextureHeight;
-    private TextureView.SurfaceTextureListener surfaceTextureListener
-            = new TextureView.SurfaceTextureListener() {
-
-        @Override
-        public void onSurfaceTextureAvailable(SurfaceTexture surfaceTexture,
-                                              int width, int height) {
-            mTextureWidth =width;
-            mTextureHeight =height;
-            Log.d("AAA", "onSurfaceTextureAvailable:(mTextureWidth,mTextureHeight) "+mTextureWidth+","+mTextureHeight);
-            //[KeyJoint]
-            igniteCamera();
-        }
-
-        @Override
-        public void onSurfaceTextureSizeChanged(SurfaceTexture surfaceTexture,
-                                                int width, int height) {
-        }
-
-        @Override
-        public boolean onSurfaceTextureDestroyed(SurfaceTexture surfaceTexture) {
-            return true;
-        }
-        @Override
-        public void onSurfaceTextureUpdated(SurfaceTexture surfaceTexture) {
-            Message msg= mScanHandler.obtainMessage();
-            msg.obj=mTextureView.getBitmap();
-            //msg.what=
-            mScanHandler.sendMessage(msg);
-        }
-
-    };
 
     @SuppressLint("MissingPermission")
-    private void igniteCamera() {
-        final Activity activity = this;
-        if (null == activity || activity.isFinishing()) {
-            return;
-        }
-
-        CameraManager manager = (CameraManager) activity.getSystemService(Context.CAMERA_SERVICE);
+    //1：设置参数、启动相机
+    public void start() {
+        CameraManager manager = (CameraManager) mActivity.getSystemService(Context.CAMERA_SERVICE);
         try {
             String cameraId = manager.getCameraIdList()[0];
 
@@ -156,21 +59,19 @@ public class CameraActivity extends AppCompatActivity {
             configureTransform(mTextureWidth,mTextureHeight);
 */
 //            manager.openCamera(cameraId, cameraStateCallback, mBackgroundHandler);
+            //流程抛给回调函数cameraStateCallback
             manager.openCamera(cameraId, cameraStateCallback, null);
         }   catch (CameraAccessException e) {
             throw new RuntimeException("Interrupted while trying to lock camera opening.");
         }
     }
 
-
-
     //********************************* CameraDevice *****************************************//
     private Semaphore mCameraOpenCloseLock = new Semaphore(1);
-    private Boolean mPreviewing=false;
     private CameraDevice mCameraDevice;
     private CameraCaptureSession mCaptureSession;
     private CaptureRequest.Builder mPreviewRequestBuilder;
-    private CameraCharacteristics mCharacteristics;
+
     private CameraDevice.StateCallback cameraStateCallback = new CameraDevice.StateCallback() {
 
         @Override
@@ -182,7 +83,7 @@ public class CameraActivity extends AppCompatActivity {
             //此时配置Recorder应该合适
             //setUpMediaRecorder();
 
-            //创建相机的对话机制, 创建会话（设置会话的回调函数），通过会话启动“会话请求”Request
+            //2：建立相机与画面的通道，并创建对话机制, 待成熟后启动对话，流程抛给回调函数sessionStateCallback
             try {
                 SurfaceTexture texture = mTextureView.getSurfaceTexture();
                 assert texture != null;
@@ -194,7 +95,7 @@ public class CameraActivity extends AppCompatActivity {
                 mPreviewRequestBuilder = mCameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
                 mPreviewRequestBuilder.addTarget(textureSurface);
 
-                //创建相机设备的会话，抛出去，待其回调函数出声
+                //创建相机设备的会话，抛出去，待其回调函数sessionStateCallback冒泡
                 mCameraDevice.createCaptureSession(Arrays.asList(textureSurface),sessionStateCallback, null);
             } catch (CameraAccessException e) {
                 e.printStackTrace();
@@ -213,7 +114,7 @@ public class CameraActivity extends AppCompatActivity {
             mCameraOpenCloseLock.release();
             cameraDevice.close();
             mCameraDevice = null;
-            Activity activity = getParent();
+            Activity activity = mActivity;
             if (null != activity) {
                 activity.finish();
             }
@@ -225,13 +126,13 @@ public class CameraActivity extends AppCompatActivity {
         @Override
         public void onConfigured(@NonNull CameraCaptureSession session) {
             mCaptureSession = session;////[KeyJoint]:mCaptureSession的句柄
-            //会话OK，启动“浏览”；
+            //3：会话机制ok,启动会话“浏览”；
             updatePreview();
         }
 
         @Override
         public void onConfigureFailed(@NonNull CameraCaptureSession session) {
-            Activity activity = getParent();
+            Activity activity = mActivity;
             if (null != activity) {
                 Toast.makeText(activity, "CaptureSession Failed", Toast.LENGTH_SHORT).show();
             }
@@ -239,6 +140,7 @@ public class CameraActivity extends AppCompatActivity {
     };
 
     //*****************通过Session启动各种功能****************************//
+    //4：“浏览”会话具体内容。浏览成功，意味着相机的数据会被投向画面TextureView
     private void updatePreview() {
         try {
             //投射通道在之前已经顺便建立： mPreviewRequestBuilder.addTarget(textureSurface);
@@ -253,7 +155,7 @@ public class CameraActivity extends AppCompatActivity {
         }
     }
 
-    private void closeCamera() {
+    private void close() {
         try {
             mCameraOpenCloseLock.acquire();
             if (null != mCaptureSession) {
