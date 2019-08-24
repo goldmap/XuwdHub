@@ -35,14 +35,12 @@ import java.util.concurrent.CountDownLatch;
 final class DecodeThread extends Thread {
 
   public static final String BARCODE_BITMAP = "barcode_bitmap";
-  private final Activity activity;
+  private final ScanActivity activity;
   private final Hashtable<DecodeHintType, Object> hints;
-  private Handler handler;
+  private DecodeHandler handler;
   private final CountDownLatch handlerInitLatch;
 
-  DecodeThread(Activity activity,
-               Vector<BarcodeFormat> decodeFormats,
-               String characterSet) {
+  DecodeThread(ScanActivity activity,Vector<BarcodeFormat> decodeFormats,String characterSet) {
 
     this.activity = activity;
     handlerInitLatch = new CountDownLatch(1);
@@ -65,7 +63,7 @@ final class DecodeThread extends Thread {
     //hints.put(DecodeHintType.NEED_RESULT_POINT_CALLBACK, resultPointCallback);
   }
 
-  Handler getHandler() {
+  public DecodeHandler getHandler() {
     try {
       handlerInitLatch.await();
     } catch (InterruptedException ie) {

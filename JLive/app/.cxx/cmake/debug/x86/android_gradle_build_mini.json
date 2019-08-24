@@ -1,0 +1,36 @@
+{
+  "buildFiles": [
+    "G:\\XuwdHub\\JLive\\app\\jni\\CMakeLists.txt"
+  ],
+  "cleanCommands": [
+    "D:\\Android\\Sdk\\cmake\\3.6.4111459\\bin\\cmake.exe --build G:\\XuwdHub\\JLive\\app\\.cxx\\cmake\\debug\\x86 --target clean"
+  ],
+  "libraries": {
+    "avformat-Debug-x86": {
+      "artifactName": "avformat",
+      "abi": "x86",
+      "output": "G:\\XuwdHub\\JLive\\app\\jni\\..\\libs\\x86\\libavformat.so"
+    },
+    "JffmpegLib-Debug-x86": {
+      "artifactName": "JffmpegLib",
+      "buildCommand": "D:\\Android\\Sdk\\cmake\\3.6.4111459\\bin\\cmake.exe --build G:\\XuwdHub\\JLive\\app\\.cxx\\cmake\\debug\\x86 --target JffmpegLib",
+      "abi": "x86",
+      "output": "G:\\XuwdHub\\JLive\\app\\build\\intermediates\\cmake\\debug\\obj\\x86\\libJffmpegLib.so"
+    },
+    "avutil-Debug-x86": {
+      "artifactName": "avutil",
+      "abi": "x86",
+      "output": "G:\\XuwdHub\\JLive\\app\\jni\\..\\libs\\x86\\libavutil.so"
+    },
+    "avfilter-Debug-x86": {
+      "artifactName": "avfilter",
+      "abi": "x86",
+      "output": "G:\\XuwdHub\\JLive\\app\\jni\\..\\libs\\x86\\libavfilter.so"
+    },
+    "avcodec-Debug-x86": {
+      "artifactName": "avcodec",
+      "abi": "x86",
+      "output": "G:\\XuwdHub\\JLive\\app\\jni\\..\\libs\\x86\\libavcodec.so"
+    }
+  }
+}

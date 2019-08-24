@@ -2,7 +2,6 @@ package com.xuwd.jscan;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.content.Context;
 import android.graphics.SurfaceTexture;
 
 import android.os.Bundle;
@@ -21,9 +20,11 @@ import java.util.TimerTask;
 import java.util.Vector;
 
 public class ScanActivity extends AppCompatActivity {
+
+    private ScanActivity mActivity;
+    public ScanActivityHandler mScanActivityHandler;
     private DecodeThread mDecodeThread;
-    private Handler mScanHandler;
-    private Activity mActivity;
+    private DecodeHandler mDecodeHandler;
 
     private Vector<BarcodeFormat> decodeFormats;
     private String characterSet;
@@ -33,7 +34,7 @@ public class ScanActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_scan);
 
-        mActivity=this;
+        mActivity= this;
         mTextureView=findViewById(R.id.capture_preview);
         mTextureView.setSurfaceTextureListener(surfaceTextureListener);
 
@@ -46,10 +47,15 @@ public class ScanActivity extends AppCompatActivity {
         ImageView scanLine = findViewById(R.id.capture_scan_line);
         scanLine.startAnimation(animation);
 
-       mDecodeThread=new DecodeThread(mActivity,decodeFormats,characterSet);
-       mDecodeThread.start();
+       mScanActivityHandler=new ScanActivityHandler(this,decodeFormats,characterSet);
 
-       mScanHandler=mDecodeThread.getHandler();
+       mDecodeThread=new DecodeThread(this,decodeFormats,characterSet);
+       mDecodeThread.start();
+       mDecodeHandler =mDecodeThread.getHandler();
+    }
+
+    public ScanActivityHandler getHandler(){
+        return mScanActivityHandler;
     }
 
     @Override
@@ -65,9 +71,9 @@ public class ScanActivity extends AppCompatActivity {
         super.onPause();
         //closeCamera();
         //stopBackgroundThread();
-        if(mScanHandler!=null){
-            //mScanHandler.quitSynchronously();
-            mScanHandler=null;
+        if(mDecodeHandler !=null){
+            //mDecodeHandler.quitSynchronously();
+            mDecodeHandler =null;
         }
     }
 
@@ -99,12 +105,12 @@ public class ScanActivity extends AppCompatActivity {
         }
         @Override
         public void onSurfaceTextureUpdated(SurfaceTexture surfaceTexture) {
-            Message msg= mScanHandler.obtainMessage();
+            Message msg= mDecodeHandler.obtainMessage();
             msg.obj=mTextureView.getBitmap();
             msg.what= R.id.decode;
             msg.arg1=mTextureWidth;
             msg.arg2=mTextureHeight;
-            mScanHandler.sendMessage(msg);
+            mDecodeHandler.sendMessage(msg);
         }
 
     };

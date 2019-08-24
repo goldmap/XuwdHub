@@ -1,0 +1,70 @@
+{
+  "variant": {
+    "module": {
+      "rootBuildGradleFolder": "G:\\XuwdHub\\JLive",
+      "sdkFolder": "D:\\Android\\Sdk",
+      "isNativeCompilerSettingsCacheEnabled": false,
+      "isBuildOnlyTargetAbiEnabled": true,
+      "splitsAbiFilterSet": [],
+      "intermediatesFolder": "G:\\XuwdHub\\JLive\\app\\build\\intermediates",
+      "gradleModulePathName": ":app",
+      "moduleRootFolder": "G:\\XuwdHub\\JLive\\app",
+      "makeFile": "G:\\XuwdHub\\JLive\\app\\jni\\CMakeLists.txt",
+      "buildSystem": "CMAKE",
+      "compilerSettingsCacheFolder": "G:\\XuwdHub\\JLive\\.cxx",
+      "cxxFolder": "G:\\XuwdHub\\JLive\\app\\.cxx",
+      "ndkFolder": "D:\\Android\\Sdk\\ndk-bundle",
+      "ndkVersion": "20.0.5594570",
+      "ndkSupportedAbiList": [
+        "ARMEABI_V7A",
+        "ARM64_V8A",
+        "X86",
+        "X86_64"
+      ],
+      "ndkDefaultAbiList": [
+        "ARMEABI_V7A",
+        "ARM64_V8A",
+        "X86",
+        "X86_64"
+      ],
+      "cmakeToolchainFile": "."
+    },
+    "buildSystemArgumentList": [],
+    "cFlagList": [],
+    "cppFlagsList": [
+      "-frtti -fexceptions"
+    ],
+    "variantName": "debug",
+    "soFolder": "G:\\XuwdHub\\JLive\\app\\build\\intermediates\\cmake\\debug\\lib",
+    "objFolder": "G:\\XuwdHub\\JLive\\app\\build\\intermediates\\cmake\\debug\\obj",
+    "jsonFolder": "G:\\XuwdHub\\JLive\\app\\.cxx\\cmake\\debug",
+    "gradleBuildOutputFolder": "G:\\XuwdHub\\JLive\\app\\.cxx\\cxx\\debug",
+    "isDebuggableEnabled": true,
+    "validAbiList": [
+      "ARMEABI_V7A",
+      "X86"
+    ],
+    "buildTargetSet": []
+  },
+  "abi": "X86",
+  "abiPlatformVersion": 23,
+  "cxxBuildFolder": "G:\\XuwdHub\\JLive\\app\\.cxx\\cmake\\debug\\x86",
+  "jsonFile": "G:\\XuwdHub\\JLive\\app\\.cxx\\cmake\\debug\\x86\\android_gradle_build.json",
+  "gradleBuildOutputFolder": "G:\\XuwdHub\\JLive\\app\\.cxx\\cxx\\debug\\x86",
+  "objFolder": "G:\\XuwdHub\\JLive\\app\\build\\intermediates\\cmake\\debug\\obj\\x86",
+  "buildCommandFile": "G:\\XuwdHub\\JLive\\app\\.cxx\\cmake\\debug\\x86\\build_command.txt",
+  "buildOutputFile": "G:\\XuwdHub\\JLive\\app\\.cxx\\cmake\\debug\\x86\\build_output.txt",
+  "modelOutputFile": "G:\\XuwdHub\\JLive\\app\\.cxx\\cmake\\debug\\x86\\build_model.json",
+  "cmake": {
+    "cmakeListsWrapperFile": "G:\\XuwdHub\\JLive\\app\\.cxx\\cxx\\debug\\x86\\CMakeLists.txt",
+    "toolchainWrapperFile": "G:\\XuwdHub\\JLive\\app\\.cxx\\cxx\\debug\\x86\\android_gradle_build.toolchain.cmake",
+    "buildGenerationStateFile": "G:\\XuwdHub\\JLive\\app\\.cxx\\cxx\\debug\\x86\\build_generation_state.json",
+    "cacheKeyFile": "G:\\XuwdHub\\JLive\\app\\.cxx\\cxx\\debug\\x86\\compiler_cache_key.json",
+    "compilerCacheUseFile": "G:\\XuwdHub\\JLive\\app\\.cxx\\cxx\\debug\\x86\\compiler_cache_use.json",
+    "compilerCacheWriteFile": "G:\\XuwdHub\\JLive\\app\\.cxx\\cxx\\debug\\x86\\compiler_cache_write.json",
+    "toolchainSettingsFromCacheFile": "G:\\XuwdHub\\JLive\\app\\.cxx\\cxx\\debug\\x86\\compiler_settings_cache.cmake",
+    "cmakeWrappingBaseFolder": "."
+  },
+  "jsonGenerationLoggingRecordFile": "G:\\XuwdHub\\JLive\\app\\.cxx\\cmake\\debug\\x86\\json_generation_record.json",
+  "compileCommandsJsonFile": "G:\\XuwdHub\\JLive\\app\\.cxx\\cmake\\debug\\x86\\compile_commands.json"
+}

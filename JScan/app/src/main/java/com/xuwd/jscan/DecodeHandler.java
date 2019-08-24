@@ -39,10 +39,10 @@ final class DecodeHandler extends Handler {
 
   private static final String TAG = DecodeHandler.class.getSimpleName();
 
-  private final Activity activity;
+  private final ScanActivity activity;
   private final MultiFormatReader multiFormatReader;
 
-  DecodeHandler(Activity activity, Hashtable<DecodeHintType, Object> hints) {
+  DecodeHandler(ScanActivity activity, Hashtable<DecodeHintType, Object> hints) {
     multiFormatReader = new MultiFormatReader();
     multiFormatReader.setHints(hints);
     this.activity = activity;
@@ -95,10 +95,17 @@ final class DecodeHandler extends Handler {
 
     //向ScanActivity的发送消息（处理的结果）
     if (rawResult != null) {
-
+      long end = System.currentTimeMillis();
+      //Log.d(TAG, "Found barcode (" + (end - start) + " ms):\n" + rawResult.toString());
+      Message message = Message.obtain(activity.getHandler(), R.id.decode_succeeded, rawResult);
+      Bundle bundle = new Bundle();
+      bundle.putParcelable(DecodeThread.BARCODE_BITMAP, source.renderCroppedGreyscaleBitmap());
+      message.setData(bundle);
+      //Log.d(TAG, "Sending decode succeeded message...");
+      message.sendToTarget();
     } else {
-      //Message message = Message.obtain(activity.getHandler(), R.id.decode_failed);
-      //message.sendToTarget();
+      Message message = Message.obtain(activity.getHandler(), R.id.decode_failed);
+      message.sendToTarget();
     }
   }
 

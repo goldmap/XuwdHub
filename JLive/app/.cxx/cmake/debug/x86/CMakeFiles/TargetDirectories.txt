@@ -1,0 +1,3 @@
+G:/XuwdHub/JLive/app/.cxx/cmake/debug/x86/CMakeFiles/JffmpegLib.dir
+G:/XuwdHub/JLive/app/.cxx/cmake/debug/x86/CMakeFiles/edit_cache.dir
+G:/XuwdHub/JLive/app/.cxx/cmake/debug/x86/CMakeFiles/rebuild_cache.dir
