@@ -32,7 +32,7 @@ import java.util.TimerTask;
 import java.util.Vector;
 import java.util.concurrent.Semaphore;
 
-public class JCamera {
+public abstract class JCamera {
     private static final int STATE_PREVIEW = 0;
     private static final int STATE_WAITING_LOCK = 1;
     private static final int STATE_WAITING_PRECAPTURE = 2;
@@ -41,6 +41,9 @@ public class JCamera {
     private int mState = STATE_PREVIEW;
     private TextureView mTextureView;
     private Activity mActivity;
+    private Bitmap mBmp;
+    //private UpdateImage updateImage=null;
+
     //private HandlerThread mBackgroundThread;
     //private Handler mBackgroundHandler;
     public JCamera(TextureView textureView, Activity activity){
@@ -66,7 +69,7 @@ public class JCamera {
             int yuvIamgeWidth = yuvImageSize[0].getWidth();
             int yuvIamgeHeight = yuvImageSize[0].getHeight();
             mImageReader = ImageReader.newInstance(yuvIamgeWidth, yuvIamgeHeight, ImageFormat.YUV_420_888, 2);
-            mImageReader.setOnImageAvailableListener(mOnImageAvailableListener);
+            mImageReader.setOnImageAvailableListener(mOnImageAvailableListener,null);
 
             //流程抛给回调函数cameraStateCallback
             manager.openCamera(cameraId, cameraStateCallback, null);
@@ -96,7 +99,6 @@ public class JCamera {
             try {
                 SurfaceTexture texture = mTextureView.getSurfaceTexture();
                 assert texture != null;
-                //texture.setDefaultBufferSize(mPreviewSize.getWidth(), mPreviewSize.getHeight());
                 Surface textureSurface = new Surface(texture);
                 Surface imageSurface = mImageReader.getSurface();
 
@@ -201,21 +203,15 @@ public class JCamera {
         }
     }
     */
-    TimerTask timerTask=new TimerTask() {
-        @Override
-        public void run() {
-        }
-    };
 
-
-    //*****************通过Session启动各种功能****************************//
+    //*****************通过Session启动各种功能，在其回调函数中跟踪**********************//
     private void lockFocus(){
         try {
             // This is how to tell the camera to lock focus.
             mPreviewRequestBuilder.set(CaptureRequest.CONTROL_AF_TRIGGER, CameraMetadata.CONTROL_AF_TRIGGER_START);
             // Tell #mCaptureCallback to wait for the lock.
             mState = STATE_WAITING_LOCK;
-            mCaptureSession.capture(mPreviewRequestBuilder.build(), captureRequestCallback,mBackgroundHandler);
+            mCaptureSession.capture(mPreviewRequestBuilder.build(), captureRequestCallback,null);
         } catch (CameraAccessException e) {
             e.printStackTrace();
         }
@@ -230,22 +226,11 @@ public class JCamera {
             = new CameraCaptureSession.CaptureCallback() {
 
         @Override
-        public void onCaptureProgressed(@NonNull CameraCaptureSession session,
-                                        @NonNull CaptureRequest request,
-                                        @NonNull CaptureResult partialResult) {
+        public void onCaptureProgressed(@NonNull CameraCaptureSession session,@NonNull CaptureRequest request,@NonNull CaptureResult partialResult) {
 //            process(partialResult);
         }
         @Override
-        public void onCaptureCompleted(@NonNull CameraCaptureSession session,
-                                       @NonNull CaptureRequest request,
-                                       @NonNull TotalCaptureResult result) {
-//            Toast.makeText(getContext(),"mState:"+mState,Toast.LENGTH_SHORT).show();
-            if(mState!=0)
-                process(result);
-        }
-
-        private void process(CaptureResult result) {
-//            Toast.makeText(getContext(),"mState"+mState,Toast.LENGTH_SHORT).show();
+        public void onCaptureCompleted(@NonNull CameraCaptureSession session,@NonNull CaptureRequest request,@NonNull TotalCaptureResult result) {
             switch (mState) {
                 case STATE_WAITING_LOCK: //简单可理解为待聚焦成功后调用capture
                 {
@@ -264,7 +249,7 @@ public class JCamera {
                             mState = STATE_PICTURE_TAKEN;
                             captureStillPicture();
                         } else {
-                            runPrecaptureSequence();
+                            //runPrecaptureSequence();
                         }
                     }
                     break;
@@ -295,8 +280,7 @@ public class JCamera {
     private void captureStillPicture() {
         try {
             // capturePictureBuilder is the CaptureRequest.Builder that we use to take a picture.
-            final CaptureRequest.Builder capturePictureBuilder =
-                    mCameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_STILL_CAPTURE);
+            CaptureRequest.Builder capturePictureBuilder = mCameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_STILL_CAPTURE);
             capturePictureBuilder.addTarget(mImageReader.getSurface());
 
             // Use the same AE and AF modes as the preview.
@@ -306,9 +290,7 @@ public class JCamera {
             CameraCaptureSession.CaptureCallback capturePictureCallback
                     = new CameraCaptureSession.CaptureCallback() {
                 @Override
-                public void onCaptureCompleted(@NonNull CameraCaptureSession session,
-                                               @NonNull CaptureRequest request,
-                                               @NonNull TotalCaptureResult result) {
+                public void onCaptureCompleted(@NonNull CameraCaptureSession session, @NonNull CaptureRequest request,@NonNull TotalCaptureResult result) {
                     unlockFocus();
                 }
             };
@@ -336,38 +318,35 @@ public class JCamera {
             width = image.getWidth();
             height = image.getHeight();
 
+            final byte[] bytes;
             //设置mImageReader = ImageReader.newInstance(imgWidth, imgHeight, ImageFormat.JPEG, 2);OK!
             if(image.getFormat()== ImageFormat.JPEG){
                 Image.Plane[] planes = image.getPlanes();
                 buffer = planes[0].getBuffer();
                 buffer.rewind();
-                byte[] bytes=new byte[buffer.remaining()];
+                bytes=new byte[buffer.remaining()];
                 buffer.get(bytes);
                 Bitmap bmp = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
 
                 mBmp=bmp;
             }//mImageReader = ImageReader.newInstance(imgWidth, imgHeight, ImageFormat.YUV_420_888, 2)
-            else if(image.getFormat()==ImageFormat.YUV_420_888){
-                byte[] yuvBytes = ImageUtil.getBytesFromImage(image,ImageUtil.YUV420P);
-                //yuvBytes=rotateGraph(yuvBytes,width,height);
-             /*这个机制失败，有待分析
-                YuvImage yuvImage = new YuvImage(yuvBytes,ImageFormat.YUV_420_888,width,height,null);
-                if(yuvImage!=null){
-                    ByteArrayOutputStream stream=new ByteArrayOutputStream();
-                    yuvImage.compressToJpeg(new Rect(0,0,width,height),80,stream);
-                    Bitmap cmp =BitmapFactory.decodeByteArray(stream.toByteArray(),0,stream.size());
-                    mBmp=cmp;
-                }
-                */
-                int rgb[]=ImageUtil.decodeYUVtoRGB(yuvBytes, width, height);
+            else {
+                bytes = ImageUtil.getBytesFromImage(image,ImageUtil.YUV420P);
+                int rgb[]=ImageUtil.decodeYUVtoRGB(bytes, width, height);
                 Bitmap cmp = Bitmap.createBitmap(rgb,0,width,width,height, Bitmap.Config.ARGB_8888);
                 mBmp=cmp;
             }
 //            mImageView.setImageBitmap(bmp);  //子线程不能操作UI
-
+            if(bytes!=null){
+                updateImage(bytes);
+            }
             image.close();
         }
 
     };
-
+    abstract  void updateImage(byte[] bytes);
+    /*
+    public interface  UpdateImage{
+        public void JImage(byte[] bytes);
+    }*/
 }
