@@ -19,6 +19,10 @@ import android.hardware.camera2.TotalCaptureResult;
 import android.hardware.camera2.params.StreamConfigurationMap;
 import android.media.Image;
 import android.media.ImageReader;
+
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.util.Size;
 import android.view.Surface;
 import android.view.TextureView;
@@ -32,7 +36,24 @@ import java.util.TimerTask;
 import java.util.Vector;
 import java.util.concurrent.Semaphore;
 
-public abstract class JCamera {
+
+public class JCamera {
+    private static final int CAMERA_MSG_ERROR            = 0x001;
+    private static final int CAMERA_MSG_SHUTTER          = 0x002;
+    private static final int CAMERA_MSG_FOCUS            = 0x004;
+    private static final int CAMERA_MSG_ZOOM             = 0x008;
+    private static final int CAMERA_MSG_PREVIEW_FRAME    = 0x010;
+    private static final int CAMERA_MSG_VIDEO_FRAME      = 0x020;
+    private static final int CAMERA_MSG_POSTVIEW_FRAME   = 0x040;
+    private static final int CAMERA_MSG_RAW_IMAGE        = 0x080;
+    private static final int CAMERA_MSG_COMPRESSED_IMAGE = 0x100;
+    private static final int CAMERA_MSG_RAW_IMAGE_NOTIFY = 0x200;
+    private static final int CAMERA_MSG_PREVIEW_METADATA = 0x400;
+    private static final int CAMERA_MSG_FOCUS_MOVE       = 0x800;
+
+    private EventHandler mEventHandler;
+    private PreviewCallback mPreviewCallback;
+
     private static final int STATE_PREVIEW = 0;
     private static final int STATE_WAITING_LOCK = 1;
     private static final int STATE_WAITING_PRECAPTURE = 2;
@@ -47,13 +68,33 @@ public abstract class JCamera {
     //private HandlerThread mBackgroundThread;
     //private Handler mBackgroundHandler;
     public JCamera(TextureView textureView, Activity activity){
+        mPreviewCallback=null;
+
         this.mTextureView=textureView;
         this.mActivity=activity;
+    }
+
+    private void initHandler(){
+        Looper looper=Looper.myLooper();
+        if(looper==null){
+            looper=Looper.getMainLooper();
+        }
+
+        if(looper!=null){
+            mEventHandler=new EventHandler(looper);
+        }else{
+            mEventHandler=null;
+        }
+    }
+
+    public void setPreviewCallback(PreviewCallback previewCallback){
+        this.mPreviewCallback=previewCallback;
     }
 
     @SuppressLint("MissingPermission")
     //1：设置参数、启动相机
     public void start() {
+        initHandler();
         CameraManager manager = (CameraManager) mActivity.getSystemService(Context.CAMERA_SERVICE);
         try {
             String cameraId = manager.getCameraIdList()[0];
@@ -205,7 +246,7 @@ public abstract class JCamera {
     */
 
     //*****************通过Session启动各种功能，在其回调函数中跟踪**********************//
-    private void lockFocus(){
+    public void lockFocus(){
         try {
             // This is how to tell the camera to lock focus.
             mPreviewRequestBuilder.set(CaptureRequest.CONTROL_AF_TRIGGER, CameraMetadata.CONTROL_AF_TRIGGER_START);
@@ -277,7 +318,7 @@ public abstract class JCamera {
         }
     };
 
-    private void captureStillPicture() {
+    public void captureStillPicture() {
         try {
             // capturePictureBuilder is the CaptureRequest.Builder that we use to take a picture.
             CaptureRequest.Builder capturePictureBuilder = mCameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_STILL_CAPTURE);
@@ -338,15 +379,36 @@ public abstract class JCamera {
             }
 //            mImageView.setImageBitmap(bmp);  //子线程不能操作UI
             if(bytes!=null){
-                updateImage(bytes);
+                //updateImage(bytes);
             }
             image.close();
+
+            if(mPreviewCallback!=null){
+                mPreviewCallback.onPreviewFrame(bytes);
+            }
         }
 
     };
-    abstract  void updateImage(byte[] bytes);
-    /*
-    public interface  UpdateImage{
-        public void JImage(byte[] bytes);
-    }*/
+
+    public interface PreviewCallback
+    {
+        void onPreviewFrame(byte[] data);
+    };
+
+    private class EventHandler extends Handler {
+
+        public EventHandler(Looper looper){
+            super(looper);
+        }
+
+        @Override
+        public void handleMessage(@NonNull Message msg) {
+            super.handleMessage(msg);
+            switch (msg.what){
+                case CAMERA_MSG_PREVIEW_FRAME:
+
+                    return;
+            }
+        }
+    }
 }

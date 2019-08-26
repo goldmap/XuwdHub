@@ -71,6 +71,14 @@
             android:layout_below="@id/capture_mask_top"
             android:layout_toRightOf="@id/capture_crop_view"
             android:background="@drawable/shadow"/>
+
+        <Button
+            android:id="@+id/btnTest"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Button" />
     </RelativeLayout>
+
+
 
 </RelativeLayout>

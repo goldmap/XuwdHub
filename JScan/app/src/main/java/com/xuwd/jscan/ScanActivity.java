@@ -9,9 +9,13 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 import android.view.TextureView;
+import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.TranslateAnimation;
+import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.Toast;
+
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.zxing.BarcodeFormat;
@@ -26,8 +30,22 @@ public class ScanActivity extends AppCompatActivity {
     private DecodeThread mDecodeThread;
     private DecodeHandler mDecodeHandler;
 
+    private JCamera mJCamera;
+
     private Vector<BarcodeFormat> decodeFormats;
     private String characterSet;
+
+    JCamera.PreviewCallback previewCallback=new JCamera.PreviewCallback() {
+        @Override
+        public void onPreviewFrame(byte[] data) {
+            Message msg= mDecodeHandler.obtainMessage();
+            msg.obj=data;
+            msg.what= R.id.decode;
+            msg.arg1=mTextureWidth;
+            msg.arg2=mTextureHeight;
+            mDecodeHandler.sendMessage(msg);
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,8 +53,20 @@ public class ScanActivity extends AppCompatActivity {
         setContentView(R.layout.activity_scan);
 
         mActivity= this;
+        mJCamera=null;
         mTextureView=findViewById(R.id.capture_preview);
         mTextureView.setSurfaceTextureListener(surfaceTextureListener);
+
+        Button btnTest=findViewById(R.id.btnTest);
+        btnTest.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(getBaseContext(),"AAA",Toast.LENGTH_SHORT).show();
+                if(mJCamera!=null){
+                    mJCamera.captureStillPicture();
+                }
+            }
+        });
 
         TranslateAnimation animation=new TranslateAnimation(Animation.RELATIVE_TO_PARENT, 0.0f, Animation
                 .RELATIVE_TO_PARENT, 0.0f, Animation.RELATIVE_TO_PARENT, 0.0f, Animation.RELATIVE_TO_PARENT,
@@ -90,8 +120,9 @@ public class ScanActivity extends AppCompatActivity {
             mTextureHeight =height;
             Log.d("AAA", "onSurfaceTextureAvailable:(mTextureWidth,mTextureHeight) "+mTextureWidth+","+mTextureHeight);
             //[KeyJoint]
-            JCamera jCamera=new JCamera(mTextureView,mActivity);
-            jCamera.start();
+            mJCamera=new JCamera(mTextureView,mActivity);
+            mJCamera.setPreviewCallback(previewCallback);
+            mJCamera.start();
         }
 
         @Override
@@ -105,12 +136,7 @@ public class ScanActivity extends AppCompatActivity {
         }
         @Override
         public void onSurfaceTextureUpdated(SurfaceTexture surfaceTexture) {
-            Message msg= mDecodeHandler.obtainMessage();
-            msg.obj=mTextureView.getBitmap();
-            msg.what= R.id.decode;
-            msg.arg1=mTextureWidth;
-            msg.arg2=mTextureHeight;
-            mDecodeHandler.sendMessage(msg);
+
         }
 
     };
@@ -140,4 +166,6 @@ public class ScanActivity extends AppCompatActivity {
         public void run() {
         }
     };
+
+
 }
