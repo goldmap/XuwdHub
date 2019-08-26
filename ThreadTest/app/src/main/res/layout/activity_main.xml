@@ -22,9 +22,15 @@
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/btnThread"
+            android:id="@+id/btnMainToSub"
             android:layout_gravity="center"
-            android:text="线程测试"/>
+            android:text="主线程=>子线程"/>
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/btnSubToMain"
+            android:layout_gravity="center"
+            android:text="子线程=>主线程"/>
     </FrameLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
