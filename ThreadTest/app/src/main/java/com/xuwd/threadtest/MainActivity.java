@@ -86,10 +86,25 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             msg.obj=bundle;
             mainHandler.sendMessage(msg);
 
-            subHandler=new SubHandler();
+            subHandler=new SubHandler(){
+                @Override
+                public void handleMessage(@NonNull Message msg) {
+                    super.handleMessage(msg);
+                    switch(msg.what) {
+                        case 1:
+                            String str = "SubHandler in Thread (" + Thread.currentThread().getId() + ") receive a message from: [";
+
+                            Bundle bundle = (Bundle) msg.obj;
+                            str += bundle.getString("thread") + "] with information: ";
+                            str += bundle.getString("message");
+                            Log.d("AAA", str);
+                    }
+                }
+            };
 
             sendMessage("CCC");
-        }
+            Looper.loop();
+        };
 
         public void sendMessage(String ms){
             Message msg=mainHandler.obtainMessage();
@@ -106,7 +121,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     class SubHandler extends Handler{
         public SubHandler(){
         }
-
+        /*
         @Override
         public void handleMessage(@NonNull Message msg) {
             switch(msg.what){
@@ -119,7 +134,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     Log.d("AAA", str);
             }
             //super.handleMessage(msg);
-        }
+
+         */
+
     }
 
     class MainHandler extends Handler{

@@ -37,7 +37,7 @@ import java.util.Hashtable;
 
 final class DecodeHandler extends Handler {
 
-  private static final String TAG = DecodeHandler.class.getSimpleName();
+  private static final String TAG = "AAA";
 
   private final ScanActivity activity;
   private final MultiFormatReader multiFormatReader;
@@ -50,13 +50,19 @@ final class DecodeHandler extends Handler {
 
   @Override
   public void handleMessage(Message message) {
+    Log.d(TAG, "DecodeHandler got message:"+message.what);
+
     switch (message.what) {
-      case R.id.decode:
-        //Log.d(TAG, "Got decode message");
+      case 11:
+        Log.d(TAG, "DecodeHandler got decode message");
         decode((byte[]) message.obj, message.arg1, message.arg2);
         break;
       case R.id.quit:
         Looper.myLooper().quit();
+        break;
+      case R.id.test:
+        String str="DecodeHandler handleMessage,thread id :"+Thread.currentThread().getId()+" and ";
+        Log.d(TAG, str+"Test OK~");
         break;
     }
   }

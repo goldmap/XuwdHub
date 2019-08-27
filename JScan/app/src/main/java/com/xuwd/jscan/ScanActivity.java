@@ -39,11 +39,13 @@ public class ScanActivity extends AppCompatActivity {
         @Override
         public void onPreviewFrame(byte[] data) {
             Message msg= mDecodeHandler.obtainMessage();
+            msg.what= R.id.test
             msg.obj=data;
-            msg.what= R.id.decode;
             msg.arg1=mTextureWidth;
             msg.arg2=mTextureHeight;
-            mDecodeHandler.sendMessage(msg);
+            Log.d("AAA", "ScanActivity set previewCallback ok");
+
+           // mDecodeHandler.sendMessage(msg);
         }
     };
 
@@ -56,6 +58,9 @@ public class ScanActivity extends AppCompatActivity {
         mJCamera=null;
         mTextureView=findViewById(R.id.capture_preview);
         mTextureView.setSurfaceTextureListener(surfaceTextureListener);
+
+        String str="SacnAvtivity onCreate,thread id :"+Thread.currentThread().getId();
+        Log.d("AAA", str);
 
         Button btnTest=findViewById(R.id.btnTest);
         btnTest.setOnClickListener(new View.OnClickListener() {
@@ -81,7 +86,12 @@ public class ScanActivity extends AppCompatActivity {
 
        mDecodeThread=new DecodeThread(this,decodeFormats,characterSet);
        mDecodeThread.start();
+
+       /*
        mDecodeHandler =mDecodeThread.getHandler();
+       Message msg=mDecodeHandler.obtainMessage();
+       msg.what=R.id.test;
+       mDecodeHandler.sendMessage(msg);*/
     }
 
     public ScanActivityHandler getHandler(){
@@ -118,7 +128,7 @@ public class ScanActivity extends AppCompatActivity {
                                               int width, int height) {
             mTextureWidth =width;
             mTextureHeight =height;
-            Log.d("AAA", "onSurfaceTextureAvailable:(mTextureWidth,mTextureHeight) "+mTextureWidth+","+mTextureHeight);
+            //Log.d("AAA", "onSurfaceTextureAvailable:(mTextureWidth,mTextureHeight) "+mTextureWidth+","+mTextureHeight);
             //[KeyJoint]
             mJCamera=new JCamera(mTextureView,mActivity);
             mJCamera.setPreviewCallback(previewCallback);

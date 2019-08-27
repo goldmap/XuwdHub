@@ -23,6 +23,7 @@ import android.media.ImageReader;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import android.util.Log;
 import android.util.Size;
 import android.view.Surface;
 import android.view.TextureView;
@@ -342,6 +343,7 @@ public class JCamera {
         } catch (CameraAccessException e) {
             e.printStackTrace();
         }
+        Log.d("AAA", "captureStillPicture: ok");
     }
 
     private ImageReader mImageReader;
@@ -382,6 +384,7 @@ public class JCamera {
                 //updateImage(bytes);
             }
             image.close();
+            Log.d("AAA", "mOnImageAvailableListener: ok");
 
             if(mPreviewCallback!=null){
                 mPreviewCallback.onPreviewFrame(bytes);
