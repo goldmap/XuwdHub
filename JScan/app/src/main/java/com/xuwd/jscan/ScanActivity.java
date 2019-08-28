@@ -38,14 +38,15 @@ public class ScanActivity extends AppCompatActivity {
     JCamera.PreviewCallback previewCallback=new JCamera.PreviewCallback() {
         @Override
         public void onPreviewFrame(byte[] data) {
+            Log.d("AAA", "ScanActivity set previewCallback ok");
             Message msg= mDecodeHandler.obtainMessage();
-            msg.what= R.id.test
+            msg.what= R.id.decode;
             msg.obj=data;
             msg.arg1=mTextureWidth;
             msg.arg2=mTextureHeight;
-            Log.d("AAA", "ScanActivity set previewCallback ok");
 
-           // mDecodeHandler.sendMessage(msg);
+            mDecodeHandler.sendMessage(msg);
+            Log.d("AAA", "ScanActivity send Message ok");
         }
     };
 
@@ -86,6 +87,7 @@ public class ScanActivity extends AppCompatActivity {
 
        mDecodeThread=new DecodeThread(this,decodeFormats,characterSet);
        mDecodeThread.start();
+       mDecodeHandler=mDecodeThread.getHandler();
 
        /*
        mDecodeHandler =mDecodeThread.getHandler();

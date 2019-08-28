@@ -49,13 +49,13 @@ final class DecodeHandler extends Handler {
   }
 
   @Override
-  public void handleMessage(Message message) {
-    Log.d(TAG, "DecodeHandler got message:"+message.what);
+  public void handleMessage(Message msg) {
+    Log.d(TAG, "DecodeHandler got message");
 
-    switch (message.what) {
-      case 11:
-        Log.d(TAG, "DecodeHandler got decode message");
-        decode((byte[]) message.obj, message.arg1, message.arg2);
+    switch (msg.what) {
+      case R.id.decode:
+        Log.d(TAG, "DecodeHandler got decode message:"+msg.arg1+","+msg.arg2);
+        decode((byte[]) msg.obj, msg.arg1, msg.arg2);
         break;
       case R.id.quit:
         Looper.myLooper().quit();
@@ -76,6 +76,8 @@ final class DecodeHandler extends Handler {
    * @param height The height of the preview frame.
    */
   private void decode(byte[] data, int width, int height) {
+    Log.d(TAG, "decode with:"+width+","+height);
+
     long start = System.currentTimeMillis();
     Result rawResult = null;
     
@@ -99,6 +101,7 @@ final class DecodeHandler extends Handler {
       multiFormatReader.reset();
     }
 
+    /*
     //向ScanActivity的发送消息（处理的结果）
     if (rawResult != null) {
       long end = System.currentTimeMillis();
@@ -113,6 +116,8 @@ final class DecodeHandler extends Handler {
       Message message = Message.obtain(activity.getHandler(), R.id.decode_failed);
       message.sendToTarget();
     }
+    */
+
   }
 
 }

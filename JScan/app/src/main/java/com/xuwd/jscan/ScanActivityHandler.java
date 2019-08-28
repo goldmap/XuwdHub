@@ -68,11 +68,11 @@ public final class ScanActivityHandler extends Handler {
         }
         break;
       case R.id.restart_preview:
-        Log.d(TAG, "Got restart preview message");
+        Log.d(TAG, "ScanActivityHanlder Got restart preview message");
         restartPreviewAndDecode();
         break;
       case R.id.decode_succeeded:
-        Log.d(TAG, "Got decode succeeded message");
+        Log.d(TAG, "ScanActivityHanlder Got decode succeeded message");
         state = State.SUCCESS;
         Bundle bundle = message.getData();
         
@@ -84,18 +84,18 @@ public final class ScanActivityHandler extends Handler {
         /***********************************************************************/
         break;
       case R.id.decode_failed:
-        Log.d(TAG, "Got decode failed message");
+        Log.d(TAG, "ScanActivityHanlder Got decode failed message");
         // We're decoding as fast as possible, so when one decode fails, start another.
         state = State.PREVIEW;
         //CameraManager.get().requestPreviewFrame(decodeThread.getHandler(), R.id.decode);
         break;
       case R.id.return_scan_result:
-        Log.d(TAG, "Got return scan result message");
+        Log.d(TAG, "ScanActivityHanlder Got return scan result message");
         activity.setResult(Activity.RESULT_OK, (Intent) message.obj);
         activity.finish();
         break;
       case R.id.launch_product_query:
-        Log.d(TAG, "Got product query message");
+        Log.d(TAG, "ScanActivityHanlder Got product query message");
         String url = (String) message.obj;
         Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
