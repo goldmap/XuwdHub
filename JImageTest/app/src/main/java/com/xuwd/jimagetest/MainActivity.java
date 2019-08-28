@@ -4,6 +4,8 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.Activity;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.ImageFormat;
 import android.graphics.SurfaceTexture;
 import android.os.Bundle;
 import android.os.Message;
@@ -12,6 +14,7 @@ import android.view.TextureView;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.google.zxing.BinaryBitmap;
 import com.google.zxing.MultiFormatReader;
@@ -19,6 +22,7 @@ import com.google.zxing.PlanarYUVLuminanceSource;
 import com.google.zxing.ReaderException;
 import com.google.zxing.Result;
 import com.google.zxing.common.HybridBinarizer;
+import com.xuwd.jimagetest.JCamera.ImageUtil;
 import com.xuwd.jimagetest.JCamera.JCamera;
 
 public class MainActivity extends JActivity {
@@ -85,18 +89,37 @@ public class MainActivity extends JActivity {
 
     JCamera.PreviewCallback previewCallback=new JCamera.PreviewCallback() {
         @Override
-        public void onPreviewFrame(byte[] data) {
-            Log.d("AAA", "previewCallback received data");
-            /*
-            Message msg= mDecodeHandler.obtainMessage();
-            msg.what= R.id.decode;
-            msg.obj=data;
-            msg.arg1=mTextureWidth;
-            msg.arg2=mTextureHeight;
+        public void onPreviewFrame(byte[] data,int ff,int width,int height) {
+            Log.d("AAA", "previewCallback received data:"+ff+","+width+":"+height);
+            Bitmap bmp=null;
 
-            mDecodeHandler.sendMessage(msg);
+            switch(ff){
+                case 1:
+                    bmp = BitmapFactory.decodeByteArray(data, 0, data.length);
+                    break;
+                case 2:
+                    byte[] rotatedData = new byte[data.length];
+                    for (int y = 0; y < height; y++) {
+                        for (int x = 0; x < width; x++)
+                            rotatedData[x * height + height - y - 1] = data[x + y * width];
+                    }
 
-             */
+                    int tmp = width; // Here we are swapping, that's the difference to #11
+                    width = height;
+                    height = tmp;
+                    int rgb[]= ImageUtil.decodeYUVtoRGB(rotatedData, width, height);
+                    //bmp = Bitmap.createBitmap(rgb,0,width,width,height, Bitmap.Config.ARGB_8888);
+                    bmp = Bitmap.createBitmap(rgb,0,width,width,height, Bitmap.Config.ARGB_8888);
+                    break;
+                default:
+                    break;
+            }
+            if(bmp!=null){
+                imgViewRight.setImageBitmap(bmp);
+            }
+            else{
+                Toast.makeText(mActivity, "bmp NULL", Toast.LENGTH_SHORT).show();
+            }
             //Log.d("AAA", "ScanActivity send Message ok");
         }
     };
