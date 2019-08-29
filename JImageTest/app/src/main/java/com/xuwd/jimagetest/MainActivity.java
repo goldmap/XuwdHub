@@ -111,6 +111,7 @@ public class MainActivity extends JActivity {
 
                     break;
                 case 2:
+                case 3:
                     rotatedData = new byte[data.length];
                     for (int y = 0; y < height; y++) {
                         for (int x = 0; x < width; x++)
@@ -130,11 +131,11 @@ public class MainActivity extends JActivity {
             if(bmp!=null){
                 imgViewLeft.setImageBitmap(bmp);
 
-                PlanarYUVLuminanceSource source = new PlanarYUVLuminanceSource(data, width, height,0,0,width,height,false);
+                //PlanarYUVLuminanceSource source = new PlanarYUVLuminanceSource(data, width, height,0,0,width,height,false);
                 //BinaryBitmap cmp = new BinaryBitmap(new HybridBinarizer(source));
                 //data=byte[] source;
-                bmp=BitmapFactory.decodeByteArray(source, 0, data.length);
-                imgViewRight.setImageBitmap(bmp);
+                //bmp=BitmapFactory.decodeByteArray(source, 0, data.length);
+                //imgViewRight.setImageBitmap(bmp);
             }
             else{
                 Toast.makeText(mActivity, "bmp NULL", Toast.LENGTH_SHORT).show();

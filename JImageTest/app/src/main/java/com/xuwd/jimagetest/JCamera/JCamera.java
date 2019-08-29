@@ -123,7 +123,7 @@ public class JCamera {
             }
 
             int[] imageFt={ImageFormat.JPEG,ImageFormat.YUV_420_888,ImageFormat.YV12};
-            int testTp=0;
+            int testTp=1;
 
             Size maxSize = Collections.max(Arrays.asList(map.getOutputSizes(imageFt[testTp])), new CompareSizeByArea());
 
@@ -381,17 +381,14 @@ public class JCamera {
 
         @Override
         public void onImageAvailable(ImageReader reader) {
-            //子线程抛出，是对的
-            //         mBackgroundHandler.post(new ImageSaver(reader.acquireNextImage(), mFile));
             Image image = reader.acquireNextImage();
-
             int pixelStride,rowStride,rowPadding,width,height;
             ByteBuffer buffer;
             width = image.getWidth();
             height = image.getHeight();
 
             byte[] bytes=null;
-            int ff=1;
+            int ff=0;
             //设置mImageReader = ImageReader.newInstance(imgWidth, imgHeight, ImageFormat.JPEG, 2);OK!
             switch(image.getFormat()){
                 case ImageFormat.JPEG:
@@ -407,7 +404,15 @@ public class JCamera {
                 case ImageFormat.YUV_420_888:
                 case ImageFormat.YUV_422_888:
                     ff=2;
-                    bytes = ImageUtil.getBytesFromImage(image,ImageUtil.YUV420SP);
+                    //bytes = ImageUtil.getBytesFromImage(image,ImageUtil.YUV420SP);
+                    bytes = ImageUtil.getBytesFromImage(image,1);
+                    //int rgb[]=ImageUtil.decodeYUVtoRGB(bytes, width, height);
+                    //Bitmap cmp = Bitmap.createBitmap(rgb,0,width,width,height, Bitmap.Config.ARGB_8888);
+                    //mBmp=cmp;
+                    break;
+                case ImageFormat.YV12:
+                    ff=3;
+                    bytes = ImageUtil.getBytesFromImage(image,ImageUtil.YV12);
                     //int rgb[]=ImageUtil.decodeYUVtoRGB(bytes, width, height);
                     //Bitmap cmp = Bitmap.createBitmap(rgb,0,width,width,height, Bitmap.Config.ARGB_8888);
                     //mBmp=cmp;

@@ -8,7 +8,7 @@ import java.nio.ByteBuffer;
 public class ImageUtil {
     public static final int YUV420P = 0;
     public static final int YUV420SP = 1;
-    public static final int NV21 = 2;
+    public static final int YV12 = 2;
     private static final String TAG = "ImageUtil";
     public static byte[] getBytesFromImage(Image image, int type) {
         final Image.Plane[] planes=image.getPlanes();
@@ -78,7 +78,7 @@ public class ImageUtil {
                     yuvBytes[dstIndex++]=vBytes[i];
                 }
                 break;
-            case NV21:
+            case YV12:
                 for(int i=0;i<vBytes.length;i++){
                     yuvBytes[dstIndex++]=vBytes[i];
                     yuvBytes[dstIndex++]=uBytes[i];
