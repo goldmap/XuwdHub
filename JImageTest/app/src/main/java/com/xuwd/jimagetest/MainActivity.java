@@ -22,6 +22,7 @@ import com.google.zxing.PlanarYUVLuminanceSource;
 import com.google.zxing.ReaderException;
 import com.google.zxing.Result;
 import com.google.zxing.common.HybridBinarizer;
+import com.xuwd.jimagetest.JCamera.AutoFitTextureView;
 import com.xuwd.jimagetest.JCamera.ImageUtil;
 import com.xuwd.jimagetest.JCamera.JCamera;
 
@@ -32,7 +33,7 @@ public class MainActivity extends JActivity {
     private Button btnLeft;
     private Bitmap mBmp;
     //**************************** TextureView ****************************//
-    private TextureView mTextureView;
+    private AutoFitTextureView mTextureView;
     private int mTextureWidth,mTextureHeight;
     private JCamera mJCamera;
 
@@ -81,7 +82,7 @@ public class MainActivity extends JActivity {
         btnLeft.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                imgViewLeft.setImageBitmap(mBmp);
+                //imgViewLeft.setImageBitmap(mBmp);
                 mJCamera.captureStillPicture();
             }
         });
@@ -92,19 +93,31 @@ public class MainActivity extends JActivity {
         public void onPreviewFrame(byte[] data,int ff,int width,int height) {
             Log.d("AAA", "previewCallback received data:"+ff+","+width+":"+height);
             Bitmap bmp=null;
-
+            byte[] rotatedData=null;
+            int tmp;
             switch(ff){
                 case 1:
-                    bmp = BitmapFactory.decodeByteArray(data, 0, data.length);
-                    break;
-                case 2:
-                    byte[] rotatedData = new byte[data.length];
+                    /*
+                    rotatedData = new byte[data.length];
                     for (int y = 0; y < height; y++) {
                         for (int x = 0; x < width; x++)
                             rotatedData[x * height + height - y - 1] = data[x + y * width];
                     }
 
-                    int tmp = width; // Here we are swapping, that's the difference to #11
+                    tmp = width; // Here we are swapping, that's the difference to #11
+                    width = height;
+                    height = tmp;*/
+                    bmp = BitmapFactory.decodeByteArray(data, 0, data.length);
+
+                    break;
+                case 2:
+                    rotatedData = new byte[data.length];
+                    for (int y = 0; y < height; y++) {
+                        for (int x = 0; x < width; x++)
+                            rotatedData[x * height + height - y - 1] = data[x + y * width];
+                    }
+
+                    tmp = width; // Here we are swapping, that's the difference to #11
                     width = height;
                     height = tmp;
                     int rgb[]= ImageUtil.decodeYUVtoRGB(rotatedData, width, height);
@@ -115,6 +128,12 @@ public class MainActivity extends JActivity {
                     break;
             }
             if(bmp!=null){
+                imgViewLeft.setImageBitmap(bmp);
+
+                PlanarYUVLuminanceSource source = new PlanarYUVLuminanceSource(data, width, height,0,0,width,height,false);
+                //BinaryBitmap cmp = new BinaryBitmap(new HybridBinarizer(source));
+                //data=byte[] source;
+                bmp=BitmapFactory.decodeByteArray(source, 0, data.length);
                 imgViewRight.setImageBitmap(bmp);
             }
             else{

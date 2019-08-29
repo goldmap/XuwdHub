@@ -3,9 +3,13 @@ package com.xuwd.jimagetest.JCamera;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.ImageFormat;
+import android.graphics.Matrix;
+import android.graphics.Point;
+import android.graphics.RectF;
 import android.graphics.SurfaceTexture;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraCaptureSession;
@@ -19,6 +23,7 @@ import android.hardware.camera2.TotalCaptureResult;
 import android.hardware.camera2.params.StreamConfigurationMap;
 import android.media.Image;
 import android.media.ImageReader;
+import android.media.MediaRecorder;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
@@ -32,7 +37,12 @@ import androidx.annotation.NonNull;
 
 import java.nio.ByteBuffer;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.concurrent.Semaphore;
+
+import static com.xuwd.jimagetest.JCamera.Camera2Utils.chooseOptimalSize;
+import static com.xuwd.jimagetest.JCamera.Camera2Utils.chooseVideoSize;
 
 
 public class JCamera {
@@ -58,14 +68,20 @@ public class JCamera {
     private static final int STATE_WAITING_NON_PRECAPTURE = 3;
     private static final int STATE_PICTURE_TAKEN = 4;
     private int mState = STATE_PREVIEW;
-    private TextureView mTextureView;
+    private AutoFitTextureView mTextureView;
     private Activity mActivity;
     private Bitmap mBmp;
     //private UpdateImage updateImage=null;
 
+    private Size mPreviewSize;
+    private Size mVideoSize;
+    private int mSensorOrientation;
+    private static final int MAX_PREVIEW_WIDTH = 1920;
+    private static final int MAX_PREVIEW_HEIGHT = 1080;
+
     //private HandlerThread mBackgroundThread;
     //private Handler mBackgroundHandler;
-    public JCamera(TextureView textureView, Activity activity){
+    public JCamera(AutoFitTextureView textureView, Activity activity){
         mPreviewCallback=null;
 
         this.mTextureView=textureView;
@@ -92,6 +108,8 @@ public class JCamera {
     @SuppressLint("MissingPermission")
     //1：设置参数、启动相机
     public void start() {
+        int width=mTextureView.getWidth();
+        int height=mTextureView.getHeight();
         initHandler();
         CameraManager manager = (CameraManager) mActivity.getSystemService(Context.CAMERA_SERVICE);
         try {
@@ -104,13 +122,26 @@ public class JCamera {
                 throw new RuntimeException("Cannot get available preview/video sizes");
             }
 
-            Size[] yuvImageSize=map.getOutputSizes(ImageFormat.YUV_420_888);
-            int yuvIamgeWidth = yuvImageSize[0].getWidth();
-            int yuvIamgeHeight = yuvImageSize[0].getHeight();
-            //mImageReader = ImageReader.newInstance(yuvIamgeWidth, yuvIamgeHeight, ImageFormat.YUV_420_888, 2);
-            mImageReader = ImageReader.newInstance(yuvIamgeWidth, yuvIamgeHeight, ImageFormat.JPEG, 2);
+            int[] imageFt={ImageFormat.JPEG,ImageFormat.YUV_420_888,ImageFormat.YV12};
+            int testTp=0;
+
+            Size maxSize = Collections.max(Arrays.asList(map.getOutputSizes(imageFt[testTp])), new CompareSizeByArea());
+
+            mImageReader = ImageReader.newInstance(maxSize.getWidth(), maxSize.getHeight(),imageFt[testTp], 2);
             mImageReader.setOnImageAvailableListener(mOnImageAvailableListener,null);
 
+            mVideoSize = chooseVideoSize(map.getOutputSizes(MediaRecorder.class));
+            mPreviewSize = chooseOptimalSize(map.getOutputSizes(SurfaceTexture.class),width, height, mVideoSize);
+
+            //获取到屏幕的旋转角度，进一步判断是否，需要交换维度来获取预览大小
+            int orientation = mActivity.getWindowManager().getDefaultDisplay().getRotation();
+            mSensorOrientation = characteristics.get(CameraCharacteristics.SENSOR_ORIENTATION);
+            if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                mTextureView.setAspectRatio(mPreviewSize.getWidth(), mPreviewSize.getHeight());
+            } else {
+                mTextureView.setAspectRatio(mPreviewSize.getHeight(), mPreviewSize.getWidth());
+            }
+            configureTransform(width, height);
             //流程抛给回调函数cameraStateCallback
             manager.openCamera(cameraId, cameraStateCallback, null);
         }   catch (CameraAccessException e) {
@@ -360,7 +391,7 @@ public class JCamera {
             height = image.getHeight();
 
             byte[] bytes=null;
-            int ff=0;
+            int ff=1;
             //设置mImageReader = ImageReader.newInstance(imgWidth, imgHeight, ImageFormat.JPEG, 2);OK!
             switch(image.getFormat()){
                 case ImageFormat.JPEG:
@@ -376,7 +407,7 @@ public class JCamera {
                 case ImageFormat.YUV_420_888:
                 case ImageFormat.YUV_422_888:
                     ff=2;
-                    bytes = ImageUtil.getBytesFromImage(image,ImageUtil.YUV420P);
+                    bytes = ImageUtil.getBytesFromImage(image,ImageUtil.YUV420SP);
                     //int rgb[]=ImageUtil.decodeYUVtoRGB(bytes, width, height);
                     //Bitmap cmp = Bitmap.createBitmap(rgb,0,width,width,height, Bitmap.Config.ARGB_8888);
                     //mBmp=cmp;
@@ -398,6 +429,28 @@ public class JCamera {
 
     };
 
+    private void configureTransform(int viewWidth, int viewHeight) {
+        Activity activity = mActivity;
+        if (null == mTextureView || null == mPreviewSize || null == activity) {
+            return;
+        }
+        int rotation = activity.getWindowManager().getDefaultDisplay().getRotation();
+        Matrix matrix = new Matrix();
+        RectF viewRect = new RectF(0, 0, viewWidth, viewHeight);
+        RectF bufferRect = new RectF(0, 0, mPreviewSize.getHeight(), mPreviewSize.getWidth());
+        float centerX = viewRect.centerX();
+        float centerY = viewRect.centerY();
+        if (Surface.ROTATION_90 == rotation || Surface.ROTATION_270 == rotation) {
+            bufferRect.offset(centerX - bufferRect.centerX(), centerY - bufferRect.centerY());
+            matrix.setRectToRect(viewRect, bufferRect, Matrix.ScaleToFit.FILL);
+            float scale = Math.max(
+                    (float) viewHeight / mPreviewSize.getHeight(),
+                    (float) viewWidth / mPreviewSize.getWidth());
+            matrix.postScale(scale, scale, centerX, centerY);
+            matrix.postRotate(90 * (rotation - 2), centerX, centerY);
+        }
+        mTextureView.setTransform(matrix);
+    }
     public interface PreviewCallback
     {
         void onPreviewFrame(byte[] data,int ff,int width,int height);
