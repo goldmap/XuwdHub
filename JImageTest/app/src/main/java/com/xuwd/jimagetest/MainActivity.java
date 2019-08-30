@@ -90,13 +90,13 @@ public class MainActivity extends JActivity {
 
     JCamera.PreviewCallback previewCallback=new JCamera.PreviewCallback() {
         @Override
-        public void onPreviewFrame(byte[] data,int ff,int width,int height) {
-            Log.d("AAA", "previewCallback received data:"+ff+","+width+":"+height);
+        public void onPreviewFrame(byte[] data,int imageFormat,int width,int height) {
+            Log.d("AAA", "previewCallback received data and show:"+imageFormat+","+width+":"+height);
             Bitmap bmp=null;
             byte[] rotatedData=null;
             int tmp;
-            switch(ff){
-                case 1:
+            switch(imageFormat){
+                case ImageFormat.JPEG:
                     /*
                     rotatedData = new byte[data.length];
                     for (int y = 0; y < height; y++) {
@@ -110,8 +110,8 @@ public class MainActivity extends JActivity {
                     bmp = BitmapFactory.decodeByteArray(data, 0, data.length);
 
                     break;
-                case 2:
-                case 3:
+                case ImageFormat.YUV_420_888:
+                case ImageFormat.YV12:
                     rotatedData = new byte[data.length];
                     for (int y = 0; y < height; y++) {
                         for (int x = 0; x < width; x++)

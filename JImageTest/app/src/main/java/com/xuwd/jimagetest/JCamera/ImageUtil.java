@@ -2,11 +2,12 @@ package com.xuwd.jimagetest.JCamera;
 
 import android.graphics.ImageFormat;
 import android.media.Image;
+import android.util.Log;
 
 import java.nio.ByteBuffer;
 
 public class ImageUtil {
-    public static final int YUV420P = 0;
+
     public static final int YUV420SP = 1;
     public static final int YV12 = 2;
     private static final String TAG = "ImageUtil";
@@ -67,18 +68,21 @@ public class ImageUtil {
         }
         image.close();
 
+        Log.d("AAA", "getBytesFromImage get imageFormat: "+type);
         switch(type){
-            case YUV420P:
+            case 0:
                 System.arraycopy(uBytes,0,yuvBytes,dstIndex,uBytes.length);
                 System.arraycopy(vBytes,0,yuvBytes,dstIndex+uBytes.length,vBytes.length);
                 break;
-            case YUV420SP:
+            case 1:
+                Log.d("AAA", "Yaa: ");
                 for(int i=0;i<vBytes.length;i++){
                     yuvBytes[dstIndex++]=uBytes[i];
                     yuvBytes[dstIndex++]=vBytes[i];
                 }
                 break;
-            case YV12:
+            case ImageFormat.YUV_420_888:
+                Log.d("AAA", "Ya: ");
                 for(int i=0;i<vBytes.length;i++){
                     yuvBytes[dstIndex++]=vBytes[i];
                     yuvBytes[dstIndex++]=uBytes[i];

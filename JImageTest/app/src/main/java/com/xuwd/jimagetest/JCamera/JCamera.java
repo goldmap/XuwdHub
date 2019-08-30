@@ -122,12 +122,14 @@ public class JCamera {
                 throw new RuntimeException("Cannot get available preview/video sizes");
             }
 
-            int[] imageFt={ImageFormat.JPEG,ImageFormat.YUV_420_888,ImageFormat.YV12};
-            int testTp=1;
+            int[] imageFt={ImageFormat.JPEG,ImageFormat.YUV_420_888};
+            String[] imageName={"ImageFormat.JPEG","ImageFormat.YUV_420_888"};
+            int testTp=2;
 
             Size maxSize = Collections.max(Arrays.asList(map.getOutputSizes(imageFt[testTp])), new CompareSizeByArea());
 
             mImageReader = ImageReader.newInstance(maxSize.getWidth(), maxSize.getHeight(),imageFt[testTp], 2);
+            Log.d("AAA", "Camera start with "+imageName[testTp]+","+imageFt[testTp]);
             mImageReader.setOnImageAvailableListener(mOnImageAvailableListener,null);
 
             mVideoSize = chooseVideoSize(map.getOutputSizes(MediaRecorder.class));
@@ -382,19 +384,18 @@ public class JCamera {
         @Override
         public void onImageAvailable(ImageReader reader) {
             Image image = reader.acquireNextImage();
-            int pixelStride,rowStride,rowPadding,width,height;
+            int pixelStride,rowStride,rowPadding;
             ByteBuffer buffer;
-            width = image.getWidth();
-            height = image.getHeight();
+            int width = image.getWidth();
+            int height = image.getHeight();
 
             byte[] bytes=null;
-            int ff=0;
-            //设置mImageReader = ImageReader.newInstance(imgWidth, imgHeight, ImageFormat.JPEG, 2);OK!
-            switch(image.getFormat()){
+            int imageFormat=image.getFormat();
+            String str="onImageAvailable sensed image format: "+imageFormat;
+            switch(imageFormat){
                 case ImageFormat.JPEG:
-                    ff=1;
-                    Image.Plane[] planes = image.getPlanes();
-                    buffer = planes[0].getBuffer();
+                    str+=", ImageFormat.JPEG";
+                    buffer =  image.getPlanes()[0].getBuffer();
                     buffer.rewind();
                     bytes=new byte[buffer.remaining()];
                     buffer.get(bytes);
@@ -402,33 +403,32 @@ public class JCamera {
                     mBmp=bmp;
                     break;
                 case ImageFormat.YUV_420_888:
-                case ImageFormat.YUV_422_888:
-                    ff=2;
+                    str+=", ImageFormat.YUV_420_888";
                     //bytes = ImageUtil.getBytesFromImage(image,ImageUtil.YUV420SP);
-                    bytes = ImageUtil.getBytesFromImage(image,1);
+                    bytes = ImageUtil.getBytesFromImage(image,imageFormat);
                     //int rgb[]=ImageUtil.decodeYUVtoRGB(bytes, width, height);
                     //Bitmap cmp = Bitmap.createBitmap(rgb,0,width,width,height, Bitmap.Config.ARGB_8888);
                     //mBmp=cmp;
                     break;
                 case ImageFormat.YV12:
-                    ff=3;
-                    bytes = ImageUtil.getBytesFromImage(image,ImageUtil.YV12);
+                    str+=", ImageFormat.YV12";
+                    bytes = ImageUtil.getBytesFromImage(image,imageFormat);
                     //int rgb[]=ImageUtil.decodeYUVtoRGB(bytes, width, height);
                     //Bitmap cmp = Bitmap.createBitmap(rgb,0,width,width,height, Bitmap.Config.ARGB_8888);
                     //mBmp=cmp;
                     break;
                 default:
-                    ff=3;
                     break;
             }
+            Log.d("AAA", str);
             if(bytes!=null){
                 //updateImage(bytes);
             }
             image.close();
-            Log.d("AAA", "mOnImageAvailableListener: ok");
+            //Log.d("AAA", "mOnImageAvailableListener: ok");
 
             if(mPreviewCallback!=null){
-                mPreviewCallback.onPreviewFrame(bytes,ff,width,height);
+                mPreviewCallback.onPreviewFrame(bytes,imageFormat,width,height);
             }
         }
 
