@@ -26,6 +26,8 @@ import com.xuwd.jimagetest.JCamera.AutoFitTextureView;
 import com.xuwd.jimagetest.JCamera.ImageUtil;
 import com.xuwd.jimagetest.JCamera.JCamera;
 
+import static com.xuwd.jimagetest.ImageUtil.yuv420pToBitmap;
+
 public class MainActivity extends JActivity {
     private Activity mActivity;
     private ImageView imgViewLeft;
@@ -111,7 +113,8 @@ public class MainActivity extends JActivity {
 
                     break;
                 case ImageFormat.YUV_420_888:
-                    /*
+                    Log.d("AAA", "previewCallback switch in ImageFormat.YUV_420_888" );
+
                     rotatedData = new byte[data.length];
                     for (int y = 0; y < height; y++) {
                         for (int x = 0; x < width; x++)
@@ -121,10 +124,15 @@ public class MainActivity extends JActivity {
                     tmp = width; // Here we are swapping, that's the difference to #11
                     width = height;
                     height = tmp;
-                    */
-                    int rgb[]= ImageUtil.decodeYUVtoRGB(rotatedData, width, height);
-                    //bmp = Bitmap.createBitmap(rgb,0,width,width,height, Bitmap.Config.ARGB_8888);
-                    bmp = Bitmap.createBitmap(rgb,0,width,width,height, Bitmap.Config.ARGB_8888);
+
+                    data=rotatedData;
+
+                    //int rgb[]= ImageUtil.decodeYUVtoRGB(rotatedData, width, height);
+                    int rgb[]= ImageUtil.decodeYUVtoRGB(data, width, height);
+                    bmp = Bitmap.createBitmap(rgb,0,width,width,height, Bitmap.Config.RGBA_F16);
+
+                    Bitmap bmp2=yuv420pToBitmap(data,width,height);
+                    imgViewRight.setImageBitmap(bmp2);
                     break;
                 default:
                     break;
