@@ -2,8 +2,15 @@
 // Created by xuwd6 on 2019/8/30.
 //
 
-void JNICALL Java_com_xuwd_jimagetest_NativeLibrary_yuv420pToRGBA(JNIEnv *env, jclass type, jbyteArray yuv, jint width, jint height, jbyteArray rgba){
- jbyte *yuv420p = env->GetByteArrayElements(yuv420p_, NULL);
+#include <jni.h>
+#include "com_xuwd_jimagetest_NativeLibrary.h"
+
+#define MAX(a, b) ((a > b) ? a : b)
+#define MIN(a, b) ((a < b) ? a : b)
+#define CLAP(a) (MAX((MIN(a, 0xff)), 0x00))
+
+void JNICALL Java_com_xuwd_jimagetest_NativeLibrary_yuv420pToRGBA(JNIEnv *env, jclass type, jbyteArray yuv420p_, jint width, jint height, jbyteArray rgba_){
+    jbyte *yuv420p = env->GetByteArrayElements(yuv420p_, NULL);
     jbyte *rgba = env->GetByteArrayElements(rgba_, NULL);
 
     i420torgba(reinterpret_cast<const unsigned char *>(yuv420p), width, height, reinterpret_cast<unsigned char *>(rgba));

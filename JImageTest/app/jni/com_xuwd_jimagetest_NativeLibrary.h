@@ -15,7 +15,9 @@ extern "C" {
 JNIEXPORT void JNICALL Java_com_xuwd_jimagetest_NativeLibrary_yuv420pToRGBA
   (JNIEnv *, jclass, jbyteArray, jint, jint, jbyteArray);
 
+void i420torgba(const unsigned char *imgY,const int width,const int height,unsigned char *imgDst);
 #ifdef __cplusplus
 }
 #endif
 #endif
+
