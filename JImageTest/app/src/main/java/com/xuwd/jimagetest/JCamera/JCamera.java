@@ -124,7 +124,7 @@ public class JCamera {
 
             int[] imageFt={ImageFormat.JPEG,ImageFormat.YUV_420_888};
             String[] imageName={"ImageFormat.JPEG","ImageFormat.YUV_420_888"};
-            int testTp=2;
+            int testTp=1;
 
             Size maxSize = Collections.max(Arrays.asList(map.getOutputSizes(imageFt[testTp])), new CompareSizeByArea());
 
@@ -388,6 +388,7 @@ public class JCamera {
             ByteBuffer buffer;
             int width = image.getWidth();
             int height = image.getHeight();
+            //image.getPlanes()[0].getBuffer().clear();
 
             byte[] bytes=null;
             int imageFormat=image.getFormat();
