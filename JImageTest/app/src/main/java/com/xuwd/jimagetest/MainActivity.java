@@ -99,39 +99,26 @@ public class MainActivity extends JActivity {
             int tmp;
             switch(imageFormat){
                 case ImageFormat.JPEG:
-                    /*
-                    rotatedData = new byte[data.length];
-                    for (int y = 0; y < height; y++) {
-                        for (int x = 0; x < width; x++)
-                            rotatedData[x * height + height - y - 1] = data[x + y * width];
-                    }
+                    //rotatedData = new byte[width*height];
+                    //ImageUtil.rotateImage(data,width,height,rotatedData);
 
-                    tmp = width; // Here we are swapping, that's the difference to #11
-                    width = height;
-                    height = tmp;*/
                     bmp = BitmapFactory.decodeByteArray(data, 0, data.length);
+                    //bmp = BitmapFactory.decodeByteArray(rotatedData, 0, rotatedData.length);
 
                     break;
                 case ImageFormat.YUV_420_888:
                     Log.d("AAA", "previewCallback switch in ImageFormat.YUV_420_888" );
-
                     rotatedData = new byte[data.length];
-                    for (int y = 0; y < height; y++) {
-                        for (int x = 0; x < width; x++)
-                            rotatedData[x * height + height - y - 1] = data[x + y * width];
-                    }
 
-                    tmp = width; // Here we are swapping, that's the difference to #11
-                    width = height;
-                    height = tmp;
-
-                    data=rotatedData;
-
-                    //int rgb[]= ImageUtil.decodeYUVtoRGB(rotatedData, width, height);
                     int rgb[]= ImageUtil.decodeYUVtoRGB(data, width, height);
-                    bmp = Bitmap.createBitmap(rgb,0,width,width,height, Bitmap.Config.RGBA_F16);
+                    //bmp = Bitmap.createBitmap(rgb,0,width,width,height, Bitmap.Config.RGBA_F16);
 
-                    Bitmap bmp2=yuv420pToBitmap(data,width,height);
+                    ImageUtil.rotateImage(data,width,height,rotatedData);
+
+                    bmp=yuv420pToBitmap(rotatedData,width,height);
+
+                    int rgb2[]= ImageUtil.decodeYUVtoRGB(rotatedData, width,height);
+                    Bitmap bmp2 = Bitmap.createBitmap(rgb2,0,height,height,width, Bitmap.Config.RGBA_F16);
                     imgViewRight.setImageBitmap(bmp2);
                     break;
                 default:

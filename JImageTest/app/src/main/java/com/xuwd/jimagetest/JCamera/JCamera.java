@@ -5,10 +5,8 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.ImageFormat;
 import android.graphics.Matrix;
-import android.graphics.Point;
 import android.graphics.RectF;
 import android.graphics.SurfaceTexture;
 import android.hardware.camera2.CameraAccessException;
@@ -30,14 +28,12 @@ import android.os.Message;
 import android.util.Log;
 import android.util.Size;
 import android.view.Surface;
-import android.view.TextureView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
 import java.nio.ByteBuffer;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.concurrent.Semaphore;
 
@@ -400,20 +396,18 @@ public class JCamera {
                     buffer.rewind();
                     bytes=new byte[buffer.remaining()];
                     buffer.get(bytes);
-                    Bitmap bmp = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
-                    mBmp=bmp;
+                    //Bitmap bmp = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
                     break;
                 case ImageFormat.YUV_420_888:
                     str+=", ImageFormat.YUV_420_888";
-                    //bytes = ImageUtil.getBytesFromImage(image,ImageUtil.YUV420SP);
-                    bytes = ImageUtil.getBytesFromImage(image,imageFormat);
+                    bytes = ImageUtil.getYUVBytesFromImage(image,imageFormat);
                     //int rgb[]=ImageUtil.decodeYUVtoRGB(bytes, width, height);
                     //Bitmap cmp = Bitmap.createBitmap(rgb,0,width,width,height, Bitmap.Config.ARGB_8888);
                     //mBmp=cmp;
                     break;
                 case ImageFormat.YV12:
                     str+=", ImageFormat.YV12";
-                    bytes = ImageUtil.getBytesFromImage(image,imageFormat);
+                    bytes = ImageUtil.getYUVBytesFromImage(image,imageFormat);
                     //int rgb[]=ImageUtil.decodeYUVtoRGB(bytes, width, height);
                     //Bitmap cmp = Bitmap.createBitmap(rgb,0,width,width,height, Bitmap.Config.ARGB_8888);
                     //mBmp=cmp;
