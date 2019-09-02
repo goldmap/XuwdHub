@@ -1,84 +1,108 @@
-package com.xuwd.jscan.JCamera;
+package com.xuwd.jscan;
 
 import android.graphics.ImageFormat;
 import android.media.Image;
+import android.util.Log;
 
 import java.nio.ByteBuffer;
 
 public class ImageUtil {
-    public static final int YUV420P = 0;
-    public static final int YUV420SP = 1;
-    public static final int NV21 = 2;
-    private static final String TAG = "ImageUtil";
-    public static byte[] getBytesFromImage(Image image, int type) {
+    public static void rotateImage(byte[] data,int width,int height,byte[] rotatedData){
+        //byte[] rotatedData = new byte[data.length];
+        int wh = width * height;
+        //Log.d("AAA", "rotateImage size(length:wh)"+data.length+","+wh);
+        //旋转Y
+        int k = 0;
+        for(int i=0;i<width;i++) {
+            for(int j=0;j<height;j++){
+                rotatedData[k] = data[width*j + i];
+                k++;
+            }
+        }
+
+        for(int i=0;i<width;i+=2) {
+            for(int j=0;j<height/2;j++){
+                rotatedData[k] = data[wh+ width*j + i];
+                rotatedData[k+1]=data[wh + width*j + i+1];
+                k+=2;
+            }
+        }
+    }
+    public static byte[] getYUVBytesFromImage(Image image, int type) {
         final Image.Plane[] planes=image.getPlanes();
         int width = image.getWidth();
         int height=image.getHeight();
         byte[] yuvBytes=new byte[width*height* ImageFormat.getBitsPerPixel(ImageFormat.YUV_420_888)/8];
-        int dstIndex=0;
-
-        byte uBytes[] = new byte[width * height / 4];
-        byte vBytes[] = new byte[width * height / 4];
+        byte[] uBytes = new byte[width * height / 4];
+        byte[] vBytes = new byte[width * height / 4];
         int uIndex = 0;
         int vIndex = 0;
 
+        int dstIndex=0;
         int pixelsStride,rowStride;
         for(int i=0;i<planes.length;i++){
             pixelsStride = planes[i].getPixelStride();
             rowStride = planes[i].getRowStride();
             ByteBuffer buffer=planes[i].getBuffer();
 
-            byte[] bytes=new byte[buffer.capacity()];
-            buffer.get(bytes);
+            byte[] imageBytes=new byte[buffer.capacity()];
+            buffer.get(imageBytes);
 
             int srcIndex=0;
-            if(i==0){
-                for(int j=0;j<height;j++){
-                    System.arraycopy(bytes,srcIndex,yuvBytes,dstIndex,width);
-                    srcIndex+=rowStride;
-                    dstIndex+=width;
-                }
-            }else if(i==1){
-                for(int j=0;j<height/2;j++){
-                    for(int k=0;k<width/2;k++){
-                        uBytes[uIndex++]=bytes[srcIndex];
-                        srcIndex+=pixelsStride;
+            switch(i){
+                case 0:
+                    for(int j=0;j<height;j++){
+                        System.arraycopy(imageBytes,srcIndex,yuvBytes,dstIndex,width);
+                        srcIndex+=rowStride;
+                        dstIndex+=width;
                     }
-                    if (pixelsStride == 2) {
-                        srcIndex += rowStride - width;
-                    } else if (pixelsStride == 1) {
-                        srcIndex += rowStride - width / 2;
+                    break;
+                case 1:
+                    for(int j=0;j<height/2;j++){
+                        for(int k=0;k<width/2;k++){
+                            uBytes[uIndex++]=imageBytes[srcIndex];
+                            srcIndex+=pixelsStride;
+                        }
+                        if (pixelsStride == 2) {
+                            srcIndex += rowStride - width;
+                        } else if (pixelsStride == 1) {
+                            srcIndex += rowStride - width / 2;
+                        }
                     }
-                }
-            }else if (i == 2) {
-                //根据pixelsStride取相应的数据
-                for (int j = 0; j < height / 2; j++) {
-                    for (int k = 0; k < width / 2; k++) {
-                        vBytes[vIndex++] = bytes[srcIndex];
-                        srcIndex += pixelsStride;
+                    break;
+                case 2:
+                    //根据pixelsStride取相应的数据
+                    for (int j = 0; j < height / 2; j++) {
+                        for (int k = 0; k < width / 2; k++) {
+                            vBytes[vIndex++] = imageBytes[srcIndex];
+                            srcIndex += pixelsStride;
+                        }
+                        if (pixelsStride == 2) {
+                            srcIndex += rowStride - width;
+                        } else if (pixelsStride == 1) {
+                            srcIndex += rowStride - width / 2;
+                        }
                     }
-                    if (pixelsStride == 2) {
-                        srcIndex += rowStride - width;
-                    } else if (pixelsStride == 1) {
-                        srcIndex += rowStride - width / 2;
-                    }
-                }
+                    break;
             }
         }
         image.close();
 
+        Log.d("AAA", "getYUVBytesFromImage get imageFormat: "+type);
         switch(type){
-            case YUV420P:
+            case 0:
                 System.arraycopy(uBytes,0,yuvBytes,dstIndex,uBytes.length);
                 System.arraycopy(vBytes,0,yuvBytes,dstIndex+uBytes.length,vBytes.length);
                 break;
-            case YUV420SP:
+            case 1:
+                Log.d("AAA", "Yaa: ");
                 for(int i=0;i<vBytes.length;i++){
                     yuvBytes[dstIndex++]=uBytes[i];
                     yuvBytes[dstIndex++]=vBytes[i];
                 }
                 break;
-            case NV21:
+            case ImageFormat.YUV_420_888:
+                Log.d("AAA", "Ya: ");
                 for(int i=0;i<vBytes.length;i++){
                     yuvBytes[dstIndex++]=vBytes[i];
                     yuvBytes[dstIndex++]=uBytes[i];

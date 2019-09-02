@@ -37,13 +37,20 @@ public class ScanActivity extends AppCompatActivity {
 
     JCamera.PreviewCallback previewCallback=new JCamera.PreviewCallback() {
         @Override
-        public void onPreviewFrame(byte[] data) {
-            Log.d("AAA", "ScanActivity set previewCallback ok");
+        public void onPreviewFrame(byte[] data,int type,int width,int height) {
+            byte[] rotatedData=null;
+            Log.d("AAA", "ScanActivity previewCallback get data type: "+type);
+            rotatedData = new byte[data.length];
+            ImageUtil.rotateImage(data,width,height,rotatedData);
+
+            //int rgb[]= ImageUtil.decodeYUVtoRGB(data, width, height);
+            //bmp = Bitmap.createBitmap(rgb,0,width,width,height, Bitmap.Config.RGBA_F16);
+
             Message msg= mDecodeHandler.obtainMessage();
             msg.what= R.id.decode;
-            msg.obj=data;
-            msg.arg1=mTextureWidth;
-            msg.arg2=mTextureHeight;
+            msg.obj=rotatedData;
+            msg.arg1=height;
+            msg.arg2=width;
 
             mDecodeHandler.sendMessage(msg);
             Log.d("AAA", "ScanActivity send Message ok");

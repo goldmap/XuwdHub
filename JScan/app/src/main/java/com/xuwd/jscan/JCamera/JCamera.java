@@ -31,8 +31,11 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
+import com.xuwd.jscan.ImageUtil;
+
 import java.nio.ByteBuffer;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.TimerTask;
 import java.util.Vector;
 import java.util.concurrent.Semaphore;
@@ -107,10 +110,10 @@ public class JCamera {
                 throw new RuntimeException("Cannot get available preview/video sizes");
             }
 
-            Size[] yuvImageSize=map.getOutputSizes(ImageFormat.YUV_420_888);
-            int yuvIamgeWidth = yuvImageSize[0].getWidth();
-            int yuvIamgeHeight = yuvImageSize[0].getHeight();
-            mImageReader = ImageReader.newInstance(yuvIamgeWidth, yuvIamgeHeight, ImageFormat.YUV_420_888, 2);
+            Size maxSize = Collections.max(Arrays.asList(map.getOutputSizes(ImageFormat.YUV_420_888)), new CompareSizeByArea());
+
+            mImageReader = ImageReader.newInstance(maxSize.getWidth(), maxSize.getHeight(), ImageFormat.YUV_420_888, 2);
+            Log.d("AAA", "Camera start with ImageFormat.YUV_420_888: "+maxSize.getWidth()+","+maxSize.getHeight());
             mImageReader.setOnImageAvailableListener(mOnImageAvailableListener,null);
 
             //流程抛给回调函数cameraStateCallback
@@ -352,34 +355,36 @@ public class JCamera {
 
         @Override
         public void onImageAvailable(ImageReader reader) {
-            //子线程抛出，是对的
-            //         mBackgroundHandler.post(new ImageSaver(reader.acquireNextImage(), mFile));
             Image image = reader.acquireNextImage();
-
-            int pixelStride,rowStride,rowPadding,width,height;
+            int pixelStride,rowStride,rowPadding;
             ByteBuffer buffer;
-            width = image.getWidth();
-            height = image.getHeight();
+            int width = image.getWidth();
+            int height = image.getHeight();
+            //image.getPlanes()[0].getBuffer().clear();
 
-            final byte[] bytes;
-            //设置mImageReader = ImageReader.newInstance(imgWidth, imgHeight, ImageFormat.JPEG, 2);OK!
-            if(image.getFormat()== ImageFormat.JPEG){
-                Image.Plane[] planes = image.getPlanes();
-                buffer = planes[0].getBuffer();
-                buffer.rewind();
-                bytes=new byte[buffer.remaining()];
-                buffer.get(bytes);
-                Bitmap bmp = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
-
-                mBmp=bmp;
-            }//mImageReader = ImageReader.newInstance(imgWidth, imgHeight, ImageFormat.YUV_420_888, 2)
-            else {
-                bytes = ImageUtil.getBytesFromImage(image,ImageUtil.YUV420P);
-                int rgb[]=ImageUtil.decodeYUVtoRGB(bytes, width, height);
-                Bitmap cmp = Bitmap.createBitmap(rgb,0,width,width,height, Bitmap.Config.ARGB_8888);
-                mBmp=cmp;
+            byte[] bytes=null;
+            int imageFormat=image.getFormat();
+            String str="onImageAvailable sensed image format: "+imageFormat;
+            switch(imageFormat){
+                case ImageFormat.JPEG:
+                    str+=", ImageFormat.JPEG";
+                    buffer =  image.getPlanes()[0].getBuffer();
+                    buffer.rewind();
+                    bytes=new byte[buffer.remaining()];
+                    buffer.get(bytes);
+                    //Bitmap bmp = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                    break;
+                case ImageFormat.YUV_420_888:
+                    str+=", ImageFormat.YUV_420_888: "+width+","+height;
+                    bytes = ImageUtil.getYUVBytesFromImage(image,imageFormat);
+                    //int rgb[]=ImageUtil.decodeYUVtoRGB(bytes, width, height);
+                    //Bitmap cmp = Bitmap.createBitmap(rgb,0,width,width,height, Bitmap.Config.ARGB_8888);
+                    //mBmp=cmp;
+                    break;
+                default:
+                    break;
             }
-//            mImageView.setImageBitmap(bmp);  //子线程不能操作UI
+            Log.d("AAA", str);
             if(bytes!=null){
                 //updateImage(bytes);
             }
@@ -387,7 +392,7 @@ public class JCamera {
             Log.d("AAA", "mOnImageAvailableListener: ok");
 
             if(mPreviewCallback!=null){
-                mPreviewCallback.onPreviewFrame(bytes);
+                mPreviewCallback.onPreviewFrame(bytes,imageFormat,width,height);
             }
         }
 
@@ -395,7 +400,7 @@ public class JCamera {
 
     public interface PreviewCallback
     {
-        void onPreviewFrame(byte[] data);
+        void onPreviewFrame(byte[] data,int type,int width,int height);
     };
 
     private class EventHandler extends Handler {

@@ -24,6 +24,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.google.zxing.BinaryBitmap;
 import com.google.zxing.DecodeHintType;
@@ -80,7 +81,7 @@ final class DecodeHandler extends Handler {
 
     long start = System.currentTimeMillis();
     Result rawResult = null;
-    
+    /*
     //modify here
     byte[] rotatedData = new byte[data.length];
     for (int y = 0; y < height; y++) {
@@ -90,8 +91,8 @@ final class DecodeHandler extends Handler {
     int tmp = width; // Here we are swapping, that's the difference to #11
     width = height;
     height = tmp;
-    
-    PlanarYUVLuminanceSource source = new PlanarYUVLuminanceSource(rotatedData, width, height,0,0,width,height);
+    */
+    PlanarYUVLuminanceSource source = new PlanarYUVLuminanceSource(data, width, height,0,0,width,height);
     BinaryBitmap bitmap = new BinaryBitmap(new HybridBinarizer(source));
     try {
       rawResult = multiFormatReader.decodeWithState(bitmap);
@@ -101,7 +102,7 @@ final class DecodeHandler extends Handler {
       multiFormatReader.reset();
     }
 
-    /*
+
     //向ScanActivity的发送消息（处理的结果）
     if (rawResult != null) {
       long end = System.currentTimeMillis();
@@ -110,13 +111,14 @@ final class DecodeHandler extends Handler {
       Bundle bundle = new Bundle();
       bundle.putParcelable(DecodeThread.BARCODE_BITMAP, source.renderCroppedGreyscaleBitmap());
       message.setData(bundle);
+      String str=rawResult.getText();
+      Toast.makeText(activity,str,Toast.LENGTH_SHORT).show();
       //Log.d(TAG, "Sending decode succeeded message...");
       message.sendToTarget();
     } else {
       Message message = Message.obtain(activity.getHandler(), R.id.decode_failed);
       message.sendToTarget();
     }
-    */
 
   }
 

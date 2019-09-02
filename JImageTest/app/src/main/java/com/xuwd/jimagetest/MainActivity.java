@@ -107,7 +107,7 @@ public class MainActivity extends JActivity {
 
                     break;
                 case ImageFormat.YUV_420_888:
-                    Log.d("AAA", "previewCallback switch in ImageFormat.YUV_420_888" );
+                                       Log.d("AAA", "previewCallback switch in ImageFormat.YUV_420_888" );
                     rotatedData = new byte[data.length];
 
                     int rgb[]= ImageUtil.decodeYUVtoRGB(data, width, height);
@@ -115,7 +115,7 @@ public class MainActivity extends JActivity {
 
                     ImageUtil.rotateImage(data,width,height,rotatedData);
 
-                    bmp=yuv420pToBitmap(rotatedData,width,height);
+                    bmp=yuv420pToBitmap(rotatedData,height,width);
 
                     int rgb2[]= ImageUtil.decodeYUVtoRGB(rotatedData, width,height);
                     Bitmap bmp2 = Bitmap.createBitmap(rgb2,0,height,height,width, Bitmap.Config.RGBA_F16);
