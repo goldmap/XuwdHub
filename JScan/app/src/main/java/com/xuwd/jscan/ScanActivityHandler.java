@@ -86,7 +86,7 @@ public final class ScanActivityHandler extends Handler {
             case R.id.decode_failed:
                 mCount++;
                 Log.d(TAG, "ScanActivityHanlder Got decode failed message, count= "+mCount);
-                if(mCount<=9){
+                if(mCount<=99){
                     state = State.PREVIEW;
                     activity.shot();
                     // We're decoding as fast as possible, so when one decode fails, start another.

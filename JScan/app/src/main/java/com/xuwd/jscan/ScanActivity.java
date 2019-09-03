@@ -55,6 +55,11 @@ public class ScanActivity extends AppCompatActivity {
             mDecodeHandler.sendMessage(msg);
             Log.d("AAA", "previewCallback in ScanActivity send Message to DeCodeHandler ok");
         }
+
+        @Override
+        public void onCameraOK() {
+            shot();
+        }
     };
 
     @Override

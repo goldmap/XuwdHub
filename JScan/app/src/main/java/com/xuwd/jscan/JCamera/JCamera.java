@@ -205,7 +205,18 @@ public class JCamera {
             mPreviewRequestBuilder.set(CaptureRequest.CONTROL_AE_MODE,CaptureRequest.CONTROL_AE_MODE_ON_AUTO_FLASH);
 
             //启动预览请求----浏览无事可处理，不需要设置回调函数---------------！！！！
-            mCaptureSession.setRepeatingRequest(mPreviewRequestBuilder.build(), null,null);
+            mCaptureSession.setRepeatingRequest(mPreviewRequestBuilder.build(), new CameraCaptureSession.CaptureCallback(){
+                @Override
+                public void onCaptureStarted(@NonNull CameraCaptureSession session, @NonNull CaptureRequest request, long timestamp, long frameNumber) {
+                    super.onCaptureStarted(session, request, timestamp, frameNumber);
+                    Log.d("AAA", "onCaptureStarted: Camera OK"+frameNumber);
+                    if(frameNumber==1){
+                        if(mPreviewCallback!=null)
+                        mPreviewCallback.onCameraOK();
+                    }
+                }
+
+            },null);
         } catch (CameraAccessException e) {
             e.printStackTrace();
         }
