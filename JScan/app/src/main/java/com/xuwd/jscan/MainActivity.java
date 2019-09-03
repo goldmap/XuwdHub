@@ -35,10 +35,17 @@ public class MainActivity extends JActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode==REQ_QR_CODE && resultCode==RESULT_OK){
-            Bundle bundle=data.getExtras();
-            String result=bundle.getString("ScanResult");
-            textView.setText(result);
+        if(requestCode==REQ_QR_CODE){
+            switch (resultCode){
+                case RESULT_OK:
+                    Bundle bundle=data.getExtras();
+                    String result=bundle.getString("QRCode");
+                    textView.setText(result);
+                    break;
+                case RESULT_CANCELED:
+                    textView.setText("NULL");
+                    break;
+            }
         }
     }
 }

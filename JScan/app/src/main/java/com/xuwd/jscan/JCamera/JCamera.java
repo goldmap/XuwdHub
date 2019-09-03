@@ -402,6 +402,7 @@ public class JCamera {
     public interface PreviewCallback
     {
         void onPreviewFrame(byte[] data,int type,int width,int height);
+        void onCameraOK();
     };
 
     private class EventHandler extends Handler {

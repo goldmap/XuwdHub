@@ -74,10 +74,8 @@ public class ScanActivity extends AppCompatActivity {
         btnTest.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(getBaseContext(),"AAA",Toast.LENGTH_SHORT).show();
-                if(mJCamera!=null){
-                    mJCamera.captureStillPicture();
-                }
+                Toast.makeText(getBaseContext(),"button clicked to scan",Toast.LENGTH_SHORT).show();
+               shot();
             }
         });
 
@@ -160,6 +158,11 @@ public class ScanActivity extends AppCompatActivity {
 
     };
 
+    public void shot(){
+        if(mJCamera!=null){
+            mJCamera.captureStillPicture();
+        }
+    }
     @SuppressLint("MissingPermission")
     /*
     private void startBackgroundThread() {

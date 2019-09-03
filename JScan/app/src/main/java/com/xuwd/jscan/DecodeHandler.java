@@ -99,10 +99,11 @@ final class DecodeHandler extends Handler {
             long end = System.currentTimeMillis();
             //Log.d(TAG, "Found barcode (" + (end - start) + " ms):\n" + rawResult.toString());
             Message message = Message.obtain(activity.getHandler(), R.id.decode_succeeded, rawResult);
-            Bundle bundle = new Bundle();
-            bundle.putParcelable(DecodeThread.BARCODE_BITMAP, source.renderCroppedGreyscaleBitmap());
-            message.setData(bundle);
             String str = rawResult.getText();
+            Bundle bundle = new Bundle();
+            //bundle.putParcelable(DecodeThread.BARCODE_BITMAP, source.renderCroppedGreyscaleBitmap());
+            bundle.putString("QRCode",str);
+            message.setData(bundle);
             Log.d(TAG, "decode OK and sengMessage to handler of ScanActivity: "+str);
             Toast.makeText(activity, str, Toast.LENGTH_SHORT).show();
 
