@@ -39,21 +39,21 @@ public class ScanActivity extends AppCompatActivity {
         @Override
         public void onPreviewFrame(byte[] data,int type,int width,int height) {
             byte[] rotatedData=null;
-            Log.d("AAA", "ScanActivity previewCallback get data type: "+type);
+            Log.d("AAA", "previewCallback in ScanActivity get data, in type: "+type+", with size:"+width+","+height);
+            // ZXING 需要的是YUV数据，本例程在JCameraz中设置的type为ImageFormat.YUV_420_888格式
             rotatedData = new byte[data.length];
             ImageUtil.rotateImage(data,width,height,rotatedData);
-
             //int rgb[]= ImageUtil.decodeYUVtoRGB(data, width, height);
             //bmp = Bitmap.createBitmap(rgb,0,width,width,height, Bitmap.Config.RGBA_F16);
 
             Message msg= mDecodeHandler.obtainMessage();
             msg.what= R.id.decode;
             msg.obj=rotatedData;
-            msg.arg1=height;
+            msg.arg1=height;//旋转了
             msg.arg2=width;
 
             mDecodeHandler.sendMessage(msg);
-            Log.d("AAA", "ScanActivity send Message ok");
+            Log.d("AAA", "previewCallback in ScanActivity send Message to DeCodeHandler ok");
         }
     };
 

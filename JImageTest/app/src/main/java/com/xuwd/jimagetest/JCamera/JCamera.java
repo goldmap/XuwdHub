@@ -374,6 +374,7 @@ public class JCamera {
     }
 
     private ImageReader mImageReader;
+    //这个环节得到图像的BYTE格式的数据和类型（JPG或YUV），不作旋转处理，传出
     private final ImageReader.OnImageAvailableListener mOnImageAvailableListener
             = new ImageReader.OnImageAvailableListener() {
 

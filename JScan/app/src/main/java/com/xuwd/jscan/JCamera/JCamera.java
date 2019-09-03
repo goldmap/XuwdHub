@@ -350,6 +350,7 @@ public class JCamera {
     }
 
     private ImageReader mImageReader;
+    //从ImageReader中得到图像数据（JPEG或YUV），不作旋转输出
     private final ImageReader.OnImageAvailableListener mOnImageAvailableListener
             = new ImageReader.OnImageAvailableListener() {
 
