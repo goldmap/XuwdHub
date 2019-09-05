@@ -3,6 +3,7 @@ apply plugin: 'com.android.application'
 android {
     compileSdkVersion 29
     buildToolsVersion "29.0.0"
+    useLibrary 'org.apache.http.legacy'
     defaultConfig {
         applicationId "com.xuwd.jweb"
         minSdkVersion 26
@@ -26,4 +27,5 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test:runner:1.2.0'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
+    implementation 'com.squareup.okhttp3:okhttp:3.11.0'
 }
