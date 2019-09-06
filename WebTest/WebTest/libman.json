@@ -20,8 +20,15 @@
     {
       "library": "twitter-bootstrap@4.3.1",
       "files": [
+        "css/bootstrap.css",
+        "css/bootstrap.min.css",
+        "css/bootstrap.css.map",
+        "css/bootstrap.min.css.map",
         "css/bootstrap-grid.css",
-        "js/bootstrap.js"
+        "js/bootstrap.js",
+        "js/bootstrap.js.map",
+        "js/bootstrap.min.js",
+        "js/bootstrap.min.js.map"
       ],
       "destination": "wwwroot/lib/bootstrap"
     }

@@ -1,7 +1,8 @@
 {
   "ExpandedNodes": [
-    ""
+    "",
+    "\\WebTest"
   ],
-  "SelectedNode": "\\AdapterHacheter",
+  "SelectedNode": "\\WebTest\\WebTest.sln",
   "PreviewInSolutionExplorer": false
 }
