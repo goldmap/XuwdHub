@@ -7,7 +7,7 @@
     <title>@ViewData["Title"] - WebTest</title>
 
     <environment include="Development">
-        <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" />
+        <link rel="stylesheet" href="~/lib/bootstrap/css/bootstrap.css" />
         <link rel="stylesheet" href="~/css/site.css" />
     </environment>
     <environment exclude="Development">
@@ -41,9 +41,15 @@
     </nav>
 
     <partial name="_CookieConsentPartial" />
+    <div>
+        aa
+        <h1>111</h1>
+    </div>
 
     <div class="container body-content">
+        ss
         @RenderBody()
+
         <hr />
         <footer>
             <p>&copy; 2019 - WebTest</p>

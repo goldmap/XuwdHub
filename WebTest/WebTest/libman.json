@@ -1,11 +1,29 @@
 {
   "version": "1.0",
   "defaultProvider": "cdnjs",
+  "defaultDestination": "wwwroot/lib",
   "libraries": [
     {
       "library": "jquery@3.4.1",
-      "destination": "libs/jQuery_3.4.1",
-      "provider": "cdnjs"
+      "files": [
+        "core.js",
+        "jquery.js",
+        "jquery.min.js",
+        "jquery.min.map",
+        "jquery.slim.js",
+        "jquery.slim.min.js",
+        "jquery.slim.min.map"
+      ],
+      "provider": "cdnjs",
+      "destination": "wwwroot/lib/jquery"
+    },
+    {
+      "library": "twitter-bootstrap@4.3.1",
+      "files": [
+        "css/bootstrap-grid.css",
+        "js/bootstrap.js"
+      ],
+      "destination": "wwwroot/lib/bootstrap"
     }
   ]
 }
