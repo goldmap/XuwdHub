@@ -46,3 +46,8 @@ E:\Hub\XuwdHub\WebTest\WebTest\obj\Debug\netcoreapp2.1\WebTest.Views.pdb
 E:\Hub\XuwdHub\WebTest\WebTest\obj\Debug\netcoreapp2.1\WebTest.dll
 E:\Hub\XuwdHub\WebTest\WebTest\obj\Debug\netcoreapp2.1\WebTest.pdb
 E:\Hub\XuwdHub\WebTest\WebTest\obj\Debug\netcoreapp2.1\WebTest.csproj.CopyComplete
+G:\XuwdHub\WebTest\WebTest\obj\Debug\netcoreapp2.1\Razor\Views\_ViewStart.g.cshtml.cs
+G:\XuwdHub\WebTest\WebTest\obj\Debug\netcoreapp2.1\Razor\Views\Shared\Error.g.cshtml.cs
+G:\XuwdHub\WebTest\WebTest\obj\Debug\netcoreapp2.1\Razor\Views\Shared\_CookieConsentPartial.g.cshtml.cs
+G:\XuwdHub\WebTest\WebTest\obj\Debug\netcoreapp2.1\Razor\Views\Shared\_ValidationScriptsPartial.g.cshtml.cs
+G:\XuwdHub\WebTest\WebTest\obj\Debug\netcoreapp2.1\Razor\Views\_ViewImports.g.cshtml.cs
