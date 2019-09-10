@@ -12,25 +12,40 @@ namespace WebTest.Models
             : base(options)
         { }
 
-        public DbSet<Blog> Blogs { get; set; }
-        public DbSet<Post> Posts { get; set; }
+        public DbSet<JBlog> JBlogs { get; set; }
+        public DbSet<JPost> JPosts { get; set; }
+        public DbSet<JImage> JImages { get; set; }
+
     }
 
-    public class Blog
+    public class JBlog
     {
-        public int BlogId { get; set; }
+        public int JBlogId { get; set; }
+        public string Title { get; set; }
+        public string Subject { get; set; }
+        public string Author { get; set; }
         public string Url { get; set; }
 
-        public ICollection<Post> Posts { get; set; }
+        public ICollection<JPost> JPosts { get; set; }
     }
 
-    public class Post
+    public class JPost
     {
-        public int PostId { get; set; }
+        public int JPostId { get; set; }
         public string Title { get; set; }
         public string Content { get; set; }
 
         public int BlogId { get; set; }
-        public Blog Blog { get; set; }
+        public JBlog JBlog { get; set; }
     }
+    public class JImage
+    {
+        public int JImageId { get; set; }
+        public string Title { get; set; }
+        public string Subject { get; set; }
+        public string Author { get; set; }
+
+        public string Url { get; set; }
+    }
+
 }
