@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "E:\\Hub\\XuwdHub\\WebTest\\WebTest\\WebTest\\WebTest.csproj": {}
+    "E:\\xuwd\\VStudio\\WebTest\\WebTest\\WebTest\\WebTest.csproj": {}
   },
   "projects": {
-    "E:\\Hub\\XuwdHub\\WebTest\\WebTest\\WebTest\\WebTest.csproj": {
+    "E:\\xuwd\\VStudio\\WebTest\\WebTest\\WebTest\\WebTest.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "E:\\Hub\\XuwdHub\\WebTest\\WebTest\\WebTest\\WebTest.csproj",
+        "projectUniqueName": "E:\\xuwd\\VStudio\\WebTest\\WebTest\\WebTest\\WebTest.csproj",
         "projectName": "WebTest",
-        "projectPath": "E:\\Hub\\XuwdHub\\WebTest\\WebTest\\WebTest\\WebTest.csproj",
+        "projectPath": "E:\\xuwd\\VStudio\\WebTest\\WebTest\\WebTest\\WebTest.csproj",
         "packagesPath": "C:\\Users\\xuwd6\\.nuget\\packages\\",
-        "outputPath": "E:\\Hub\\XuwdHub\\WebTest\\WebTest\\WebTest\\obj\\",
+        "outputPath": "E:\\xuwd\\VStudio\\WebTest\\WebTest\\WebTest\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"

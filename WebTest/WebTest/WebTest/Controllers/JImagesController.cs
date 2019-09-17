@@ -17,8 +17,14 @@ namespace WebTest.Controllers
         {
             _context = context;
         }
-
+        /*
         // GET: JImages
+        public async Task<IActionResult> Index()
+        {
+            return View(await _context.JImages.ToListAsync());
+        }
+        */
+
         public async Task<IActionResult> Index()
         {
             return View(await _context.JImages.ToListAsync());
@@ -147,6 +153,13 @@ namespace WebTest.Controllers
         private bool JImageExists(int id)
         {
             return _context.JImages.Any(e => e.JImageId == id);
+        }
+
+        public IActionResult GetImage()
+        {
+            List<JImage> jImages = _context.JImages.ToList();
+            var result = new { success = true, data = jImages };
+            return Json(result);
         }
     }
 }
