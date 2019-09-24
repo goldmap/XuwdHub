@@ -98,7 +98,6 @@ E:\Hub\XuwdHub\WebTest\WebTest\WebTest\obj\Debug\netcoreapp2.1\Razor\Views\JBlog
 E:\Hub\XuwdHub\WebTest\WebTest\WebTest\obj\Debug\netcoreapp2.1\Razor\Views\JBlogs\Details.g.cshtml.cs
 E:\Hub\XuwdHub\WebTest\WebTest\WebTest\obj\Debug\netcoreapp2.1\Razor\Views\JBlogs\Edit.g.cshtml.cs
 E:\Hub\XuwdHub\WebTest\WebTest\WebTest\obj\Debug\netcoreapp2.1\Razor\Views\JBlogs\Index.g.cshtml.cs
-E:\Hub\XuwdHub\WebTest\WebTest\WebTest\obj\Debug\netcoreapp2.1\WebTest.csprojAssemblyReference.cache
 E:\Hub\XuwdHub\WebTest\WebTest\WebTest\obj\Debug\netcoreapp2.1\Razor\Views\JImages\Create.g.cshtml.cs
 E:\Hub\XuwdHub\WebTest\WebTest\WebTest\obj\Debug\netcoreapp2.1\Razor\Views\JImages\Delete.g.cshtml.cs
 E:\Hub\XuwdHub\WebTest\WebTest\WebTest\obj\Debug\netcoreapp2.1\Razor\Views\JImages\Details.g.cshtml.cs
@@ -146,3 +145,4 @@ E:\xuwd\VStudio\WebTest\WebTest\WebTest\obj\Debug\netcoreapp2.1\WebTest.dll
 E:\xuwd\VStudio\WebTest\WebTest\WebTest\obj\Debug\netcoreapp2.1\WebTest.pdb
 E:\xuwd\VStudio\WebTest\WebTest\WebTest\obj\Debug\netcoreapp2.1\WebTest.csproj.CopyComplete
 E:\xuwd\VStudio\WebTest\WebTest\WebTest\obj\Debug\netcoreapp2.1\WebTest.csprojAssemblyReference.cache
+E:\Hub\XuwdHub\WebTest\WebTest\WebTest\obj\Debug\netcoreapp2.1\WebTest.csprojAssemblyReference.cache

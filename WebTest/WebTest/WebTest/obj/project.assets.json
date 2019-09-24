@@ -12537,11 +12537,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "E:\\xuwd\\VStudio\\WebTest\\WebTest\\WebTest\\WebTest.csproj",
+      "projectUniqueName": "E:\\Hub\\XuwdHub\\WebTest\\WebTest\\WebTest\\WebTest.csproj",
       "projectName": "WebTest",
-      "projectPath": "E:\\xuwd\\VStudio\\WebTest\\WebTest\\WebTest\\WebTest.csproj",
+      "projectPath": "E:\\Hub\\XuwdHub\\WebTest\\WebTest\\WebTest\\WebTest.csproj",
       "packagesPath": "C:\\Users\\xuwd6\\.nuget\\packages\\",
-      "outputPath": "E:\\xuwd\\VStudio\\WebTest\\WebTest\\WebTest\\obj\\",
+      "outputPath": "E:\\Hub\\XuwdHub\\WebTest\\WebTest\\WebTest\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
