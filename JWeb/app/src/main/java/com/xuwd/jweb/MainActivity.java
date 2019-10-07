@@ -8,6 +8,7 @@ import android.os.Message;
 import android.util.Log;
 import android.view.TextureView;
 import android.view.View;
+import android.webkit.WebView;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -24,13 +25,15 @@ import static java.net.Proxy.Type.HTTP;
 
 public class MainActivity extends AppCompatActivity {
     private TextView textView;
+    private WebView webView;
     final  Handler mHandler = new Handler(){
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
             if(msg.what==1){
                 String str=(String) msg.obj;
-                textView.setText(str);
+                //textView.setText(str);
+                //webView.setText
             }
 
         }
@@ -42,23 +45,26 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         textView=findViewById(R.id.textView);
+        webView=findViewById(R.id.webView);
 
         Button sendButton = (Button) findViewById(R.id.btnSend);
         sendButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                test();
+                WebViewTest();
             }
         });
     }
 
     public void test(){
         OkHttpClient okHttpClient=new OkHttpClient();
-        Request request = new Request.Builder().url("http://www.baidu.com").build();
+        Request request = new Request.Builder().url("https://www.wentier.com").build();
 
         okHttpClient.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
+
+                Log.d("AAA","lianjie shibai了");
             }
             @Override
             public void onResponse(Call call, Response response) throws IOException {
@@ -76,5 +82,8 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    public void WebViewTest(){
+       webView.loadUrl("https://www.wentier.com/test");
+    }
 
 }

@@ -1,24 +1,26 @@
 {
   "format": 1,
   "restore": {
-    "E:\\Hub\\XuwdHub\\WebTest\\WebTest\\WebTest\\WebTest.csproj": {}
+    "D:\\MyGitHub\\XuwdHub\\WebTest\\WebTest\\WebTest\\WebTest.csproj": {}
   },
   "projects": {
-    "E:\\Hub\\XuwdHub\\WebTest\\WebTest\\WebTest\\WebTest.csproj": {
+    "D:\\MyGitHub\\XuwdHub\\WebTest\\WebTest\\WebTest\\WebTest.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "E:\\Hub\\XuwdHub\\WebTest\\WebTest\\WebTest\\WebTest.csproj",
+        "projectUniqueName": "D:\\MyGitHub\\XuwdHub\\WebTest\\WebTest\\WebTest\\WebTest.csproj",
         "projectName": "WebTest",
-        "projectPath": "E:\\Hub\\XuwdHub\\WebTest\\WebTest\\WebTest\\WebTest.csproj",
-        "packagesPath": "C:\\Users\\xuwd6\\.nuget\\packages\\",
-        "outputPath": "E:\\Hub\\XuwdHub\\WebTest\\WebTest\\WebTest\\obj\\",
+        "projectPath": "D:\\MyGitHub\\XuwdHub\\WebTest\\WebTest\\WebTest\\WebTest.csproj",
+        "packagesPath": "C:\\Users\\Administrator\\.nuget\\packages\\",
+        "outputPath": "D:\\MyGitHub\\XuwdHub\\WebTest\\WebTest\\WebTest\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
+          "C:\\Microsoft\\Xamarin\\NuGet\\",
           "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
         ],
         "configFilePaths": [
-          "C:\\Users\\xuwd6\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+          "C:\\Users\\Administrator\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Xamarin.Offline.config"
         ],
         "originalTargetFrameworks": [
           "netcoreapp2.1"
@@ -64,10 +66,16 @@
             }
           },
           "imports": [
-            "net461"
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48"
           ],
           "assetTargetFallback": true,
-          "warn": true
+          "warn": true,
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\3.0.100\\RuntimeIdentifierGraph.json"
         }
       }
     }
