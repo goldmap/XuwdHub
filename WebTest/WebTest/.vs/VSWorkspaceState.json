@@ -1,0 +1,14 @@
+{
+  "ExpandedNodes": [
+    "",
+    "\\WebTest",
+    "\\WebTest\\obj\\Debug",
+    "\\WebTest\\obj\\Debug\\netcoreapp2.1",
+    "\\WebTest\\obj\\Release",
+    "\\WebTest\\obj\\Release\\netcoreapp2.1\\PubTmp",
+    "\\WebTest\\obj\\Release\\netcoreapp2.1\\PubTmp\\TestProfilesForFilePreview",
+    "\\WebTest\\Properties"
+  ],
+  "SelectedNode": "\\WebTest\\WebTest.csproj",
+  "PreviewInSolutionExplorer": false
+}
